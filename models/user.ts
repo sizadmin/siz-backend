@@ -1,0 +1,40 @@
+import { IUser } from './../types/user';
+import { model, Schema } from 'mongoose';
+
+const userSchema: Schema = new Schema(
+    {
+        first_name: {
+            type: String,
+        },
+        last_name: {
+            type: String,
+        },
+        email: {
+            type: String,
+            required: true
+        },
+        phone_number: {
+            type: String
+        },
+        address: {
+            type: String
+        },
+        role: {
+            type: Schema.Types.ObjectId,
+            ref: 'Role',
+        },
+        password:{
+            type:String
+        },
+        isActive:{
+            type:Boolean,
+            default:false
+        }
+    },
+    {
+        timestamps: true,
+    }
+);
+
+
+export default model<IUser>('User', userSchema);
