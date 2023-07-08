@@ -40,7 +40,7 @@ let config = {
   url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
   headers: { 
     'Content-Type': 'application/json', 
-    'Authorization': 'Bearer EAAIl8Exy9ZCMBAPg1zMfZB29P1CoVwc808VMnMdinUbNZBtZBwuBQn9B2bajxejWbLkRECigTuWifuqLMcNk3dpJOgoWW1Xp1Mcnz1rZBHa9hn72EV3GiS4qZBVin6l6tvi7oVEofrSOumn3Kf6PILkfcbRUy5MaKEGWL9OLZB9rfTzkcAmJ46S3IR7i7fhFy1yrRX3pTqHNe26wS6aImhGkpBvbxKtzZBQZD'
+    'Authorization': 'Bearer EAAIl8Exy9ZCMBAMzDV2UjtgBD9v4tr58p7auaT4S4nQay1btQ61lKJx0VFnUEq86AROVyK9ZAKp42O0R4uXuqVed04dVckklh8xGmRWt1pVKhpZAUBpbAES9RBFoEUbQz4UEDKBZCioydf7k57ZCyRtaSGXvXSyDq5ZAvstrAQkAZAkZCvFkPYMl1ciTeZCofA23PFCt67mssDbtz9aJRdTWrZCc0KhOiHYQsZD'
   },
   data : data
 };
