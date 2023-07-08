@@ -1,6 +1,6 @@
 import axios from 'axios';
-// import { IOrder } from '../../../types/order';
-// import Order from '../../../models/order';
+import { IOrder } from '../../../types/order';
+import Order from '../../../models/order';
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
 
@@ -10,9 +10,18 @@ import axios from 'axios';
 const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
     try {
         const { body } = req;
-
-
         console.log(body);
+        const newOrder: IOrder = new Order({
+            order_id: body.id,
+            order_date: body.created_at,
+            email: body.contact_email,
+            phone_number: body.phone,
+            order_details: body,
+            order_number: body.order_number,
+            total_price: body.total_price
+
+        });
+        const savedOrder: IOrder = await newOrder.save();
         res.status(200).json({
             success: true,
             message: "Shopify products fetched successfully.",
