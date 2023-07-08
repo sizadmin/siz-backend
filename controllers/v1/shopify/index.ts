@@ -3,7 +3,6 @@ import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
 import Product from '../../../models/product';
-const { SHOPIFY_TOKEN } = process.env;
 
 
 const fetchShopifyOrder = async (req: any, res: any) => {
@@ -12,10 +11,21 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 
         let config = {
             headers: {
-                'X-Shopify-Access-Token': SHOPIFY_TOKEN,
+                'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
             },
         };
         const response = await axios.get(url, config);
+
+
+        // const response = await axios.post(
+        //     '/api/webhook',
+        //     {},
+        //     {
+        //       headers: {
+        //         'X-Shopify-Hmac-Sha256': process.env.REACT_APP_SHOPIFY_WEBHOOK_SECRET,
+        //       },
+        //     }
+        //   );
 
         for await (const order of response.data.orders) {
 
@@ -57,7 +67,6 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 }
 
 const fetchShopifyProducts = async (req: any, res: any) => {
-    console.log(SHOPIFY_TOKEN, process.env)
     try {
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
 
@@ -69,6 +78,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         const response = await axios.get(url, config);
 
         for await (const product of response.data.products) {
+            console.log(response.data.products.length)
 
             const findProduct: Array<IProduct> | null = await Product.find({
                 $and: [
@@ -105,7 +115,6 @@ const fetchShopifyProducts = async (req: any, res: any) => {
 }
 
 const fetchShopifyLenders = async (req: any, res: any) => {
-    console.log(SHOPIFY_TOKEN, process.env)
     try {
         let url = `https://siz-ae.myshopify.com/admin/products/7697209852124/metafields.json`;
 
@@ -152,7 +161,28 @@ const fetchShopifyLenders = async (req: any, res: any) => {
     }
 }
 
+const getOrderById = async (req: any, res: any) => {
+    try {
+        let orderID = req.params.id;
+        console.log(orderID)
+        const findOrder: Array<IOrder> | null = await Order.find({ order_id: orderID });
+        console.log(findOrder)
 
 
+        res.status(200).json({
+            success: true,
+            message: "Shopify product fetched successfully.",
+            data: findOrder
+        });
+    } catch (err) {
+        console.error("Failed to fetch shopify products:", err);
+        res
+            .status(500)
+            .json({ success: false, error: "Failed to fetch shopify product" });
 
-export { fetchShopifyOrder, fetchShopifyProducts ,fetchShopifyLenders}
+    }
+
+}
+
+
+export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, getOrderById }

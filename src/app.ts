@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import whatsappRoutes from "./../routes/whatsapp_messsaging_role_route";
 import roleRoute from "./../routes/rolesRoutes";
 import userRoute from "./../routes/userRoutes";
+import webhooks from "./../routes/webhooks";
+
 
 
 require("dotenv").config();
@@ -28,6 +30,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/v1/', roleRoute)
 app.use('/api/v1/', whatsappRoutes)
 app.use('/api/v1/', userRoute)
+app.use('/api/v1/', webhooks)
+
 
 
 app.get("/", (req, res) => res.send("Welcome to My-Backend!"));

@@ -19,22 +19,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchShopifyLenders = exports.fetchShopifyProducts = exports.fetchShopifyOrder = void 0;
+exports.getOrderById = exports.fetchShopifyLenders = exports.fetchShopifyProducts = exports.fetchShopifyOrder = void 0;
 const axios_1 = __importDefault(require("axios"));
 const order_1 = __importDefault(require("../../../models/order"));
 const product_1 = __importDefault(require("../../../models/product"));
-const { SHOPIFY_TOKEN } = process.env;
 const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     try {
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-06-20T00:00:00-00:00`;
         let config = {
             headers: {
-                'X-Shopify-Access-Token': SHOPIFY_TOKEN,
+                'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
             },
         };
         const response = yield axios_1.default.get(url, config);
         try {
+            // const response = await axios.post(
+            //     '/api/webhook',
+            //     {},
+            //     {
+            //       headers: {
+            //         'X-Shopify-Hmac-Sha256': process.env.REACT_APP_SHOPIFY_WEBHOOK_SECRET,
+            //       },
+            //     }
+            //   );
             for (var _d = true, _e = __asyncValues(response.data.orders), _f; _f = yield _e.next(), _a = _f.done, !_a;) {
                 _c = _f.value;
                 _d = false;
@@ -87,7 +95,6 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.fetchShopifyOrder = fetchShopifyOrder;
 const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _g, e_2, _h, _j;
-    console.log(SHOPIFY_TOKEN, process.env);
     try {
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
         let config = {
@@ -102,6 +109,7 @@ const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 _k = false;
                 try {
                     const product = _j;
+                    console.log(response.data.products.length);
                     const findProduct = yield product_1.default.find({
                         $and: [
                             { product_id: product.id },
@@ -145,7 +153,6 @@ const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, fun
 });
 exports.fetchShopifyProducts = fetchShopifyProducts;
 const fetchShopifyLenders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(SHOPIFY_TOKEN, process.env);
     try {
         let url = `https://siz-ae.myshopify.com/admin/products/7697209852124/metafields.json`;
         let config = {
@@ -185,4 +192,24 @@ const fetchShopifyLenders = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.fetchShopifyLenders = fetchShopifyLenders;
+const getOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let orderID = req.params.id;
+        console.log(orderID);
+        const findOrder = yield order_1.default.find({ order_id: orderID });
+        console.log(findOrder);
+        res.status(200).json({
+            success: true,
+            message: "Shopify product fetched successfully.",
+            data: findOrder
+        });
+    }
+    catch (err) {
+        console.error("Failed to fetch shopify products:", err);
+        res
+            .status(500)
+            .json({ success: false, error: "Failed to fetch shopify product" });
+    }
+});
+exports.getOrderById = getOrderById;
 //# sourceMappingURL=index.js.map
