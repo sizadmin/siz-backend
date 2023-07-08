@@ -35,7 +35,8 @@ const saveOrderInDb = async (body :  any) => {
         phone_number: body.phone,
         order_details: body,
         order_number: body.order_number,
-        total_price: body.total_price
+        total_price: body.total_price,
+        order_items: body.line_items,
 
     });
     const savedOrder: IOrder = await newOrder.save();

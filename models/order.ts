@@ -24,6 +24,9 @@ const orderSchema: Schema = new Schema(
         order_details: {
             type: Schema.Types.Mixed,
         },
+        order_items : {
+            type:Schema.Types.Mixed,
+        }
     },
     {
         timestamps: true,
