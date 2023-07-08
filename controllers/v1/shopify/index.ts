@@ -180,13 +180,9 @@ const getOrderById = async (req: any, res: any) => {
             .status(500)
             .json({ success: false, error: "Failed to fetch shopify product" });
 
-<<<<<<< HEAD
     }
 
 }
 
 
 export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, getOrderById }
-=======
-export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders }
->>>>>>> 1fac0e1bf14dce96490111d46112af4db5ec8b8e
