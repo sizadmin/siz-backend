@@ -12,7 +12,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         const { body } = req;
 
 
-        console
+        console.log(body);
         res.status(200).json({
             success: true,
             message: "Shopify products fetched successfully.",
