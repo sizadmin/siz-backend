@@ -10,6 +10,7 @@ import axios from 'axios';
 const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
     try {
         const { body } = req;
+        console.log(body);
         res.status(200).json({
             success: true,
             message: "Shopify products fetched successfully.",
