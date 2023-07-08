@@ -3,7 +3,6 @@ import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
 import Product from '../../../models/product';
-const { SHOPIFY_TOKEN } = process.env;
 
 
 const fetchShopifyOrder = async (req: any, res: any) => {
@@ -12,10 +11,21 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 
         let config = {
             headers: {
-                'X-Shopify-Access-Token': SHOPIFY_TOKEN,
+                'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
             },
         };
         const response = await axios.get(url, config);
+
+
+        // const response = await axios.post(
+        //     '/api/webhook',
+        //     {},
+        //     {
+        //       headers: {
+        //         'X-Shopify-Hmac-Sha256': process.env.REACT_APP_SHOPIFY_WEBHOOK_SECRET,
+        //       },
+        //     }
+        //   );
 
         for await (const order of response.data.orders) {
 
@@ -57,7 +67,6 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 }
 
 const fetchShopifyProducts = async (req: any, res: any) => {
-    console.log(SHOPIFY_TOKEN, process.env)
     try {
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
 
@@ -105,7 +114,6 @@ const fetchShopifyProducts = async (req: any, res: any) => {
 }
 
 const fetchShopifyLenders = async (req: any, res: any) => {
-    console.log(SHOPIFY_TOKEN, process.env)
     try {
         let url = `https://siz-ae.myshopify.com/admin/products/7697209852124/metafields.json`;
 
@@ -155,4 +163,4 @@ const fetchShopifyLenders = async (req: any, res: any) => {
 
 
 
-export { fetchShopifyOrder, fetchShopifyProducts ,fetchShopifyLenders}
+export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders }
