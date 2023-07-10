@@ -77,7 +77,7 @@ const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: a
       'Content-Type': 'application/json',
       'Authorization': 'Bearer Token EAAIl8Exy9ZCMBADVac6pl0ARqgiqLcdcDYAb7Bxv8ZAOfEVlDtJLZCL6Q370dwZCs2RshR01UyGQcEcq9SkWZCQGP1we8yZAMgfMkkwNu0OZBiNZB2tfcmZBtq57HI9vLD9YupIEBbVB3qAUIzZC0Lu8O9ckZAa00iPHqXWZAZCcJVm07PDCdYY6hueSm27KQayZAhWEB22OWKOc1PlnhzFmrFUsntmcFVPTpkSBcZD'
     },
-    data: JSON.stringify(payload)
+    data: payload
   };
 
   axios.request(config)
