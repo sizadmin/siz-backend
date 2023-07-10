@@ -29,7 +29,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 }
 
 
-const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) {
+const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
   let payload = {
     messaging_product: 'whatsapp',
     to: toNumber,
