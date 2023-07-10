@@ -53,7 +53,7 @@ const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: a
             { type: 'text', text: clientName },
             { type: 'text', text: itemName },
             { type: 'text', text: duration },
-			{ type: 'text', text: startDate },
+			      { type: 'text', text: startDate },
             { type: 'text', text: endDate }
           ]
         },
@@ -68,7 +68,7 @@ const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: a
       ]
     }
   };
-
+console.log(orderId,"order id");
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
