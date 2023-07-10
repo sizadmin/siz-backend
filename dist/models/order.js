@@ -23,6 +23,9 @@ const orderSchema = new mongoose_1.Schema({
     order_details: {
         type: mongoose_1.Schema.Types.Mixed,
     },
+    order_items: {
+        type: mongoose_1.Schema.Types.Mixed,
+    }
 }, {
     timestamps: true,
 });

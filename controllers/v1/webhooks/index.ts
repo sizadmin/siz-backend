@@ -12,7 +12,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         const { body } = req;
         console.log(body);
         saveOrderInDb(body);
-        sendWhatsappMessageToRenter(body);
+        sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery","https://siz.ae/cdn/shop/products/NADINEMERABIFREYADRESS2_600x.jpg?v=1649939352","Annabel","Freya Dress","4 Days","10 July 2023","13 July 2023","5349092393180");
         res.status(200).json({
             success: true,
             message: "Shopify products fetched successfully.",
@@ -29,10 +29,70 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 }
 
 
+const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) {
+  let payload = {
+    messaging_product: 'whatsapp',
+    to: toNumber,
+    type: 'template',
+    template: {
+      name: templateName,
+      language: {
+        code: 'en_US',
+        policy: 'deterministic'
+      },
+      components: [
+		{        
+		"type": "header",      
+		"parameters": [         
+			{ "type": "image", "image": {  "link": headerImageUrl, } }     
+		]      
+		},
+        {
+          type: 'body',
+          parameters: [
+            { type: 'text', text: clientName },
+            { type: 'text', text: itemName },
+            { type: 'text', text: duration },
+			{ type: 'text', text: startDate },
+            { type: 'text', text: endDate }
+          ]
+        },
+        {
+          type: 'button',
+          sub_type: 'url',
+          index: '0',
+          parameters: [
+            { type: 'text', text: orderId }
+          ]
+        }
+      ]
+    }
+  };
+
+  const config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer Token EAAIl8Exy9ZCMBADVac6pl0ARqgiqLcdcDYAb7Bxv8ZAOfEVlDtJLZCL6Q370dwZCs2RshR01UyGQcEcq9SkWZCQGP1we8yZAMgfMkkwNu0OZBiNZB2tfcmZBtq57HI9vLD9YupIEBbVB3qAUIzZC0Lu8O9ckZAa00iPHqXWZAZCcJVm07PDCdYY6hueSm27KQayZAhWEB22OWKOc1PlnhzFmrFUsntmcFVPTpkSBcZD'
+    },
+    data: JSON.stringify(payload)
+  };
+
+  axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
 const sendWhatsappMessageToRenter = async (body: any ) => {
     //const renterPhoneNumber = body.phone ;
     const axios = require('axios');
-let data = '{\n    "messaging_product": "whatsapp",\n    "to": "971561114006",\n    "type": "template",\n    "template": {\n       "name": "order_confirmed ",\n       "language": {\n           "code": "en_US",\n           "policy": "deterministic"\n       },\n       "components": [\n          {\n           "type": "body",\n           "parameters": [\n               {\n                   "type": "text",\n                   "text": "Annabel"\n               },\n                {\n                   "type": "text",\n                   "text": "Freya Dress"\n               }, {\n                   "type": "text",\n                   "text": "07 July 2023"\n               } ]\n         },\n         {\n          "type": "button",\n          "sub_type": "url",\n           "index": "0",\n          "parameters": [\n            {\n              "type": "text",\n              "text": "23493282245"\n            }\n          ]\n        }\n\n       ]\n    }\n}';
+let data = '{\n    "messaging_product": "whatsapp",\n    "to": "971561114006",\n    "type": "template",\n    "template": {\n       "name": "order_placement_with_delivery",\n       "language": {\n           "code": "en_US",\n           "policy": "deterministic"\n       },\n       "components": [\n          {\n           "type": "body",\n           "parameters": [\n               {\n                   "type": "text",\n                   "text": "Annabel"\n               },\n                {\n                   "type": "text",\n                   "text": "Freya Dress"\n               }, {\n                   "type": "text",\n                   "text": "07 July 2023"\n               } ]\n         },\n         {\n          "type": "button",\n          "sub_type": "url",\n           "index": "0",\n          "parameters": [\n            {\n              "type": "text",\n              "text": "23493282245"\n            }\n          ]\n        }\n\n       ]\n    }\n}';
 
 let config = {
   method: 'post',
