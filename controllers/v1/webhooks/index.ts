@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
+import Logo from "../,,/src/assets/images/logo.png";
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
 
@@ -12,7 +13,16 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         const { body } = req;
         console.log(body);
         saveOrderInDb(body);
-        sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery","https://siz.ae/cdn/shop/products/NADINEMERABIFREYADRESS2_600x.jpg?v=1649939352","Annabel","Freya Dress","4 Days","10 July 2023","13 July 2023","5349092393180");
+
+        to_Number = body.phone ;
+        image_url={Logo}
+        renter_name=body.order_details.billing_address.first_name 
+        item_name=body.order_details.line_items[0].name.split("-")[0]
+        duration = body.order_details.line_items[0].name.split("/")[3]
+        start_date = body.order_details.line_items[0].properties[0].value;
+        order_id = body.order_details.id
+
+        sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery",image_url,renter_name,item_name,duration,start_date,"13 July 2023",order_id);
         res.status(200).json({
             success: true,
             message: "Shopify products fetched successfully.",
