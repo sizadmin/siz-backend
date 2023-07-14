@@ -21,6 +21,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         let duration = body.order_details.line_items[0].name.split("/")[3]
         let start_date = body.order_details.line_items[0].properties[0].value;
         let order_id = body.order_details.id
+        console.log(body)
         console.log(renter_name)
         console.log(item_name)
         console.log(duration)
