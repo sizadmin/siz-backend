@@ -37,14 +37,14 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
   const sendOrderPlacementMessageToRenter =  async (body:any) => { 
 console.log(body);
         let to_Number = body.phone ;
-        let price = body.billing_address.first_name
-        console.log(to_Number+"  "+price)
+        let clientName = body.billing_address.first_name
         let headerImageUrl="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
-        let clientName=body.billing_address.first_name 
         let itemName=body.line_items[0].name.split("-")[0]
         let duration = body.line_items[0].name.split("/")[3]
-        let startDate = body.line_items[0].properties[0].value;
-        let endDate = body.line_items[0].properties[0].value;
+       // let startDate = body.line_items[0].properties[0].value;
+       let startDate = "14 July 2023"
+       let startDate = "17 July 2023"
+       // let endDate = body.line_items[0].properties[0].value;
         let orderId = body.id
         
         console.log(clientName)
