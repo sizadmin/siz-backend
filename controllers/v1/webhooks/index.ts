@@ -14,21 +14,9 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         console.log(body);
         saveOrderInDb(body);
 
-        let to_Number = body.phone ;
-        let image_url="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
-        console.log("BODY   "+req.body)
-        let renter_name=body.order_details.billing_address.first_name 
-        let item_name=body.order_details.line_items[0].name.split("-")[0]
-        let duration = body.order_details.line_items[0].name.split("/")[3]
-        let start_date = body.order_details.line_items[0].properties[0].value;
-        let order_id = body.order_details.id
         
-        console.log(renter_name)
-        console.log(item_name)
-        console.log(duration)
-        console.log(start_date)
-        console.log(order_id)
-        sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery",image_url,renter_name,item_name,duration,start_date,"13 July 2023",order_id);
+        sendOrderPlacementMessageToRenter(body)
+        //sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery",image_url,renter_name,item_name,duration,start_date,"13 July 2023",order_id);
         res.status(200).json({
             success: true,
             message: "Shopify products fetched successfully.",
@@ -45,13 +33,30 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 }
 
 
-const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
-  let payload = {
+//const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
+  const sendOrderPlacementMessageToRenter =  async (body:any) => { 
+
+        let to_Number = body.phone ;
+        let headerImageUrl="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
+        let clientName=body.order_details.billing_address.first_name 
+        let itemName=body.order_details.line_items[0].name.split("-")[0]
+        let duration = body.order_details.line_items[0].name.split("/")[3]
+        let startDate = body.order_details.line_items[0].properties[0].value;
+        let endDate = body.order_details.line_items[0].properties[0].value;
+        let orderId = body.order_details.id
+        
+        console.log(clientName)
+        console.log(itemName)
+        console.log(duration)
+        console.log(startDate)
+        console.log(orderId)
+
+let payload = {
     messaging_product: 'whatsapp',
-    to: toNumber,
+    to: "971561114006",
     type: 'template',
     template: {
-      name: templateName,
+      name: "order_placement_with_delivery",
       language: {
         code: 'en_US',
         policy: 'deterministic'
