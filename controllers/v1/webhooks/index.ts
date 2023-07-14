@@ -16,7 +16,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 
         let to_Number = body.phone ;
         let image_url="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
-        console.log("BODY   "+body)
+        console.log("BODY   "+res.body)
         let renter_name=body.order_details.billing_address.first_name 
         let item_name=body.order_details.line_items[0].name.split("-")[0]
         let duration = body.order_details.line_items[0].name.split("/")[3]
