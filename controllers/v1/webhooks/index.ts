@@ -43,7 +43,7 @@ console.log(body);
         let duration = body.line_items[0].name.split("/")[3]
        // let startDate = body.line_items[0].properties[0].value;
        let startDate = "14 July 2023"
-       let startDate = "17 July 2023"
+       let endDate = "17 July 2023"
        // let endDate = body.line_items[0].properties[0].value;
         let orderId = body.id
         
