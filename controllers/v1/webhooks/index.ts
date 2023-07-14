@@ -40,7 +40,7 @@ console.log(body);
         let clientName = body.billing_address.first_name
         let headerImageUrl="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
         let itemName=body.line_items[0].name.split("-")[0]
-        let duration = (body.line_items[0].name.split("/").length > 0 ) ? body.line_items[0].name.split("/")[3] : "Not Found" ;
+        let duration = (body.line_items[0].name.split("/").length > 3 ) ? body.line_items[0].name.split("/")[3] : "Not Found" ;
         let startDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
         let endDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
        console.log(startDate)
