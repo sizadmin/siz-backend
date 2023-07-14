@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
-//import Logo from "logo.png";
+
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
 
@@ -35,7 +35,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 
 //const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
   const sendOrderPlacementMessageToRenter =  async (body:any) => { 
-
+console.log(body);
         let to_Number = body.phone ;
         let headerImageUrl="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
         let clientName=body.order_details.billing_address.first_name 
