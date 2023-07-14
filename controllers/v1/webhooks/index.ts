@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
-import Logo from "../../src/assets/images/logo.png";
+//import Logo from "logo.png";
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
 
@@ -15,7 +15,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         saveOrderInDb(body);
 
         let to_Number = body.phone ;
-        let image_url={Logo}
+        let image_url="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
         let renter_name=body.order_details.billing_address.first_name 
         let item_name=body.order_details.line_items[0].name.split("-")[0]
         let duration = body.order_details.line_items[0].name.split("/")[3]
