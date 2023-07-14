@@ -40,7 +40,7 @@ console.log(body);
         let clientName = body.billing_address.first_name
         let headerImageUrl="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
         let itemName=body.line_items[0].name.split("-")[0]
-        let duration = body.line_items[0].name.split("/")[3]
+        let duration = body.line_items[0].name
        // let startDate = body.line_items[0].properties[0].value;
        let startDate = "14 July 2023"
        let endDate = "17 July 2023"
