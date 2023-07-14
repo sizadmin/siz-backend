@@ -37,6 +37,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
   const sendOrderPlacementMessageToRenter =  async (body:any) => { 
 console.log(body);
         let to_Number = body.phone ;
+        console.log(to_Number)
         let headerImageUrl="https://logistics.siz.ae/static/media/LOGO.0fb7ba4f97cb1437570b.jpeg"
         let clientName=body.billing_address.first_name 
         let itemName=body.line_items[0].name.split("-")[0]
