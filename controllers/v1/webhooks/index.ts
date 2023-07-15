@@ -57,7 +57,7 @@ console.log(body);
 
 let payload = {
     messaging_product: 'whatsapp',
-    to: "971561114006",
+    to: "+971561114006",
     type: 'template',
     template: {
       name: "order_placement_with_delivery",
