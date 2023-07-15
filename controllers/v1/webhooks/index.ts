@@ -33,32 +33,36 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 }
 
 
-//const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
-  const sendOrderPlacementMessageToRenter =  async (body:any) => { 
-console.log(body);
+        //const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
+const sendOrderPlacementMessageToRenter =  async (body:any) => { 
+        console.log(body);
         let to_Number = body.phone ;
         let clientName = body.billing_address.first_name
         let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/order_received_15.png"
-        //let itemName=body.line_items[0].name.split("-")[0]
-        //let duration = (body.line_items[0].name.split("/").length >  3) ? body.line_items[0].name.split("/")[3] : "Not Found" ;
-        let name = "Freya Dress - S/M / Black / 4 Days"
-        let dateString = "June 29, 2023 to July 3, 2023"
-        let itemName=name.split("-")[0]
-        let duration = (name.split("/").length >  3) ? name.split("/")[3] : "Not Found" ;
-        
-        //let startDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
-        //let endDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
-
+        let line_items_array = body.line_items ;
+        let arrayLength = line_items_array.length ;
+        let itemName  = "";
+        let duration = "" ;
+        let dateString = "" ;
+        if(arrayLength.length > 0){
+            itemName = line_items_array[0].name.split("-")[0] + "And" + (arrayLength-1) + "Others" ; 
+            duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+            if(line_items_array[0].properties.length > 0 ){
+              let key = line_items_array[0].properties[0].name ;
+              if(key == "Date"){
+                dateString = line_items_array[0].properties[0].value ;
+              }
+            }else{
+              dateString = "Not Found" ;
+            } 
+        }else{
+          itemName = "Not Found" ;
+          duration = "Not Found" ;
+        }
         let startDate = (dateString.length > 0) ? dateString.split("to")[0] : "Not Found";
         let endDate = (dateString.length > 0) ? dateString.split("to")[1]: "Not Found";
-       
-       
         console.log(startDate)
-        //let startDate = "14 July 2023"
-      // let endDate = "17 July 2023"
-       // let endDate = body.line_items[0].properties[0].value;
         let orderId = body.id
-        
         console.log(clientName)
         console.log(itemName)
         console.log(duration)
