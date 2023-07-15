@@ -118,7 +118,7 @@ console.log(orderId,"order id");
     },
     data: payload
   };
-
+if(itemName != "Not Found"){
   axios.request(config)
     .then((response) => {
       console.log(JSON.stringify(response.data));
@@ -126,6 +126,9 @@ console.log(orderId,"order id");
     .catch((error) => {
       console.log(error);
     });
+  }else{
+    console.log("No item found to send whatsapp notification")
+  }
 }
 
 const sendWhatsappMessageToRenter = async (body: any ) => {
