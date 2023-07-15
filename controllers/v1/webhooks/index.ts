@@ -83,7 +83,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
 
 let payload = {
     messaging_product: 'whatsapp',
-    to: "+971588086958",
+    to: to_Number,
     type: 'template',
     template: {
       name: "order_placement_with_delivery",
@@ -101,7 +101,7 @@ let payload = {
         {
           type: 'body',
           parameters: [
-            { type: 'text', text: "Annabel" },
+            { type: 'text', text: clientName },
             { type: 'text', text: itemName },
             { type: 'text', text: duration },
 			      { type: 'text', text: startDate },
