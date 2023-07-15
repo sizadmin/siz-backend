@@ -39,11 +39,21 @@ console.log(body);
         let to_Number = body.phone ;
         let clientName = body.billing_address.first_name
         let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/order_received_15.png"
-        let itemName=body.line_items[0].name.split("-")[0]
-        let duration = (body.line_items[0].name.split("/").length >  3) ? body.line_items[0].name.split("/")[3] : "Not Found" ;
-        let startDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
-        let endDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
-       console.log(startDate)
+        //let itemName=body.line_items[0].name.split("-")[0]
+        //let duration = (body.line_items[0].name.split("/").length >  3) ? body.line_items[0].name.split("/")[3] : "Not Found" ;
+        let name = "Freya Dress - S/M / Black / 4 Days"
+        let dateString = "June 29, 2023 to July 3, 2023"
+        let itemName=name.split("-")[0]
+        let duration = (name.split("/").length >  3) ? name.split("/")[3] : "Not Found" ;
+        
+        //let startDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
+        //let endDate = (body.line_items[0].properties.length > 0) ? body.line_items[0].properties[0].value : "Not Found";
+
+        let startDate = (dateString.length > 0) ? dateString.split("to")[0] : "Not Found";
+        let endDate = (dateString.length > 0) ? dateString.split("to")[1]: "Not Found";
+       
+       
+        console.log(startDate)
         //let startDate = "14 July 2023"
       // let endDate = "17 July 2023"
        // let endDate = body.line_items[0].properties[0].value;
