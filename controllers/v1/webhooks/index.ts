@@ -83,7 +83,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
 
 let payload = {
     messaging_product: 'whatsapp',
-    to: "+971561114006",
+    to: "+971588086958",
     type: 'template',
     template: {
       name: "order_placement_with_delivery",
@@ -101,7 +101,7 @@ let payload = {
         {
           type: 'body',
           parameters: [
-            { type: 'text', text: clientName },
+            { type: 'text', text: "Annabel" },
             { type: 'text', text: itemName },
             { type: 'text', text: duration },
 			      { type: 'text', text: startDate },
@@ -146,7 +146,7 @@ if(itemName != "Not Found"){
 const sendWhatsappMessageToRenter = async (body: any ) => {
     //const renterPhoneNumber = body.phone ;
     const axios = require('axios');
-let data = '{\n    "messaging_product": "whatsapp",\n    "to": "971561114006",\n    "type": "template",\n    "template": {\n       "name": "order_placement_with_delivery",\n       "language": {\n           "code": "en_US",\n           "policy": "deterministic"\n       },\n       "components": [\n          {\n           "type": "body",\n           "parameters": [\n               {\n                   "type": "text",\n                   "text": "Annabel"\n               },\n                {\n                   "type": "text",\n                   "text": "Freya Dress"\n               }, {\n                   "type": "text",\n                   "text": "07 July 2023"\n               } ]\n         },\n         {\n          "type": "button",\n          "sub_type": "url",\n           "index": "0",\n          "parameters": [\n            {\n              "type": "text",\n              "text": "23493282245"\n            }\n          ]\n        }\n\n       ]\n    }\n}';
+let data = '{\n    "messaging_product": "whatsapp",\n    "to": "+971588086958",\n    "type": "template",\n    "template": {\n       "name": "order_placement_with_delivery",\n       "language": {\n           "code": "en_US",\n           "policy": "deterministic"\n       },\n       "components": [\n          {\n           "type": "body",\n           "parameters": [\n               {\n                   "type": "text",\n                   "text": "Annabel"\n               },\n                {\n                   "type": "text",\n                   "text": "Freya Dress"\n               }, {\n                   "type": "text",\n                   "text": "07 July 2023"\n               } ]\n         },\n         {\n          "type": "button",\n          "sub_type": "url",\n           "index": "0",\n          "parameters": [\n            {\n              "type": "text",\n              "text": "23493282245"\n            }\n          ]\n        }\n\n       ]\n    }\n}';
 
 let config = {
   method: 'post',
