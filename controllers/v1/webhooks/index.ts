@@ -45,7 +45,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         let duration = "" ;
         let dateString = "" ;
         console.log(arrayLength);
-        if(arrayLength.length > 0){
+        if(arrayLength > 1){
             itemName = line_items_array[0].name.split("-")[0] + "And" + (arrayLength-1) + "Others" ; 
             duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
             if(line_items_array[0].properties.length > 0 ){
@@ -56,8 +56,12 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
             }else{
               dateString = "Not Found" ;
             } 
+        }else if(arrayLength == 1){
+          itemName = line_items_array[0].name.split("-")[0] ; 
+          duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+            
         }else{
-          itemName = "Not Found" ;
+          itemName = "Not Found";
           duration = "Not Found" ;
         }
         let startDate = (dateString.length > 0) ? dateString.split("to")[0] : "Not Found";
