@@ -44,7 +44,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         let itemName  = "";
         let duration = "" ;
         let dateString = "" ;
-        console(arrayLength);
+        console.log(arrayLength);
         if(arrayLength.length > 0){
             itemName = line_items_array[0].name.split("-")[0] + "And" + (arrayLength-1) + "Others" ; 
             duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
