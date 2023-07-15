@@ -36,7 +36,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         //const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
 const sendOrderPlacementMessageToRenter =  async (body : any) => { 
         console.log(body);
-        let to_Number = body.phone ;
+        let to_Number = (body.billing_address.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
         let clientName = (body.billing_address.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
         let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/order_received_15.png"
         let line_items_array = body.line_items ;
