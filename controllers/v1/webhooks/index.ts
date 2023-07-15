@@ -59,7 +59,14 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         }else if(arrayLength == 1){
           itemName = line_items_array[0].name.split("-")[0] ; 
           duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
-            
+          if(line_items_array[0].properties.length > 0 ){
+            let key = line_items_array[0].properties[0].name ;
+            if(key == "Date"){
+              dateString = line_items_array[0].properties[0].value ;
+            }
+          }else{
+            dateString = "Not Found" ;
+          } 
         }else{
           itemName = "Not Found";
           duration = "Not Found" ;
