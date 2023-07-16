@@ -1,10 +1,12 @@
 import { Router } from 'express';
-import { getOrderDeliveryStatus,newOrderStatus, updateOrderStatus } from '../controllers/v1/orders';
+import { getDashboardOrders, getOrderDeliveryStatus,newOrderStatus, updateOrderStatus } from '../controllers/v1/orders';
 const router: Router = Router();
 
-router.get('/order-status/:id', getOrderDeliveryStatus);
-router.post('/order-status/:id',newOrderStatus );
-router.put('/order-status/:id',updateOrderStatus );
+router.get('/:id', getOrderDeliveryStatus);
+router.post('/:id',newOrderStatus );
+router.put('/:id',updateOrderStatus );
+
+
 
 
 export default router;

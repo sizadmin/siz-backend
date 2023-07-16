@@ -208,8 +208,6 @@ const newOrderStatus = async (req: any, res: any) => {
             orderID: body.orderID,
             product_delivery_date: body.product_delivery_date,
             product_pickup_date: body.product_pickup_date,
-            product_delivery_timeslot: body.product_delivery_timeslot,
-            product_pickup_timeslot: body.product_pickup_timeslot,
             notes: body.notes
         });
 
@@ -257,5 +255,26 @@ const updateOrderStatus = async (req: any, res: any) => {
 }
 
 
+const getDashboardOrders = async (req: any, res: any) => {
+    try {
+        const findOrder: Array<IOrder> | null = await Order.find({}, 'order_id email order_details.phone order_details.customer.first_name order_details.customer.last_name order_number total_price order_details.line_items  order_details.order_status_url');
+        res.status(200).json({
+            success: true,
+            message: "Orders data is fetched successfully.",
+            data: findOrder
+        });
 
-export { getOrderDeliveryStatus, newOrderStatus, updateOrderStatus }
+
+
+    } catch (error) {
+        // Handle errors and send an error response back to the client
+        console.error("Failed to fetch  order status:", error);
+        res
+            .status(500)
+            .json({ success: false, error: "Failed to fetch order status", data: error });
+    }
+}
+
+
+
+export { getOrderDeliveryStatus, newOrderStatus, updateOrderStatus, getDashboardOrders }
