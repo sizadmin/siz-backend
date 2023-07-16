@@ -12,6 +12,12 @@ const productSchema: Schema = new Schema(
         product_pickup_date: {
             type: Date,
         },
+        product_delivery_timeslot: {
+            type: String,
+        },
+        product_pickup_timeslot: {
+            type: String,
+        },
         notes:{
             type:String
         }
