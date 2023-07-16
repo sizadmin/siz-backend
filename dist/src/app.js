@@ -12,6 +12,7 @@ const whatsapp_messsaging_role_route_1 = __importDefault(require("./../routes/wh
 const rolesRoutes_1 = __importDefault(require("./../routes/rolesRoutes"));
 const userRoutes_1 = __importDefault(require("./../routes/userRoutes"));
 const webhooks_1 = __importDefault(require("./../routes/webhooks"));
+const orderRoutes_1 = __importDefault(require("./../routes/orderRoutes"));
 require("dotenv").config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5001;
@@ -28,6 +29,7 @@ app.use('/api/v1/', rolesRoutes_1.default);
 app.use('/api/v1/', whatsapp_messsaging_role_route_1.default);
 app.use('/api/v1/', userRoutes_1.default);
 app.use('/api/v1/', webhooks_1.default);
+app.use('/api/v1/', orderRoutes_1.default);
 app.get("/", (req, res) => res.send("Welcome to My-Backend!"));
 app.get("/api", (req, res) => res.send("Welcome to My-Backend! API"));
 const uri = MONGO_URL !== null && MONGO_URL !== void 0 ? MONGO_URL : `mongodb://${DB_USERNAME}:${DB_PASSWORD}@cluster0.oafna.mongodb.net/${DB_NAME}?authSource=${DB_NAME}&w=1`;

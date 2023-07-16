@@ -7,6 +7,7 @@ import whatsappRoutes from "./../routes/whatsapp_messsaging_role_route";
 import roleRoute from "./../routes/rolesRoutes";
 import userRoute from "./../routes/userRoutes";
 import webhooks from "./../routes/webhooks";
+import orderRoute from "./../routes/orderRoutes";
 
 
 
@@ -31,6 +32,7 @@ app.use('/api/v1/', roleRoute)
 app.use('/api/v1/', whatsappRoutes)
 app.use('/api/v1/', userRoute)
 app.use('/api/v1/', webhooks)
+app.use('/api/v1/', orderRoute)
 
 
 
