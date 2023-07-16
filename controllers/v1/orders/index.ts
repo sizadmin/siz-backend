@@ -208,6 +208,8 @@ const newOrderStatus = async (req: any, res: any) => {
             orderID: body.orderID,
             product_delivery_date: body.product_delivery_date,
             product_pickup_date: body.product_pickup_date,
+            product_delivery_timeslot: body.product_delivery_timeslot,
+            product_pickup_timeslot: body.product_pickup_timeslot,
             notes: body.notes
         });
 
