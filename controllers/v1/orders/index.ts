@@ -9,7 +9,7 @@ import orderstatus from '../../../models/orderstatus';
 
 const fetchShopifyOrder = async (req: any, res: any) => {
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-06-20T00:00:00-00:00`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-07/orders.json?status=any&created_at_min=2023-06-20T00:00:00-00:00`;
 
         let config = {
             headers: {
