@@ -26,7 +26,19 @@ const orderSchema: Schema = new Schema(
         },
         order_items : {
             type:Schema.Types.Mixed,
-        }
+        },
+        lender_name:{
+            type: String
+        },
+        lender_address:{
+            type: String
+        },
+        lender_phone_call : {
+            type: String
+        },
+        lender_phone_whatsapp : {
+            type: String
+        },
     },
     {
         timestamps: true,

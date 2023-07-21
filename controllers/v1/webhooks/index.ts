@@ -3,6 +3,7 @@ import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
 import product from '../../../models/product';
+import lender from '../../../models/lender';
 
 
 // import { IProduct } from '../../../types/product';
@@ -16,8 +17,6 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         const { body } = req;
         console.log(body);
         saveOrderInDb(body);
-
-        
         sendOrderPlacementMessageToRenter(body)
         //sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery",image_url,renter_name,item_name,duration,start_date,"13 July 2023",order_id);
         res.status(200).json({
@@ -182,6 +181,8 @@ axios.request(config)
 }
 
 const saveOrderInDb = async (body :  any) => {
+
+    let lender = await findLenderDetails(body);
     const newOrder: IOrder = new Order({
         order_id: body.id,
         order_date: body.created_at,
@@ -192,9 +193,41 @@ const saveOrderInDb = async (body :  any) => {
         total_price: body.total_price,
         order_items: body.line_items,
         order_note:body.note,
+        lender_name:lender.name,
+        lender_address:lender.address,
+        lender_phone_call : lender.phone_number_call,
+        lender_phone_whatsapp : lender.phone_number_whatsapp,
+
     });
     const savedOrder: IOrder = await newOrder.save();
 }
 
+const findLenderDetails = async (body : any ) => {
+  let product = await findProductFromOrder(body);
+  let product_id = product.product_id ;
+  let tags = product.product_details.tags ;
+  const regex = /influencer_([A-Za-z0-9_]+)/;
+  const matches = tags.match(regex);
+  let influencerTag = "" ;
+  if (matches && matches.length >= 2) {
+    influencerTag = matches[1];
+    console.log("Influencer Tag:", influencerTag);
+    const findLender: any| null = await lender.findOne({
+      "shopify_id": influencerTag
+    });
+    return findLender;
+  } else {
+    console.log("Influencer Tag not found.");
+    return null ;
+  }
+}
+
+const findProductFromOrder = async (body : any) => {
+  let product_title = body.line_items.title ;
+  const findProduct: any| null = await product.findOne({
+    "product_details.title": product_title 
+  });
+  return findProduct ;
+}
 
 export { fetchShopifyOrderUsingWebhook }
