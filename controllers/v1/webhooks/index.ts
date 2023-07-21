@@ -2,7 +2,8 @@ import axios from 'axios';
 import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
-import product from '../../../models/Product';
+import product from '../../../models/product';
+
 
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
@@ -83,7 +84,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         const parsedUrl = url.parse(note);
         const backup_product_handle = parsedUrl.pathname.split('/').pop();
         console.log("Last Part "+backup_product_handle)
-        const findBackupProduct: IProduct| null = await product.find({
+        const findBackupProduct: Array<IProduct>| null = await product.find({
               "product_details.handle": backup_product_handle
         },"product_details");
 
