@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
+import { IProduct } from '../../../types/product';
+import product from '../../../models/product';
 
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
@@ -79,13 +81,14 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         let note = body.note ;
         const url = require('url');
         const parsedUrl = url.parse(note);
-        const lastPart = parsedUrl.pathname.split('/').pop();
-        console.log("Last Part "+lastPart)
-        console.log(clientName)
-        console.log(itemName)
-        console.log(duration)
-        console.log(startDate)
-        console.log(orderId)
+        const backup_product_handle = parsedUrl.pathname.split('/').pop();
+        console.log("Last Part "+backup_product_handle)
+        const findBackupProduct: any| null = await product.find({
+              "product_details.handle": backup_product_handle
+        },"product_details.handle product_details.title product_details.tags");
+
+        console.log(findBackupProduct)
+        
 
 let payload = {
     messaging_product: 'whatsapp',
@@ -111,7 +114,9 @@ let payload = {
             { type: 'text', text: itemName },
             { type: 'text', text: duration },
 			      { type: 'text', text: startDate },
-            { type: 'text', text: endDate }
+            { type: 'text', text: endDate },
+            { type: 'text', text: findBackupProduct.product_details.title },
+
           ]
         },
         {
