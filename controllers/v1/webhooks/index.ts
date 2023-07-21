@@ -223,11 +223,13 @@ const findLenderDetails = async (body : any ) => {
 }
 
 const findProductFromOrder = async (body : any) => {
-  let product_title = body.line_items.title ;
+  let product_title = body.line_items[0].title ;
   const findProduct: any| null = await product.findOne({
     "product_details.title": product_title 
   });
+  console.log(findProduct)
   return findProduct ;
+  
 }
 
 export { fetchShopifyOrderUsingWebhook }
