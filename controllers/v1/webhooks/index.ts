@@ -44,9 +44,10 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         let itemName  = "";
         let duration = "" ;
         let dateString = "" ;
+        let backupPieceName = "" ;
         console.log(arrayLength);
         if(arrayLength > 1){
-            itemName = line_items_array[0].name.split("-")[0] + "And" + (arrayLength-1) + "Others" ; 
+            itemName = line_items_array[0].name.split("-")[0] + " & " + (arrayLength-1) + "Others" ; 
             duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
             if(line_items_array[0].properties.length > 0 ){
               let key = line_items_array[0].properties[0].name ;
@@ -75,6 +76,11 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         let endDate = (dateString.length > 0) ? dateString.split("to")[1]: "Not Found";
         console.log(startDate)
         let orderId = body.id
+        let note = body.note ;
+        const url = require('url');
+        const parsedUrl = url.parse(note);
+        const lastPart = parsedUrl.pathname.split('/').pop();
+        console.log("Last Part "+lastPart)
         console.log(clientName)
         console.log(itemName)
         console.log(duration)
@@ -179,7 +185,7 @@ const saveOrderInDb = async (body :  any) => {
         order_number: body.order_number,
         total_price: body.total_price,
         order_items: body.line_items,
-
+        order_note:body.note,
     });
     const savedOrder: IOrder = await newOrder.save();
 }
