@@ -84,7 +84,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         const parsedUrl = url.parse(note);
         const backup_product_handle = parsedUrl.pathname.split('/').pop();
         console.log("Last Part "+backup_product_handle)
-        const findBackupProduct: any| null = await product.find({
+        const findBackupProduct: any| null = await product.findOne({
               "product_details.handle": backup_product_handle
         });
 
