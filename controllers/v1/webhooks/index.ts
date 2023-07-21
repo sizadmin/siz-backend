@@ -84,9 +84,9 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         const parsedUrl = url.parse(note);
         const backup_product_handle = parsedUrl.pathname.split('/').pop();
         console.log("Last Part "+backup_product_handle)
-        const findBackupProduct: Array<IProduct>| null = await product.find({
+        const findBackupProduct: any| null = await product.find({
               "product_details.handle": backup_product_handle
-        },"product_details");
+        });
 
         console.log(findBackupProduct)
         
@@ -116,7 +116,7 @@ let payload = {
             { type: 'text', text: duration },
 			      { type: 'text', text: startDate },
             { type: 'text', text: endDate },
-           // { type: 'text', text: findBackupProduct.product_details.title },
+            { type: 'text', text: findBackupProduct.product_details.title },
 
           ]
         },

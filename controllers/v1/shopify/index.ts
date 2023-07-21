@@ -68,7 +68,7 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 
 const fetchShopifyProducts = async (req: any, res: any) => {
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?limit=250`;
 
         let config = {
             headers: {

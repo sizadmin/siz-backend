@@ -96,7 +96,7 @@ exports.fetchShopifyOrder = fetchShopifyOrder;
 const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _g, e_2, _h, _j;
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?limit=250`;
         let config = {
             headers: {
                 'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
