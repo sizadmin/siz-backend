@@ -2,7 +2,7 @@ import axios from 'axios';
 import { IOrder } from '../../../types/order';
 import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
-import product from '../../../models/product';
+import product from '../../../models/Product';
 
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
@@ -83,9 +83,9 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         const parsedUrl = url.parse(note);
         const backup_product_handle = parsedUrl.pathname.split('/').pop();
         console.log("Last Part "+backup_product_handle)
-        const findBackupProduct: any| null = await product.find({
+        const findBackupProduct: IProduct| null = await product.find({
               "product_details.handle": backup_product_handle
-        },"product_details.handle product_details.title product_details.tags");
+        },"product_details");
 
         console.log(findBackupProduct)
         
