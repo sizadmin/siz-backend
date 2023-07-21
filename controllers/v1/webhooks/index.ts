@@ -206,7 +206,7 @@ const findLenderDetails = async (body : any ) => {
   let product = await findProductFromOrder(body);
   let product_id = product.product_id ;
   let tags = product.product_details.tags ;
-  const regex = /influencer_([A-Za-z0-9_]+)/;
+  const regex = /(influencer_[A-Za-z0-9_]+)/;
   const matches = tags.match(regex);
   let influencerTag = "" ;
   if (matches && matches.length >= 2) {
