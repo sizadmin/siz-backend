@@ -89,70 +89,70 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         });
 
         console.log(findBackupProduct)
-        
+        setTimeout(() => {let payload = {
+          messaging_product: 'whatsapp',
+          to: "+971561114006",
+          type: 'template',
+          template: {
+            name: "order_placement_with_delivery",
+            language: {
+              code: 'en_US',
+              policy: 'deterministic'
+            },
+            components: [
+          {        
+          "type": "header",      
+          "parameters": [         
+            { "type": "image", "image": {  "link": headerImageUrl, } }     
+          ]      
+          },
+              {
+                type: 'body',
+                parameters: [
+                  { type: 'text', text: clientName },
+                  { type: 'text', text: itemName },
+                  { type: 'text', text: duration },
+                  { type: 'text', text: startDate },
+                  { type: 'text', text: endDate },
+                  { type: 'text', text: findBackupProduct.product_details.title },
+      
+                ]
+              },
+              {
+                type: 'button',
+                sub_type: 'url',
+                index: '0',
+                parameters: [
+                  { type: 'text', text: orderId }
+                ]
+              }
+            ]
+          }
+        };
+      console.log(orderId,"order id");
+        const config = {
+          method: 'post',
+          maxBodyLength: Infinity,
+          url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+          },
+          data: payload
+        };
+      if(itemName != "Not Found"){
+        axios.request(config)
+          .then((response) => {
+            console.log(JSON.stringify(response.data));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        }else{
+          console.log("No item found to send whatsapp notification")
+        }},5000) 
 
-let payload = {
-    messaging_product: 'whatsapp',
-    to: "+971561114006",
-    type: 'template',
-    template: {
-      name: "order_placement_with_delivery",
-      language: {
-        code: 'en_US',
-        policy: 'deterministic'
-      },
-      components: [
-		{        
-		"type": "header",      
-		"parameters": [         
-			{ "type": "image", "image": {  "link": headerImageUrl, } }     
-		]      
-		},
-        {
-          type: 'body',
-          parameters: [
-            { type: 'text', text: clientName },
-            { type: 'text', text: itemName },
-            { type: 'text', text: duration },
-			      { type: 'text', text: startDate },
-            { type: 'text', text: endDate },
-            { type: 'text', text: findBackupProduct.product_details.title },
 
-          ]
-        },
-        {
-          type: 'button',
-          sub_type: 'url',
-          index: '0',
-          parameters: [
-            { type: 'text', text: orderId }
-          ]
-        }
-      ]
-    }
-  };
-console.log(orderId,"order id");
-  const config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
-    },
-    data: payload
-  };
-if(itemName != "Not Found"){
-  axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }else{
-    console.log("No item found to send whatsapp notification")
-  }
 }
 
 const sendWhatsappMessageToRenter = async (body: any ) => {
