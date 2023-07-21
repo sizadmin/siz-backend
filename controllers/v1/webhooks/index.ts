@@ -116,7 +116,7 @@ let payload = {
             { type: 'text', text: duration },
 			      { type: 'text', text: startDate },
             { type: 'text', text: endDate },
-            { type: 'text', text: "Alanis Dress" },
+            { type: 'text', text: findBackupProduct.product_details.title },
 
           ]
         },
