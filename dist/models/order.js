@@ -25,7 +25,19 @@ const orderSchema = new mongoose_1.Schema({
     },
     order_items: {
         type: mongoose_1.Schema.Types.Mixed,
-    }
+    },
+    lender_name: {
+        type: String
+    },
+    lender_address: {
+        type: String
+    },
+    lender_phone_call: {
+        type: String
+    },
+    lender_phone_whatsapp: {
+        type: String
+    },
 }, {
     timestamps: true,
 });

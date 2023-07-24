@@ -5,7 +5,7 @@ const lenderSchema = new mongoose_1.Schema({
     lender_id: {
         type: String,
     },
-    first_name: {
+    name: {
         type: String,
     },
     last_name: {

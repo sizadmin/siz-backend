@@ -23,10 +23,13 @@ exports.getOrderById = exports.fetchShopifyLenders = exports.fetchShopifyProduct
 const axios_1 = __importDefault(require("axios"));
 const order_1 = __importDefault(require("../../../models/order"));
 const product_1 = __importDefault(require("../../../models/product"));
+const product_2 = __importDefault(require("../../../models/product"));
+const lender_1 = __importDefault(require("../../../models/lender"));
 const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
+    var _d, _e;
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-06-20T00:00:00-00:00`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00`;
         let config = {
             headers: {
                 'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
@@ -43,9 +46,9 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
             //       },
             //     }
             //   );
-            for (var _d = true, _e = __asyncValues(response.data.orders), _f; _f = yield _e.next(), _a = _f.done, !_a;) {
-                _c = _f.value;
-                _d = false;
+            for (var _f = true, _g = __asyncValues(response.data.orders), _h; _h = yield _g.next(), _a = _h.done, !_a;) {
+                _c = _h.value;
+                _f = false;
                 try {
                     const order = _c;
                     const findOrder = yield order_1.default.find({
@@ -54,6 +57,33 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
                         ],
                     });
                     if (findOrder.length == 0) {
+                        let product_title = (_d = order.line_items[0]) === null || _d === void 0 ? void 0 : _d.title;
+                        const findProduct = yield product_2.default.findOne({
+                            "product_details.title": product_title
+                        });
+                        let tags = (_e = findProduct === null || findProduct === void 0 ? void 0 : findProduct.product_details) === null || _e === void 0 ? void 0 : _e.tags;
+                        const regex = /(influencer_[A-Za-z0-9_]+)/;
+                        const matches = tags.match(regex);
+                        let influencerTag = "";
+                        let lender_name = "";
+                        let lender_address = "";
+                        let lender_phone_call = "";
+                        let lender_phone_whatsapp = "";
+                        if (matches && matches.length >= 2) {
+                            influencerTag = matches[1];
+                            console.log("Influencer Tag:", influencerTag);
+                            const findLender = yield lender_1.default.findOne({
+                                "shopify_id": influencerTag
+                            });
+                            lender_name = findLender ? findLender.name : "Not Found";
+                            lender_address = findLender ? findLender.address : "Not Found";
+                            lender_phone_call = findLender ? findLender.phone_number_call : "Not Found";
+                            lender_phone_whatsapp = findLender ? findLender.phone_number_whatsapp : "Not Found";
+                        }
+                        else {
+                            console.log("Influencer Tag not found.");
+                            return null;
+                        }
                         const newOrder = new order_1.default({
                             order_id: order.id,
                             order_date: order.created_at,
@@ -61,20 +91,24 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
                             phone_number: order.phone,
                             order_details: order,
                             order_number: order.order_number,
-                            total_price: order.total_price
+                            total_price: order.total_price,
+                            lender_name: lender_name,
+                            lender_address: lender_address,
+                            lender_phone_call: lender_phone_call,
+                            lender_phone_whatsapp: lender_phone_whatsapp,
                         });
                         const savedOrder = yield newOrder.save();
                     }
                 }
                 finally {
-                    _d = true;
+                    _f = true;
                 }
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
         finally {
             try {
-                if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
+                if (!_f && !_a && (_b = _g.return)) yield _b.call(_g);
             }
             finally { if (e_1) throw e_1.error; }
         }
@@ -94,7 +128,7 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.fetchShopifyOrder = fetchShopifyOrder;
 const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _g, e_2, _h, _j;
+    var _j, e_2, _k, _l;
     try {
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?limit=250`;
         let config = {
@@ -104,11 +138,11 @@ const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, fun
         };
         const response = yield axios_1.default.get(url, config);
         try {
-            for (var _k = true, _l = __asyncValues(response.data.products), _m; _m = yield _l.next(), _g = _m.done, !_g;) {
-                _j = _m.value;
-                _k = false;
+            for (var _m = true, _o = __asyncValues(response.data.products), _p; _p = yield _o.next(), _j = _p.done, !_j;) {
+                _l = _p.value;
+                _m = false;
                 try {
-                    const product = _j;
+                    const product = _l;
                     console.log(response.data.products.length);
                     const findProduct = yield product_1.default.find({
                         $and: [
@@ -126,14 +160,14 @@ const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, fun
                     }
                 }
                 finally {
-                    _k = true;
+                    _m = true;
                 }
             }
         }
         catch (e_2_1) { e_2 = { error: e_2_1 }; }
         finally {
             try {
-                if (!_k && !_g && (_h = _l.return)) yield _h.call(_l);
+                if (!_m && !_j && (_k = _o.return)) yield _k.call(_o);
             }
             finally { if (e_2) throw e_2.error; }
         }
