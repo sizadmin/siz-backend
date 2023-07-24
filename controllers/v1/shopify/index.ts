@@ -44,7 +44,7 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 
                 let tags = findProduct?.product_details?.tags ;
                 const regex = /(influencer_[A-Za-z0-9_]+)/;
-                const matches = tags.match(regex);
+                const matches = tags?.match(regex);
                 let influencerTag = "" ;
                 let lender_name = "" ;
                 let lender_address = "" ;
