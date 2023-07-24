@@ -88,6 +88,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         });
 
         console.log(findBackupProduct)
+        let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
         setTimeout(() => {let payload = {
           messaging_product: 'whatsapp',
           to: "+971561114006",
@@ -113,7 +114,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
                   { type: 'text', text: duration },
                   { type: 'text', text: startDate },
                   { type: 'text', text: endDate },
-                  { type: 'text', text: findBackupProduct?.product_details.title },
+                  { type: 'text', text: findBackupProduct },
       
                 ]
               },
