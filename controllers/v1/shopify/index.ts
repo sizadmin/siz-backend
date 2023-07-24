@@ -62,7 +62,6 @@ const fetchShopifyOrder = async (req: any, res: any) => {
                      lender_phone_whatsapp = findLender?findLender.phone_number_whatsapp : "Not Found";
                 } else {
                     console.log("Influencer Tag not found.");
-                    return null ;
                 }
                 const newOrder: IOrder = new Order({
                     order_id: order.id,
