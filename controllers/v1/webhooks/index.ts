@@ -40,20 +40,20 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 const sendOrderPlacementMessageToRenter =  async (body : any) => { 
   console.log("sending message to renter")
         console.log(body);
-        let to_Number = (body.billing_address.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
-        let clientName = (body.billing_address.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
+        let to_Number = (body.billing_address?.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
+        let clientName = (body.billing_address?.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
         let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/order_received_15.png"
         let line_items_array = body.line_items ;
-        let arrayLength = line_items_array.length ;
+        let arrayLength = line_items_array?.length ;
         let itemName  = "";
         let duration = "" ;
         let dateString = "" ;
         let backupPieceName = "" ;
         console.log(arrayLength);
         if(arrayLength > 1){
-            itemName = line_items_array[0].name.split("-")[0] + " & " + (arrayLength-1) + "Others" ; 
-            duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
-            if(line_items_array[0].properties.length > 0 ){
+            itemName = line_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + "Others" ; 
+            duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+            if(line_items_array[0]?.properties?.length > 0 ){
               let key = line_items_array[0].properties[0].name ;
               if(key == "Date"){
                 dateString = line_items_array[0].properties[0].value ;
@@ -62,9 +62,9 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
               dateString = "Not Found" ;
             } 
         }else if(arrayLength == 1){
-          itemName = line_items_array[0].name.split("-")[0] ; 
-          duration = (line_items_array[0].name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
-          if(line_items_array[0].properties.length > 0 ){
+          itemName = line_items_array[0]?.name.split("-")[0] ; 
+          duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+          if(line_items_array[0]?.properties?.length > 0 ){
             let key = line_items_array[0].properties[0].name ;
             if(key == "Date"){
               dateString = line_items_array[0].properties[0].value ;
@@ -76,12 +76,12 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
           itemName = "Not Found";
           duration = "Not Found" ;
         }
-        let startDate = (dateString.length > 0) ? dateString.split("to")[0] : "Not Found";
-        let endDate = (dateString.length > 0) ? dateString.split("to")[1]: "Not Found";
+        let startDate = (dateString?.length > 0) ? dateString?.split("to")[0] : "Not Found";
+        let endDate = (dateString?.length > 0) ? dateString?.split("to")[1]: "Not Found";
         console.log(startDate)
         let orderId = body.id
         let note = body.note ;
-        const backup_product_handle = note.split('/').pop();
+        const backup_product_handle = note?.split('/').pop();
         console.log("Last Part "+backup_product_handle)
         const findBackupProduct: any| null = await product.findOne({
               "product_details.handle": backup_product_handle
@@ -113,7 +113,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
                   { type: 'text', text: duration },
                   { type: 'text', text: startDate },
                   { type: 'text', text: endDate },
-                  { type: 'text', text: findBackupProduct.product_details.title },
+                  { type: 'text', text: findBackupProduct?.product_details.title },
       
                 ]
               },
