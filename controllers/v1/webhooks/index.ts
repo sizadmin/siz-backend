@@ -114,7 +114,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
                   { type: 'text', text: duration },
                   { type: 'text', text: startDate },
                   { type: 'text', text: endDate },
-                  { type: 'text', text: findBackupProduct },
+                  { type: 'text', text: backupProduct },
       
                 ]
               },
