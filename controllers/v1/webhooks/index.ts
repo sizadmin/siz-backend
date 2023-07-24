@@ -17,6 +17,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         const { body } = req;
         console.log(body);
         await saveOrderInDb(body);
+        console.log("Order saved in DB");
         await sendOrderPlacementMessageToRenter(body)
         //sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery",image_url,renter_name,item_name,duration,start_date,"13 July 2023",order_id);
         res.status(200).json({
@@ -37,6 +38,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
 
         //const sendOrderPlacementMessageToRenter =  async (toNumber : any,templateName: any,headerImageUrl: any,clientName: any,itemName: any,duration: any,startDate: any,endDate: any,orderId: any) => {
 const sendOrderPlacementMessageToRenter =  async (body : any) => { 
+  console.log("sending message to renter")
         console.log(body);
         let to_Number = (body.billing_address.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
         let clientName = (body.billing_address.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
