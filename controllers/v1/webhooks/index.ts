@@ -81,9 +81,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         console.log(startDate)
         let orderId = body.id
         let note = body.note ;
-        const url = require('url');
-        const parsedUrl = url.parse(note);
-        const backup_product_handle = parsedUrl.pathname.split('/').pop();
+        const backup_product_handle = note.split('/').pop();
         console.log("Last Part "+backup_product_handle)
         const findBackupProduct: any| null = await product.findOne({
               "product_details.handle": backup_product_handle
