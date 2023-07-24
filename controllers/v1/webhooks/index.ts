@@ -205,8 +205,8 @@ const saveOrderInDb = async (body :  any) => {
 
 const findLenderDetails = async (body : any ) => {
   let product = await findProductFromOrder(body);
-  let product_id = product.product_id ;
-  let tags = product.product_details.tags ;
+  let product_id = product?.product_id ;
+  let tags = product?.product_details?.tags ;
   const regex = /(influencer_[A-Za-z0-9_]+)/;
   const matches = tags.match(regex);
   let influencerTag = "" ;
@@ -224,7 +224,7 @@ const findLenderDetails = async (body : any ) => {
 }
 
 const findProductFromOrder = async (body : any) => {
-  let product_title = body.line_items[0].title ;
+  let product_title = body.line_items[0]?.title ;
   const findProduct: any| null = await product.findOne({
     "product_details.title": product_title 
   });
