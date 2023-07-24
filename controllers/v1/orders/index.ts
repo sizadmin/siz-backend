@@ -257,11 +257,83 @@ const updateOrderStatus = async (req: any, res: any) => {
 
 const getDashboardOrders = async (req: any, res: any) => {
     try {
-        const findOrder: Array<IOrder> | null = await Order.find({}, 'order_id email order_details.phone order_details.customer.first_name order_details.customer.last_name order_number total_price order_details.line_items  order_details.order_status_url');
+
+        const page = Number(req.query.page) || 1;
+        const size = Number(req.query.size) || 250;
+        let sortProperty = req.query.sortByOrder;
+
+        let start_date = req.query.start_date;
+        let end_date = req.query.end_date;
+
+
+        let lender_name = req.query.lender_name;
+        let lender_Lname = req.query.lender_Lname;
+
+
+        let renter_name = req.query.renter_name;
+        let renter_Lname = req.query.renter_Lname;
+
+        let product = req.query.product;
+
+
+
+        let MatchQuery: any = {};
+        if (lender_name) MatchQuery.lender_name = { $regex: lender_name, $options: 'i' };
+        if (lender_Lname) MatchQuery.lender_name = { $regex: lender_Lname, $options: 'i' };
+
+        if (renter_name) MatchQuery['order_details.customer.first_name'] = { $regex: renter_name, $options: 'i' };
+        if (renter_Lname) MatchQuery['order_details.customer.last_name'] = { $regex: renter_Lname, $options: 'i' };
+
+        // if (product) MatchQuery['order_details.line_items.[0].name'] = { $regex: product, $options: 'i' };
+
+        const sort: any = {};
+            console.log(sortProperty)
+        if (sortProperty === 'order_number' ) {
+          sort['order_number'] = 1;
+        }
+        if (sortProperty === '-order_number' ) {
+            sort['order_number'] = -1;
+          }
+
+
+        if (start_date !== undefined) {
+            MatchQuery.order_date = {
+                $gte: new Date(start_date),
+            }
+        }
+        if (end_date !== undefined) {
+            MatchQuery.order_date = {
+                ...MatchQuery.order_date,
+                $lte: new Date(end_date),
+            }
+        }
+
+        const agg: any = [
+            {
+                $match: MatchQuery,
+            },
+            {
+
+                $lookup: {
+                    from: "orderstatuses",         // The target collection name
+                    localField: "order_id",  // The field from the source collection to match
+                    foreignField: "orderID",// The field from the target collection to match
+                    as: "order_status"         // The field to store the joined documents
+                }
+
+            },
+            { $sort: sort },
+
+        ];
+
+        const aggregatedData: any = await Order.aggregate(agg);
+
+
+
         res.status(200).json({
             success: true,
             message: "Orders data is fetched successfully.",
-            data: findOrder
+            data: aggregatedData
         });
 
 
@@ -274,7 +346,6 @@ const getDashboardOrders = async (req: any, res: any) => {
             .json({ success: false, error: "Failed to fetch order status", data: error });
     }
 }
-
 
 
 export { getOrderDeliveryStatus, newOrderStatus, updateOrderStatus, getDashboardOrders }
