@@ -9,7 +9,7 @@ import lender from '../../../models/lender';
 
 const fetchShopifyOrder = async (req: any, res: any) => {
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00&limit=250`;
 
         let config = {
             headers: {
