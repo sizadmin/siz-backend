@@ -100,8 +100,14 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 
 const fetchShopifyProducts = async (req: any, res: any) => {
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?limit=250`;
+        const today = new Date();
 
+        // Subtract one day from the current date to get yesterday's date
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const formattedYesterday = yesterday.toISOString().replace("Z", "-04:00");
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?created_at_min=`+formattedYesterday;
+        console.log("URL : "url);
         let config = {
             headers: {
                 'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
