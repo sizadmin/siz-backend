@@ -107,7 +107,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         yesterday.setDate(today.getDate() - 1);
         const formattedYesterday = yesterday.toISOString().replace("Z", "-04:00");
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?created_at_min=`+formattedYesterday;
-        console.log("URL : "url);
+        console.log("URL : ",url);
         let config = {
             headers: {
                 'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
