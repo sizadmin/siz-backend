@@ -18,7 +18,7 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         console.log(body);
         await saveOrderInDb(body);
         console.log("Order saved in DB");
-        await sendOrderPlacementMessageToRenter(body)
+        
         //sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery",image_url,renter_name,item_name,duration,start_date,"13 July 2023",order_id);
         res.status(200).json({
             success: true,
@@ -201,16 +201,20 @@ const saveOrderInDb = async (body :  any) => {
 
     });
     const savedOrder: IOrder = await newOrder.save();
+    await sendOrderPlacementMessageToRenter(body);
     await sendOrderReceivedMessageToLender(newOrder);
 }
 const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
-  console.log("sending message to renter")
+  console.log("sending message to lender")
   console.log(newOrder);
-  let to_Number = (newOrder.lender_phone_whatsapp?.phone.length > 0 ) ? newOrder.lender_phone_whatsapp : "Phone Not Found" ; ;
-  let LenderName = (newOrder.lender_name?.length > 0 ) ? newOrder.lender_name : "Lender Name Not Found" ;
+  let to_Number = (newOrder?.lender_phone_whatsapp?.length > 0 ) ? newOrder.lender_phone_whatsapp : "Phone Not Found" ; ;
+  let LenderName = (newOrder?.lender_name?.length > 0 ) ? newOrder.lender_name : "Lender Name Not Found" ;
   let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
-  let line_items_array = newOrder.order_items ;
+  console.log("URL");
+  let line_items_array = newOrder?.order_items ;
+  console.log("array captured");
   let arrayLength = line_items_array?.length ;
+  console.log("array length captured");
   let itemName  = "";
   let duration = "" ;
   let dateString = "" ;
