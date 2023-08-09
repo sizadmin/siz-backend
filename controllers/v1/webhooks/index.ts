@@ -202,7 +202,7 @@ const saveOrderInDb = async (body :  any) => {
     });
     const savedOrder: IOrder = await newOrder.save();
     await sendOrderPlacementMessageToRenter(body);
-    await sendOrderReceivedMessageToLender(newOrder);
+    await (lender)?sendOrderReceivedMessageToLender(newOrder):"No Lender Details Found";
 }
 const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
   console.log("sending message to lender")
@@ -261,7 +261,7 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
   let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
   setTimeout(() => {let payload = {
     messaging_product: 'whatsapp',
-    to: +971561114006,
+    to: +971588086958,
     type: 'template',
     template: {
       name: "order_placement_pickup_schedule_lender",
