@@ -201,14 +201,128 @@ const saveOrderInDb = async (body :  any) => {
 
     });
     const savedOrder: IOrder = await newOrder.save();
+    await sendOrderReceivedMessageToLender(newOrder);
 }
+const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
+  console.log("sending message to renter")
+  console.log(newOrder);
+  let to_Number = (newOrder.lender_phone_whatsapp?.phone.length > 0 ) ? newOrder.lender_phone_whatsapp : "Phone Not Found" ; ;
+  let LenderName = (newOrder.lender_name?.length > 0 ) ? newOrder.lender_name : "Lender Name Not Found" ;
+  let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
+  let line_items_array = newOrder.order_items ;
+  let arrayLength = line_items_array?.length ;
+  let itemName  = "";
+  let duration = "" ;
+  let dateString = "" ;
+  let backupPieceName = "" ;
+  console.log(arrayLength);
+  if(arrayLength > 1){
+      itemName = line_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + "Others" ; 
+      duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+      if(line_items_array[0]?.properties?.length > 0 ){
+        let key = line_items_array[0].properties[0].name ;
+        if(key == "Date"){
+          dateString = line_items_array[0].properties[0].value ;
+        }
+      }else{
+        dateString = "Not Found" ;
+      } 
+  }else if(arrayLength == 1){
+    itemName = line_items_array[0]?.name.split("-")[0] ; 
+    duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+    if(line_items_array[0]?.properties?.length > 0 ){
+      let key = line_items_array[0].properties[0].name ;
+      if(key == "Date"){
+        dateString = line_items_array[0].properties[0].value ;
+      }
+    }else{
+      dateString = "Not Found" ;
+    } 
+  }else{
+    itemName = "Not Found";
+    duration = "Not Found" ;
+  }
+  let startDate = (dateString?.length > 0) ? dateString?.split("to")[0] : "Not Found";
+  let endDate = (dateString?.length > 0) ? dateString?.split("to")[1]: "Not Found";
+  console.log(startDate)
+  let orderId = newOrder.order_id
+  let note = newOrder.order_note ;
+  const backup_product_handle = note?.split('/').pop();
+  console.log("Last Part "+backup_product_handle)
+  const findBackupProduct: any| null = await product.findOne({
+        "product_details.handle": backup_product_handle
+  });
 
+  console.log(findBackupProduct)
+  let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
+  setTimeout(() => {let payload = {
+    messaging_product: 'whatsapp',
+    to: +971561114006,
+    type: 'template',
+    template: {
+      name: "order_placement_pickup_schedule_lender",
+      language: {
+        code: 'en_US',
+        policy: 'deterministic'
+      },
+      components: [
+    {        
+    "type": "header",      
+    "parameters": [         
+      { "type": "image", "image": {  "link": headerImageUrl, } }     
+    ]      
+    },
+        {
+          type: 'body',
+          parameters: [
+            { type: 'text', text: LenderName },
+            { type: 'text', text: itemName },
+            { type: 'text', text: duration },
+            { type: 'text', text: startDate },
+            { type: 'text', text: endDate },
+          ]
+        },
+        {
+          type: 'button',
+          sub_type: 'url',
+          index: '0',
+          parameters: [
+            { type: 'text', text: orderId }
+          ]
+        }
+      ]
+    }
+  };
+console.log(orderId,"order id");
+  const config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+    },
+    data: payload
+  };
+if(itemName != "Not Found"){
+  axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }else{
+    console.log("No item found to send whatsapp notification")
+  }},5000) 
+
+}
 const findLenderDetails = async (body : any ) => {
   let product = await findProductFromOrder(body);
   let product_id = product?.product_id ;
   let tags = product?.product_details?.tags ;
   const regex = /(influencer_[A-Za-z0-9_]+)/;
-  const matches = tags.match(regex);
+  const matches = tags?.match(regex);
   let influencerTag = "" ;
   if (matches && matches.length >= 2) {
     influencerTag = matches[1];
