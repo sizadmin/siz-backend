@@ -261,7 +261,7 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
   let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
   setTimeout(() => {let payload = {
     messaging_product: 'whatsapp',
-    to: +971588086958,
+    to: to_Number,
     type: 'template',
     template: {
       name: "order_placement_pickup_schedule_lender",
