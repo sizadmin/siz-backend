@@ -89,6 +89,14 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
 
         console.log(findBackupProduct)
         let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
+        if(clientName == "" || clientName == null) return ;
+        if(itemName == "" || itemName == null) return ;
+        if(duration == "" || duration == null) duration = "Not Selected" ;
+        if(startDate == "" || startDate == null) startDate = "Not Selected" ;
+        if(endDate == "" || endDate == null) endDate = "Not Selected" ;
+        if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) endDate = "Not Selected" ;
+
+
         setTimeout(() => {let payload = {
           messaging_product: 'whatsapp',
           to: to_Number,
@@ -259,6 +267,15 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
 
   console.log(findBackupProduct)
   let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
+  
+  if(LenderName == "" || LenderName == null) return ;
+  if(itemName == "" || itemName == null) return ;
+  if(duration == "" || duration == null) duration = "Not Selected" ;
+  if(startDate == "" || startDate == null) startDate = "Not Selected" ;
+  if(endDate == "" || endDate == null) endDate = "Not Selected" ;
+  // if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) endDate = "Not Selected" ;
+
+  
   setTimeout(() => {let payload = {
     messaging_product: 'whatsapp',
     to: to_Number,
