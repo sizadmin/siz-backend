@@ -191,7 +191,8 @@ axios.request(config)
 
 const saveOrderInDb = async (body :  any) => {
 
-    let lender = await findLenderDetails(body);
+    let lenderObj = await findLenderDetails(body);
+   
     const newOrder: IOrder = new Order({
         order_id: body.id,
         order_date: body.created_at,
@@ -202,10 +203,10 @@ const saveOrderInDb = async (body :  any) => {
         total_price: body.total_price,
         order_items: body.line_items,
         order_note:body.note,
-        lender_name:lender.name,
-        lender_address:lender.address,
-        lender_phone_call : lender.phone_number_call,
-        lender_phone_whatsapp : lender.phone_number_whatsapp,
+        lender_name:lenderObj?.name,
+        lender_address:lenderObj?.address,
+        lender_phone_call : lenderObj?.phone_number_call,
+        lender_phone_whatsapp : lenderObj?.phone_number_whatsapp,
 
     });
     const savedOrder: IOrder = await newOrder.save();
