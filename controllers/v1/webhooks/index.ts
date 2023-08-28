@@ -231,6 +231,7 @@ const saveOrderInDb = async (body :  any) => {
         let startDate = (dateString?.length > 0) ? dateString?.split("to")[0] : "Not Found";
         let endDate = (dateString?.length > 0) ? dateString?.split("to")[1]: "Not Found";
         console.log(startDate)
+        console.log("endDate in renter message: "+endDate)
         let orderId = body.id
         let note = body.note ;
         const backup_product_handle = note?.split('/').pop();
