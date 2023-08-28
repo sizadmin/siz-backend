@@ -19,7 +19,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOrderById = exports.fetchShopifyLenders = exports.fetchShopifyProducts = exports.fetchShopifyOrder = void 0;
+exports.sendDeliveryReminderToRenter = exports.getOrderById = exports.fetchShopifyLenders = exports.fetchShopifyProducts = exports.fetchShopifyOrder = void 0;
 const axios_1 = __importDefault(require("axios"));
 const order_1 = __importDefault(require("../../../models/order"));
 const product_1 = __importDefault(require("../../../models/product"));
@@ -29,7 +29,7 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
     var _a, e_1, _b, _c;
     var _d, _e;
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00&limit=250`;
         let config = {
             headers: {
                 'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
@@ -63,7 +63,7 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
                         });
                         let tags = (_e = findProduct === null || findProduct === void 0 ? void 0 : findProduct.product_details) === null || _e === void 0 ? void 0 : _e.tags;
                         const regex = /(influencer_[A-Za-z0-9_]+)/;
-                        const matches = tags.match(regex);
+                        const matches = tags === null || tags === void 0 ? void 0 : tags.match(regex);
                         let influencerTag = "";
                         let lender_name = "";
                         let lender_address = "";
@@ -82,7 +82,6 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
                         }
                         else {
                             console.log("Influencer Tag not found.");
-                            return null;
                         }
                         const newOrder = new order_1.default({
                             order_id: order.id,
@@ -127,10 +126,33 @@ const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.fetchShopifyOrder = fetchShopifyOrder;
+const sendDeliveryReminderToRenter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const today = new Date();
+        // Subtract one day from the current date to get yesterday's date
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        console.log("TOMORROW:" + tomorrow);
+    }
+    catch (error) {
+        // Handle errors and send an error response back to the client
+        console.error("Failed to send reminder to renter", error);
+        res
+            .status(500)
+            .json({ success: false, error: "Failed to send reminder to renter" });
+    }
+});
+exports.sendDeliveryReminderToRenter = sendDeliveryReminderToRenter;
 const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _j, e_2, _k, _l;
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?limit=250`;
+        const today = new Date();
+        // Subtract one day from the current date to get yesterday's date
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const formattedYesterday = yesterday.toISOString().replace("Z", "-04:00");
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?created_at_min=` + formattedYesterday;
+        console.log("URL : ", url);
         let config = {
             headers: {
                 'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,

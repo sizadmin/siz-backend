@@ -5,6 +5,8 @@ import { IProduct } from '../../../types/product';
 import Product from '../../../models/product';
 import product from '../../../models/product';
 import lender from '../../../models/lender';
+import orderstatus from '../../../models/orderstatus';
+import { IOrderStatus } from '../../../types/orderstatus';
 
 
 const fetchShopifyOrder = async (req: any, res: any) => {
@@ -104,9 +106,15 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
 
         // Subtract one day from the current date to get yesterday's date
         const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-        console.log("TOMORROW:"+tomorrow)
+        tomorrow.setDate(today.getDate() + 1).format(
+            "YYYY-MM-DDTHH:mm:ss");
+        console.log("TOMORROW:"+tomorrow) ;
+        const query = {
+            product_delivery_date: tomorrow
+          };
+        const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.find(query);
 
+        console.log("Orders for tomorrow : " + findOrderStatus)
 
     }catch(error){
         // Handle errors and send an error response back to the client

@@ -8,6 +8,7 @@ router.post('/msg', whatsapp_1.sendWhatsappMsg);
 router.get('/fetchOrders', shopify_1.fetchShopifyOrder);
 router.get('/fetchProducts', shopify_1.fetchShopifyProducts);
 router.get('/fetchLenders', shopify_1.fetchShopifyLenders);
+router.get('/sendDeliveryReminder', shopify_1.sendDeliveryReminderToRenter);
 router.get('/order/:id', shopify_1.getOrderById);
 exports.default = router;
 //# sourceMappingURL=whatsapp_messsaging_role_route.js.map
