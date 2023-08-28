@@ -126,14 +126,16 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
 
         console.log("Orders for tomorrow : " + findOrders)
         if (findOrders) {
+            console.log("sending reminder message day before orders");
             findOrders.forEach(async (order) => {
-              const order_id = order.orderID;
-              const delivery_time = order.product_delivery_timeslot ;
+              const order_id = await order.orderID;
+              const delivery_time = await order.product_delivery_timeslot ;
               const findOrder: Array<IOrder> | null = await Order.find({
                 $and: [
                     { order_id: order_id },
                 ],
             });
+            console.log("order found to send reminder:" + findOrder);
             sendDeliveryReminderWhatsappMessage(findOrder,delivery_time);
             });
             
