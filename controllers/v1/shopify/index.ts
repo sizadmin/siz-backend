@@ -111,7 +111,7 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
         
         tomorrow.setHours(0, 0, 0, 0); // Set time to 00:00:00.000
 
-        const formattedTomorrow = tomorrow.toISOString();
+        const formattedTomorrow = tomorrow.toISOString().replace("Z", "+00:00");;
         console.log("TOMORROW:"+formattedTomorrow) ;
         const query = {
             product_delivery_date: tomorrow
