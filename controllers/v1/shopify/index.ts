@@ -98,6 +98,27 @@ const fetchShopifyOrder = async (req: any, res: any) => {
     }
 }
 
+const sendDeliveryReminderToRenter = async (req: any, res: any) => {
+    try{
+        const today = new Date();
+
+        // Subtract one day from the current date to get yesterday's date
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        console.log("TOMORROW:"+tomorrow)
+
+
+    }catch(error){
+        // Handle errors and send an error response back to the client
+        console.error("Failed to send reminder to renter", error);
+        res
+            .status(500)
+            .json({ success: false, error: "Failed to send reminder to renter" });
+    }
+}
+
+
+
 const fetchShopifyProducts = async (req: any, res: any) => {
     try {
         const today = new Date();
@@ -223,4 +244,4 @@ const getOrderById = async (req: any, res: any) => {
 }
 
 
-export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, getOrderById }
+export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, getOrderById,sendDeliveryReminderToRenter }

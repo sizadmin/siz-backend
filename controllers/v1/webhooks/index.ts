@@ -192,6 +192,63 @@ axios.request(config)
 const saveOrderInDb = async (body :  any) => {
 
     let lenderObj = await findLenderDetails(body);
+
+        let renter_phone_number = (body.billing_address?.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
+        let clientName = (body.billing_address?.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
+        let line_items_array = body.line_items ;
+        let arrayLength = line_items_array?.length ;
+        let itemName  = "";
+        let duration = "" ;
+        let dateString = "" ;
+        let backupPieceName = "" ;
+        console.log(arrayLength);
+        if(arrayLength > 1){
+            itemName = line_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + "Others" ; 
+            duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+            if(line_items_array[0]?.properties?.length > 0 ){
+              let key = line_items_array[0].properties[0].name ;
+              if(key == "Date"){
+                dateString = line_items_array[0].properties[0].value ;
+              }
+            }else{
+              dateString = "Not Found" ;
+            } 
+        }else if(arrayLength == 1){
+          itemName = line_items_array[0]?.name.split("-")[0] ; 
+          duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+          if(line_items_array[0]?.properties?.length > 0 ){
+            let key = line_items_array[0].properties[0].name ;
+            if(key == "Date"){
+              dateString = line_items_array[0].properties[0].value ;
+            }
+          }else{
+            dateString = "Not Found" ;
+          } 
+        }else{
+          itemName = "Not Found";
+          duration = "Not Found" ;
+        }
+        let startDate = (dateString?.length > 0) ? dateString?.split("to")[0] : "Not Found";
+        let endDate = (dateString?.length > 0) ? dateString?.split("to")[1]: "Not Found";
+        console.log(startDate)
+        let orderId = body.id
+        let note = body.note ;
+        const backup_product_handle = note?.split('/').pop();
+        console.log("Last Part "+backup_product_handle)
+        const findBackupProduct: any| null = await product.findOne({
+              "product_details.handle": backup_product_handle
+        });
+
+        console.log(findBackupProduct)
+        let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
+        if(clientName == "" || clientName == null) return ;
+        if(itemName == "" || itemName == null) return ;
+        if(duration == "" || duration == null) duration = "Not Selected" ;
+        if(startDate == "" || startDate == null) startDate = "Not Selected" ;
+        if(endDate == "" || endDate == null) endDate = "Not Selected" ;
+        if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) endDate = "Not Selected" ;
+
+
    
     const newOrder: IOrder = new Order({
         order_id: body.id,
@@ -201,6 +258,12 @@ const saveOrderInDb = async (body :  any) => {
         order_details: body,
         order_number: body.order_number,
         total_price: body.total_price,
+        renter_phone_number : renter_phone_number,
+        rental_start_date : startDate ,
+        rental_end_date : endDate ,
+        renter_name : clientName,
+        rental_duration : duration ,
+        backup_piece : backupProduct ,
         order_items: body.line_items,
         order_note:body.note,
         lender_name:lenderObj?.name,
