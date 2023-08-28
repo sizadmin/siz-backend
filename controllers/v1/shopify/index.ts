@@ -128,8 +128,8 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
         if (findOrders) {
             console.log("sending reminder message day before orders");
             findOrders.forEach(async (order) => {
-              const order_id = await order.orderID;
-              const delivery_time = await order.product_delivery_timeslot ;
+              let order_id = await order.orderID;
+              let delivery_time = await order.product_delivery_timeslot ;
               const findOrder: Array<IOrder> | null = await Order.find({
                 $and: [
                     { order_id: order_id },
@@ -154,6 +154,8 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
 }
 
 const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,delivery_time: any) => { 
+    console.log("in sendReminderMessage Function: "+newOrder);
+    console.log(delivery_time);
     let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
     setTimeout(() => {let payload = {
         messaging_product: 'whatsapp',
