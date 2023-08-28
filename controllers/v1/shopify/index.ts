@@ -114,7 +114,7 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
         const formattedTomorrow = tomorrow.toISOString().replace("Z", "+00:00");;
         console.log("TOMORROW:"+formattedTomorrow) ;
         const query = {
-            product_delivery_date: tomorrow
+            product_delivery_date: formattedTomorrow
           };
         const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.find(query);
 
