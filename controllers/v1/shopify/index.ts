@@ -108,8 +108,9 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
         // Subtract one day from the current date to get yesterday's date
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1)
+        
+        moment(tomorrow).format("YYYY-MM-DDT00:00:00.000+00:00");
         console.log("TOMORROW:"+tomorrow) ;
-        moment(tomorrow).format("YYYY-MM-DDTHH:mm:ss");
         const query = {
             product_delivery_date: tomorrow
           };
