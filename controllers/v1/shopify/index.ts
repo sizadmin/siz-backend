@@ -135,8 +135,9 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
                     { order_id: order_id },
                 ],
             });
-            console.log("order found to send reminder:" + findOrder);
-            sendDeliveryReminderWhatsappMessage(findOrder,delivery_time);
+            let renter_name = findOrder.renter_name ;
+            console.log("order found to send reminder:" + findOrder.renter_name);
+            sendDeliveryReminderWhatsappMessage(findOrder,renter_name,delivery_time);
             });
             
           } else {
@@ -153,10 +154,10 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
     }
 }
 
-const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,delivery_time: any) => { 
+const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,renter_name:any,delivery_time: any) => { 
     console.log("in sendReminderMessage Function: "+newOrder);
     console.log(delivery_time);
-    let renterName = newOrder.renter_name ;
+    let renterName = renter_name ;
     if(delivery_time == "" || delivery_time == null || delivery_time == undefined) delivery_time = "Not Selected" ;
     let deliverySlot = delivery_time ;
     let itemName =  newOrder.rental_piece_name ;
