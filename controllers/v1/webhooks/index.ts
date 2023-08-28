@@ -94,7 +94,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         if(duration == "" || duration == null) duration = "Not Selected" ;
         if(startDate == "" || startDate == null) startDate = "Not Selected" ;
         if(endDate == "" || endDate == null) endDate = "Not Selected" ;
-        if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) endDate = "Not Selected" ;
+        if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) backupProduct = "Not Selected" ;
 
 
         setTimeout(() => {let payload = {
@@ -247,7 +247,7 @@ const saveOrderInDb = async (body :  any) => {
         if(duration == "" || duration == null) duration = "Not Selected" ;
         if(startDate == "" || startDate == null) startDate = "Not Selected" ;
         if(endDate == "" || endDate == null) endDate = "Not Selected" ;
-        if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) endDate = "Not Selected" ;
+        if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) backupProduct = "Not Selected" ;
 
 
    
