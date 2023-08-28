@@ -119,7 +119,7 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
         console.log("TODAY:"+queryToday) ;
         const query = {
             $and: [
-                { product_delivery_date: {$gte : queryToday } },
+                { product_delivery_date: {$gte : queryToday,$lt:queryTomorrow } },
             ],          
           };
         const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.find(query);
