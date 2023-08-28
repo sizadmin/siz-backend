@@ -7,6 +7,7 @@ import product from '../../../models/product';
 import lender from '../../../models/lender';
 import orderstatus from '../../../models/orderstatus';
 import { IOrderStatus } from '../../../types/orderstatus';
+import moment from "moment";
 
 
 const fetchShopifyOrder = async (req: any, res: any) => {
@@ -106,9 +107,9 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
 
         // Subtract one day from the current date to get yesterday's date
         const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1).format(
-            "YYYY-MM-DDTHH:mm:ss");
+        tomorrow.setDate(today.getDate() + 1)
         console.log("TOMORROW:"+tomorrow) ;
+        moment(tomorrow).format("YYYY-MM-DDTHH:mm:ss");
         const query = {
             product_delivery_date: tomorrow
           };
