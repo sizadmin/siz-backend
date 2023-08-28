@@ -156,7 +156,16 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
 const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,delivery_time: any) => { 
     console.log("in sendReminderMessage Function: "+newOrder);
     console.log(delivery_time);
+    let renterName = newOrder.renter_name ;
+    if(delivery_time == "" || delivery_time == null || delivery_time == undefined) delivery_time = "Not Selected" ;
+    let deliverySlot = delivery_time ;
+    let itemName =  newOrder.rental_piece_name ;
+    let duration = newOrder.rental_duration ;
+    let startDate = newOrder.rental_start_date ;
+    let endDate = newOrder.rental_end_date ;
     let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
+
+    console.log("PARAMS: " +renterName + "," + deliverySlot + "," +itemName+ "," +duration+ "," +startDate+ "," +endDate)
     setTimeout(() => {let payload = {
         messaging_product: 'whatsapp',
         to: newOrder.renter_phone_number,
@@ -177,12 +186,12 @@ const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,delivery_time
             {
               type: 'body',
               parameters: [
-                { type: 'text', text: newOrder.renter_name },
-                { type: 'text', text: delivery_time },
-                { type: 'text', text: newOrder.rental_piece_name },
-                { type: 'text', text: newOrder.rental_duration },
-                { type: 'text', text: newOrder.rental_start_date },
-                { type: 'text', text: newOrder.rental_end_date },
+                { type: 'text', text: renterName },
+                { type: 'text', text: deliverySlot },
+                { type: 'text', text: itemName },
+                { type: 'text', text: duration },
+                { type: 'text', text: startDate },
+                { type: 'text', text: endDate },
               ]
             }
           ]
