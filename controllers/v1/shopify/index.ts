@@ -127,19 +127,26 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
         console.log("Orders for tomorrow : " + findOrders)
         if (findOrders) {
             console.log("sending reminder message day before orders");
-            findOrders.forEach(async (order) => {
-              let order_id = await order.orderID;
-              let delivery_time = await order.product_delivery_timeslot ;
+            findOrders.forEach(async (orderstatus) => {
+              let order_id = await orderstatus.orderID;
+              let delivery_time = await orderstatus.product_delivery_timeslot ;
               const findOrder: Array<IOrder> | null = await Order.find({
                 $and: [
                     { order_id: order_id },
                 ],
             });
-            let renter_name = findOrder.renter_name ;
-            console.log("order found to send reminder:" + findOrder.renter_name);
-            sendDeliveryReminderWhatsappMessage(findOrder,renter_name,delivery_time);
-            });
-            
+
+                if(findOrder){
+                    findOrder.forEach(async (newOrder) => {
+                        let renter_name = newOrder.renter_name ;
+                        console.log("order found to send reminder:" + newOrder.renter_name);
+                        sendDeliveryReminderWhatsappMessage(newOrder,renter_name,delivery_time);
+                        });
+                }else {
+                    console.log("No matching orders found.");
+                  }
+           
+                });
           } else {
             console.log("No matching orders found.");
           }

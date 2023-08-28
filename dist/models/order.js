@@ -38,6 +38,27 @@ const orderSchema = new mongoose_1.Schema({
     lender_phone_whatsapp: {
         type: String
     },
+    renter_phone_number: {
+        type: String
+    },
+    rental_start_date: {
+        type: String
+    },
+    rental_end_date: {
+        type: String
+    },
+    renter_name: {
+        type: String
+    },
+    rental_duration: {
+        type: String
+    },
+    rental_piece_name: {
+        type: String
+    },
+    backup_piece: {
+        type: String
+    }
 }, {
     timestamps: true,
 });

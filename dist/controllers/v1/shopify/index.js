@@ -25,6 +25,7 @@ const order_1 = __importDefault(require("../../../models/order"));
 const product_1 = __importDefault(require("../../../models/product"));
 const product_2 = __importDefault(require("../../../models/product"));
 const lender_1 = __importDefault(require("../../../models/lender"));
+const orderstatus_1 = __importDefault(require("../../../models/orderstatus"));
 const fetchShopifyOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     var _d, _e;
@@ -132,7 +133,48 @@ const sendDeliveryReminderToRenter = (req, res) => __awaiter(void 0, void 0, voi
         // Subtract one day from the current date to get yesterday's date
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
-        console.log("TOMORROW:" + tomorrow);
+        today.setHours(23, 59, 0, 0);
+        tomorrow.setHours(23, 59, 0, 0); // Set time to 00:00:00.000
+        const formattedToday = today.toISOString().replace("Z", "+00:00");
+        ;
+        const formattedTomorrow = tomorrow.toISOString().replace("Z", "+00:00");
+        ;
+        const queryTomorrow = new Date(formattedTomorrow);
+        const queryToday = new Date(formattedToday);
+        console.log("TOMORROW:" + queryTomorrow);
+        console.log("TODAY:" + queryToday);
+        const query = {
+            $and: [
+                { product_delivery_date: { $gte: queryToday, $lt: queryTomorrow } },
+            ],
+        };
+        const findOrders = yield orderstatus_1.default.find(query);
+        console.log("Orders for tomorrow : " + findOrders);
+        if (findOrders) {
+            console.log("sending reminder message day before orders");
+            findOrders.forEach((orderstatus) => __awaiter(void 0, void 0, void 0, function* () {
+                let order_id = yield orderstatus.orderID;
+                let delivery_time = yield orderstatus.product_delivery_timeslot;
+                const findOrder = yield order_1.default.find({
+                    $and: [
+                        { order_id: order_id },
+                    ],
+                });
+                if (findOrder) {
+                    findOrder.forEach((newOrder) => __awaiter(void 0, void 0, void 0, function* () {
+                        let renter_name = newOrder.renter_name;
+                        console.log("order found to send reminder:" + newOrder.renter_name);
+                        sendDeliveryReminderWhatsappMessage(newOrder, renter_name, delivery_time);
+                    }));
+                }
+                else {
+                    console.log("No matching orders found.");
+                }
+            }));
+        }
+        else {
+            console.log("No matching orders found.");
+        }
     }
     catch (error) {
         // Handle errors and send an error response back to the client
@@ -143,6 +185,75 @@ const sendDeliveryReminderToRenter = (req, res) => __awaiter(void 0, void 0, voi
     }
 });
 exports.sendDeliveryReminderToRenter = sendDeliveryReminderToRenter;
+const sendDeliveryReminderWhatsappMessage = (newOrder, renter_name, delivery_time) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("in sendReminderMessage Function: " + newOrder);
+    console.log(delivery_time);
+    let renterName = renter_name;
+    if (delivery_time == "" || delivery_time == null || delivery_time == undefined)
+        delivery_time = "Not Selected";
+    let deliverySlot = delivery_time;
+    let itemName = newOrder.rental_piece_name;
+    let duration = newOrder.rental_duration;
+    let startDate = newOrder.rental_start_date;
+    let endDate = newOrder.rental_end_date;
+    let headerImageUrl = "https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png";
+    console.log("PARAMS: " + renterName + "," + deliverySlot + "," + itemName + "," + duration + "," + startDate + "," + endDate);
+    setTimeout(() => {
+        let payload = {
+            messaging_product: 'whatsapp',
+            to: newOrder.renter_phone_number,
+            type: 'template',
+            template: {
+                name: "delivery_reminder",
+                language: {
+                    code: 'en_US',
+                    policy: 'deterministic'
+                },
+                components: [
+                    {
+                        "type": "header",
+                        "parameters": [
+                            { "type": "image", "image": { "link": headerImageUrl, } }
+                        ]
+                    },
+                    {
+                        type: 'body',
+                        parameters: [
+                            { type: 'text', text: renterName },
+                            { type: 'text', text: deliverySlot },
+                            { type: 'text', text: itemName },
+                            { type: 'text', text: duration },
+                            { type: 'text', text: startDate },
+                            { type: 'text', text: endDate },
+                        ]
+                    }
+                ]
+            }
+        };
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+            },
+            data: payload
+        };
+        if (newOrder.rental_piece_name != "Not Found") {
+            axios_1.default.request(config)
+                .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+                .catch((error) => {
+                console.log(error);
+            });
+        }
+        else {
+            console.log("No item found to send whatsapp notification");
+        }
+    }, 5000);
+});
 const fetchShopifyProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _j, e_2, _k, _l;
     try {
