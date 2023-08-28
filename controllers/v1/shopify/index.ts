@@ -122,9 +122,25 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
                 { product_delivery_date: {$gte : queryToday,$lt:queryTomorrow } },
             ],          
           };
-        const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.find(query);
+        const findOrders: Array<IOrderStatus> | null = await orderstatus.find(query);
 
-        console.log("Orders for tomorrow : " + findOrderStatus)
+        console.log("Orders for tomorrow : " + findOrders)
+        if (findOrders) {
+            findOrders.forEach(async (order) => {
+              const order_id = order.orderID;
+              const delivery_time = order.product_delivery_timeslot ;
+              const findOrder: Array<IOrder> | null = await Order.find({
+                $and: [
+                    { order_id: order_id },
+                ],
+            });
+            sendDeliveryReminderWhatsappMessage(findOrder,delivery_time);
+            });
+            
+          } else {
+            console.log("No matching orders found.");
+          }
+
 
     }catch(error){
         // Handle errors and send an error response back to the client
@@ -135,7 +151,61 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
     }
 }
 
-
+const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,delivery_time: any) => { 
+    let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
+    setTimeout(() => {let payload = {
+        messaging_product: 'whatsapp',
+        to: newOrder.renter_phone_number,
+        type: 'template',
+        template: {
+          name: "delivery_reminder",
+          language: {
+            code: 'en_US',
+            policy: 'deterministic'
+          },
+          components: [
+        {        
+        "type": "header",      
+        "parameters": [         
+          { "type": "image", "image": {  "link": headerImageUrl, } }     
+        ]      
+        },
+            {
+              type: 'body',
+              parameters: [
+                { type: 'text', text: newOrder.renter_name },
+                { type: 'text', text: delivery_time },
+                { type: 'text', text: newOrder.rental_piece_name },
+                { type: 'text', text: newOrder.rental_duration },
+                { type: 'text', text: newOrder.rental_start_date },
+                { type: 'text', text: newOrder.rental_end_date },
+              ]
+            }
+          ]
+        }
+      };
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+        },
+        data: payload
+      };
+    if(newOrder.rental_piece_name != "Not Found"){
+      axios.request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      }else{
+        console.log("No item found to send whatsapp notification")
+      }},5000) 
+}
 
 const fetchShopifyProducts = async (req: any, res: any) => {
     try {
