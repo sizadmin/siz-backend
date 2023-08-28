@@ -110,14 +110,15 @@ const sendDeliveryReminderToRenter = async (req: any, res: any) => {
         tomorrow.setDate(today.getDate() + 1)
         today.setHours(23, 59, 0, 0);
         tomorrow.setHours(23, 59, 0, 0); // Set time to 00:00:00.000
-
+        const formattedToday = today.toISOString().replace("Z", "+00:00");;
         const formattedTomorrow = tomorrow.toISOString().replace("Z", "+00:00");;
         console.log("TOMORROW:"+formattedTomorrow) ;
-        const queryDate = new Date(formattedTomorrow);
+        const queryTomorrow = new Date(formattedTomorrow);
+        const queryToday = new Date(formattedToday);
         const query = {
             $and: [
-                { product_delivery_date: {$gte : today } },
-                { product_delivery_date: {$lte : tomorrow } },
+                { product_delivery_date: {$gte : queryToday } },
+                { product_delivery_date: {$lte : queryTomorrow } },
             ],          
           };
         const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.find(query);
