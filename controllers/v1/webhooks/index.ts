@@ -263,7 +263,7 @@ const saveOrderInDb = async (body :  any) => {
         rental_end_date : endDate ,
         renter_name : clientName,
         rental_duration : duration ,
-        rental_piece_name = itemName ,
+        rental_piece_name : itemName ,
         backup_piece : backupProduct ,
         order_items: body.line_items,
         order_note:body.note,
