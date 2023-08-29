@@ -20,7 +20,20 @@ const productSchema: Schema = new Schema(
         },
         notes:{
             type:String
-        }
+        },
+        product_pickup_date_from_renter : {
+            type: Date,
+        },
+        product_pickup_timeslot_from_renter : {
+            type: String,
+        },
+        product_delivery_date_to_lender:{
+            type: Date,
+        },
+        product_delivery_timeslot_to_lender : {
+            type: String,
+        },
+
        
     },
     {
