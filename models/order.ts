@@ -43,10 +43,10 @@ const orderSchema: Schema = new Schema(
             type: String
         },
         rental_start_date : {
-            type: String
+            type: Date
         },
         rental_end_date : {
-            type: String
+            type: Date
         },
         renter_name : {
             type: String
