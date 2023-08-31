@@ -13,8 +13,8 @@ export interface IOrder extends Document {
     lender_phone_call :string;
     lender_phone_whatsapp :string;
     renter_phone_number :string;
-    rental_start_date :string;
-    rental_end_date :string;
+    rental_start_date :Date;
+    rental_end_date :Date;
     renter_name :string;
     rental_duration :string; 
     rental_piece_name :string;
