@@ -100,77 +100,43 @@ const fetchShopifyOrder = async (req: any, res: any) => {
             .json({ success: false, error: "Failed to fetch shopify orders" });
     }
 }
-const sendReturnPickupReminderToRenter = async (req: any, res: any) => {
-    try{
-        const today = new Date();
-
-        // Subtract one day from the current date to get yesterday's date
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1)
-        today.setHours(23, 59, 0, 0);
-        tomorrow.setHours(23, 59, 0, 0); // Set time to 00:00:00.000
-        const formattedToday = today.toISOString().replace("Z", "+00:00");;
-        const formattedTomorrow = tomorrow.toISOString().replace("Z", "+00:00");;
-        
-        const queryTomorrow = new Date(formattedTomorrow);
-        const queryToday = new Date(formattedToday);
-        console.log("TOMORROW:"+queryTomorrow) ;
-        console.log("TODAY:"+queryToday) ;
-        const query = {
-            $and: [
-                { rental_end_date: {$gte : queryToday,$lt:queryTomorrow } },
-            ],          
-          };
-        const findOrders: Array<IOrder> | null = await Order.find(query);
-
-        console.log("Orders Ending for tomorrow : " + findOrders)
-        if (findOrders) {
-            console.log("sending reminder message day before rental period ends");
-            findOrders.forEach(async (order) => {
-              let order_id = await order.order_id;
-              const findOrder: Array<IOrder> | null = await Order.find({
-                $and: [
-                    { order_id: order_id },
-                ],
-            });
-
-                if(findOrder){
-                    findOrder.forEach(async (newOrder) => {
-                        let renter_name = newOrder.renter_name ;
-                        console.log("order found to send reminder:" + newOrder.renter_name);
-                        sendReturnPickupReminderWhatsappMessage(newOrder,renter_name);
-                        });
-                }else {
-                    console.log("No matching orders found.");
-                  }
-           
-                });
-          } else {
-            console.log("No matching orders found.");
-          }
-
-
-    }catch(error){
-        // Handle errors and send an error response back to the client
-        console.error("Failed to send reminder to renter", error);
-        res
-            .status(500)
-            .json({ success: false, error: "Failed to send reminder to renter" });
+const sendUpdateOnPickupFromRenter = async (req: any, res: any) => {
+  try {
+    let orderID = req.params.id;
+    console.log(orderID)
+    const findOrder: Array<IOrder> | null = await Order.find({ order_id: orderID });
+    console.log(findOrder)
+    if(findOrder){
+      findOrder.forEach(async (newOrder) => {
+          let lender_name = newOrder.lender_name ;
+          let item_name = newOrder.rental_piece_name ;
+          console.log("order found to send message:" + newOrder.renter_name);
+          sendUpdateOnPickupFromRenterWhatsappMessage(newOrder,lender_name,item_name);
+          });
+  }else {
+      console.log("No matching orders found.");
     }
+} catch (err) {
+    console.error("Failed to fetch shopify products:", err);
+    res
+        .status(500)
+        .json({ success: false, error: "Failed to fetch shopify product" });
+
+}
 }
 
-const sendReturnPickupReminderWhatsappMessage =  async (newOrder : any,renter_name:any) => { 
-    console.log("in sendReminderMessage Function: "+newOrder);
-    let renterName = renter_name ;
+const sendUpdateOnPickupFromRenterWhatsappMessage =  async (newOrder : any,renter_name:any,item_name:any) => { 
+    console.log("in sendUpdateOnPickupFromRenterWhatsappMessage Function: "+newOrder,renter_name,item_name);
+    if(renter_name == "" || renter_name == null || renter_name == undefined) renter_name = "Not Selected" ;
+    if(item_name == "" || item_name == null || item_name == undefined) item_name = "Not Selected" ;
     let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
 
-    console.log("PARAMS: " +renterName)
     setTimeout(() => {let payload = {
         messaging_product: 'whatsapp',
-        to: newOrder.renter_phone_number,
+        to: "+971561114006",
         type: 'template',
         template: {
-          name: "return_reminder_to_renter",
+          name: "update_pickup_drycleaner",
           language: {
             code: 'en_US',
             policy: 'deterministic'
@@ -185,18 +151,11 @@ const sendReturnPickupReminderWhatsappMessage =  async (newOrder : any,renter_na
             {
               type: 'body',
               parameters: [
-                { type: 'text', text: renterName },
+                { type: 'text', text: renter_name },
+                { type: 'text', text: item_name },
               ]
             },
-            ,
-              {
-                type: 'button',
-                sub_type: 'url',
-                index: '0',
-                parameters: [
-                  { type: 'text', text: newOrder.order_id }
-                ]
-              }
+            
           ]
         }
       };
@@ -210,7 +169,7 @@ const sendReturnPickupReminderWhatsappMessage =  async (newOrder : any,renter_na
         },
         data: payload
       };
-    if(newOrder.rental_piece_name != "Not Found"){
+    if(newOrder.rental_piece_name != "Not Selected"){
       axios.request(config)
         .then((response) => {
           console.log(JSON.stringify(response.data));
@@ -221,6 +180,131 @@ const sendReturnPickupReminderWhatsappMessage =  async (newOrder : any,renter_na
       }else{
         console.log("No item found to send whatsapp notification")
       }},5000) 
+}
+
+
+
+const sendReturnPickupReminderToRenter = async (req: any, res: any) => {
+  try{
+      const today = new Date();
+
+      // Subtract one day from the current date to get yesterday's date
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1)
+      today.setHours(23, 59, 0, 0);
+      tomorrow.setHours(23, 59, 0, 0); // Set time to 00:00:00.000
+      const formattedToday = today.toISOString().replace("Z", "+00:00");;
+      const formattedTomorrow = tomorrow.toISOString().replace("Z", "+00:00");;
+      
+      const queryTomorrow = new Date(formattedTomorrow);
+      const queryToday = new Date(formattedToday);
+      console.log("TOMORROW:"+queryTomorrow) ;
+      console.log("TODAY:"+queryToday) ;
+      const query = {
+          $and: [
+              { rental_end_date: {$gte : queryToday,$lt:queryTomorrow } },
+          ],          
+        };
+      const findOrders: Array<IOrder> | null = await Order.find(query);
+
+      console.log("Orders Ending for tomorrow : " + findOrders)
+      if (findOrders) {
+          console.log("sending reminder message day before rental period ends");
+          findOrders.forEach(async (order) => {
+            let order_id = await order.order_id;
+            const findOrder: Array<IOrder> | null = await Order.find({
+              $and: [
+                  { order_id: order_id },
+              ],
+          });
+
+              if(findOrder){
+                  findOrder.forEach(async (newOrder) => {
+                      let renter_name = newOrder.renter_name ;
+                      console.log("order found to send reminder:" + newOrder.renter_name);
+                      sendReturnPickupReminderWhatsappMessage(newOrder,renter_name);
+                      });
+              }else {
+                  console.log("No matching orders found.");
+                }
+         
+              });
+        } else {
+          console.log("No matching orders found.");
+        }
+
+
+  }catch(error){
+      // Handle errors and send an error response back to the client
+      console.error("Failed to send reminder to renter", error);
+      res
+          .status(500)
+          .json({ success: false, error: "Failed to send reminder to renter" });
+  }
+}
+
+const sendReturnPickupReminderWhatsappMessage =  async (newOrder : any,renter_name:any) => { 
+  console.log("in sendReminderMessage Function: "+newOrder);
+  let renterName = renter_name ;
+  let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
+
+  console.log("PARAMS: " +renterName)
+  setTimeout(() => {let payload = {
+      messaging_product: 'whatsapp',
+      to: newOrder.renter_phone_number,
+      type: 'template',
+      template: {
+        name: "return_reminder_to_renter",
+        language: {
+          code: 'en_US',
+          policy: 'deterministic'
+        },
+        components: [
+      {        
+      "type": "header",      
+      "parameters": [         
+        { "type": "image", "image": {  "link": headerImageUrl, } }     
+      ]      
+      },
+          {
+            type: 'body',
+            parameters: [
+              { type: 'text', text: renterName },
+            ]
+          },
+          ,
+            {
+              type: 'button',
+              sub_type: 'url',
+              index: '0',
+              parameters: [
+                { type: 'text', text: newOrder.order_id }
+              ]
+            }
+        ]
+      }
+    };
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+      },
+      data: payload
+    };
+  if(newOrder.rental_piece_name != "Not Found"){
+    axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    }else{
+      console.log("No item found to send whatsapp notification")
+    }},5000) 
 }
 
 
@@ -732,4 +816,4 @@ const getOrderById = async (req: any, res: any) => {
 }
 
 
-export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, getOrderById,sendDeliveryReminderToRenter,sendReturnPickupReminderToRenter,sendFeedbackMessageToRenter,sendPickupReminderToLender }
+export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders,sendUpdateOnPickupFromRenter, getOrderById,sendDeliveryReminderToRenter,sendReturnPickupReminderToRenter,sendFeedbackMessageToRenter,sendPickupReminderToLender }
