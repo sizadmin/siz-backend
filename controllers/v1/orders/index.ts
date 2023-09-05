@@ -234,32 +234,63 @@ const newOrderStatus = async (req: any, res: any) => {
             .json({ success: false, error: "Failed to create order status", data: error });
     }
 }
-const updateOrderStatusChanges = async (req: any, res: any) => {
-    console.log("update status changes function");
-    try {
-        let options = { new: false };
 
+const updateOrderStatusChanges = async (req: any, res: any) => {
+    try {
         let body = req.body;
-        console.log("UPDATE ORDEr STATUS: ",body);
-        const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.findByIdAndUpdate({ orderID: body.orderID,body,options});
-        console.log(findOrderStatus);
+        let options = { new: true };
+
+        const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.find({ orderID: body.orderID });
+
+        if (findOrderStatus.length > 0) {
+
+
+            const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.findByIdAndUpdate({ _id: body._id }, body, options);
+
+
+
+            res.status(200).json({
+                success: true,
+                message: "Order status is updated successfully.",
+                data: findOrderStatus
+            });
+            return;
+        }
+        const newOrderStatus: IOrderStatus = new orderstatus({
+            orderID: body.orderID,
+            product_delivery_date: body.product_delivery_date,
+            product_pickup_date: body.product_pickup_date,
+            notes: body.notes,
+            product_delivery_timeslot : body.product_delivery_timeslot,
+            product_pickup_timeslot : body.product_pickup_timeslot,
+            product_pickup_date_from_renter : body.product_pickup_date_from_renter,
+            product_pickup_timeslot_from_renter : body.product_pickup_timeslot_from_renter,
+            return_picked_up : body.return_picked_up,
+        });
+
+        const savedProduct = await newOrderStatus.save();
+
         res.status(200).json({
             success: true,
-            message: "Order status is updated successfully.",
-            data: findOrderStatus
+            message: "Order status is created successfully.",
+            data: savedProduct
         });
 
 
 
     } catch (error) {
         // Handle errors and send an error response back to the client
-        console.error("Failed to update  order status:", error);
+        console.error("Failed to create  order status:", error);
         res
             .status(500)
-            .json({ success: false, error: "Failed to update order status", data: error });
+            .json({ success: false, error: "Failed to create order status", data: error });
     }
 
 }
+
+
+
+
 const updateOrderStatus = async (req: any, res: any) => {
     try {
         let options = { new: true };
