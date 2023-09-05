@@ -234,7 +234,30 @@ const newOrderStatus = async (req: any, res: any) => {
             .json({ success: false, error: "Failed to create order status", data: error });
     }
 }
+const updateOrderStatusChanges = async (req: any, res: any) => {
+    try {
+        let options = { new: true };
 
+        let body = req.body;
+        const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.findByIdAndUpdate({ orderID: body.orderID, body, options });
+
+        res.status(200).json({
+            success: true,
+            message: "Order status is updated successfully.",
+            data: findOrderStatus
+        });
+
+
+
+    } catch (error) {
+        // Handle errors and send an error response back to the client
+        console.error("Failed to update  order status:", error);
+        res
+            .status(500)
+            .json({ success: false, error: "Failed to update order status", data: error });
+    }
+
+}
 const updateOrderStatus = async (req: any, res: any) => {
     try {
         let options = { new: true };
@@ -353,4 +376,4 @@ const getDashboardOrders = async (req: any, res: any) => {
 }
 
 
-export { getOrderDeliveryStatus, newOrderStatus, updateOrderStatus, getDashboardOrders }
+export { getOrderDeliveryStatus, newOrderStatus, updateOrderStatus, getDashboardOrders ,updateOrderStatusChanges}
