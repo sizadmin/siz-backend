@@ -241,7 +241,7 @@ const updateOrderStatusChanges = async (req: any, res: any) => {
 
         let body = req.body;
         console.log("UPDATE ORDEr STATUS: ",body);
-        const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.findByIdAndUpdate({ orderID: body.orderID, body, options });
+        const findOrderStatus: Array<IOrderStatus> | null = await orderstatus.find({ orderID: body.orderID, body, options });
 
         res.status(200).json({
             success: true,
