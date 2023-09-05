@@ -34,6 +34,10 @@ const productSchema: Schema = new Schema(
             type: String,
         },
 
+        return_picked_up : {
+            type : String,
+        }
+
        
     },
     {

@@ -213,6 +213,7 @@ const newOrderStatus = async (req: any, res: any) => {
             product_pickup_timeslot : body.product_pickup_timeslot,
             product_pickup_date_from_renter : body.product_pickup_date_from_renter,
             product_pickup_timeslot_from_renter : body.product_pickup_timeslot_from_renter,
+            return_picked_up : body.return_picked_up,
         });
 
         const savedProduct = await newOrderStatus.save();
