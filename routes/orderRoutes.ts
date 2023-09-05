@@ -5,7 +5,7 @@ const router: Router = Router();
 router.get('/:id', getOrderDeliveryStatus);
 router.post('/:id',newOrderStatus );
 router.put('/:id',updateOrderStatus );
-router.put('updateOrderStatus/:id',updateOrderStatusChanges );
+router.post('/updateOrderStatus/:id',updateOrderStatusChanges );
 
 
 

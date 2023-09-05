@@ -235,6 +235,7 @@ const newOrderStatus = async (req: any, res: any) => {
     }
 }
 const updateOrderStatusChanges = async (req: any, res: any) => {
+    console.log("update status changes function");
     try {
         let options = { new: false };
 
