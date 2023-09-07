@@ -476,8 +476,7 @@ const sendPickupReminderToLender = async (req: any, res: any) => {
       console.log("TODAY:"+querypickupDate) ;
       const query = {
           $and: [
-              { product_pickup_date : {$gte : queryyesterday,$lt:querypickupDate } },
-              { product_pickup_timeslot :   pickupSlot }
+              { product_pickup_date : {$gte : queryyesterday,$lt:querypickupDate } }
           ],          
         };
       const findOrders: Array<IOrderStatus> | null = await orderstatus.find(query);
@@ -486,14 +485,17 @@ const sendPickupReminderToLender = async (req: any, res: any) => {
       if (findOrders) {
           console.log("sending reminder message day before orders");
           findOrders.forEach(async (orderstatus) => {
-            let order_id = await orderstatus.orderID;
-            let pickup_time = await orderstatus.product_pickup_timeslot ;
-            let pickup_date = await orderstatus.product_pickup_date ;
-            const findOrder: Array<IOrder> | null = await Order.find({
-              $and: [
-                  { order_id: order_id },
-              ],
-          });
+            const pickupTimeslot = orderstatus.product_pickup_timeslot ;
+            console.log(pickupTimeslot);
+            if(pickupTimeslot === pickupSlot){
+              let order_id = await orderstatus.orderID;
+              let pickup_time = await orderstatus.product_pickup_timeslot ;
+              let pickup_date = await orderstatus.product_pickup_date ;
+              const findOrder: Array<IOrder> | null = await Order.find({
+                $and: [
+                    { order_id: order_id },
+                ],
+              });
 
               if(findOrder){
                   findOrder.forEach(async (newOrder) => {
@@ -505,6 +507,8 @@ const sendPickupReminderToLender = async (req: any, res: any) => {
                   console.log("No matching orders found.");
                 }
          
+            }
+            
               });
         } else {
           console.log("No matching orders found.");
