@@ -230,7 +230,7 @@ const sendUpdateOnPaymentToLender = async (req: any, res: any) => {
 }
 
 const sendPaymentReminderWhatsappMessage =  async (newOrder : any,lender_name:any,item_name:any) => { 
-  console.log("in sendUpdateOnPickupFromRenterWhatsappMessage Function: "+newOrder,lender_name,item_name);
+  console.log("in sendPaymentReminderWhatsappMessage Function: "+newOrder,lender_name,item_name);
   if(lender_name == "" || lender_name == null || lender_name == undefined) lender_name = "Not Selected" ;
   if(item_name == "" || item_name == null || item_name == undefined) item_name = "Not Selected" ;
   let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
