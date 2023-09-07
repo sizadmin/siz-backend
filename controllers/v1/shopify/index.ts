@@ -538,7 +538,7 @@ const sendPickupReminderWhatsappMessage =  async (newOrder : any,lender_name:any
   console.log("PARAMS: " +lenderName + "," +pickupDate+","+ pickupSlot + "," +itemName+ "," +duration+ "," +startDate+ "," +endDate)
   setTimeout(() => {let payload = {
       messaging_product: 'whatsapp',
-      to: newOrder.renter_phone_number,
+      to: newOrder.lender_phone_whatsapp,
       type: 'template',
       template: {
         name: "pickup_reminder_to_lender",
