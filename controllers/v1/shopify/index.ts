@@ -532,11 +532,11 @@ const sendPickupReminderWhatsappMessage =  async (newOrder : any,lender_name:any
   let pickupSlot = pickup_time ;
   let pickupDate = moment(
     pickup_date
-  ).format("MM/DD/YYYY")
+  ).format("DD-MMM-YYYY")
   let itemName =  newOrder.rental_piece_name ;
   let duration = newOrder.rental_duration ;
-  let startDate = newOrder.rental_start_date ;
-  let endDate = newOrder.rental_end_date ;
+  let startDate = moment(newOrder.rental_start_date).format("DD-MMM-YYYY") ;
+  let endDate = moment(newOrder.rental_end_date).format("DD-MMM-YYYY") ;
   let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
 
   console.log("PARAMS: " +lenderName + "," +pickupDate+","+ pickupSlot + "," +itemName+ "," +duration+ "," +startDate+ "," +endDate)
