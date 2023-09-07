@@ -102,10 +102,26 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 }
 const sendUpdateOnPickupFromRenter = async (req: any, res: any) => {
   try {
-    let orderID = req.params.id;
-    console.log(orderID)
-    const findOrder: Array<IOrder> | null = await Order.find({ order_id: orderID });
-    console.log(findOrder)
+    const today = new Date();
+
+        // Subtract one day from the current date to get yesterday's date
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1)
+        today.setHours(23, 59, 0, 0);
+        yesterday.setHours(23, 59, 0, 0); // Set time to 00:00:00.000
+        const formattedToday = today.toISOString().replace("Z", "+00:00");;
+        const formattedYesterday = yesterday.toISOString().replace("Z", "+00:00");;
+        
+        const queryYesterday = new Date(formattedYesterday);
+        const queryToday = new Date(formattedToday);
+        console.log("TOMORROW:"+queryYesterday) ;
+        console.log("TODAY:"+queryToday) ;
+        const query = {
+            $and: [
+                { rental_end_date: {$gte : queryYesterday,$lt:queryToday } },
+            ],          
+          };
+        const findOrder: Array<IOrder> | null = await Order.find(query);
     if(findOrder){
       findOrder.forEach(async (newOrder) => {
           let lender_name = newOrder.lender_name ;
@@ -441,21 +457,27 @@ const sendPickupReminderToLender = async (req: any, res: any) => {
   try{
       const today = new Date();
 
-      // Subtract one day from the current date to get yesterday's date
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1)
-      today.setHours(23, 59, 0, 0);
-      tomorrow.setHours(23, 59, 0, 0); // Set time to 00:00:00.000
-      const formattedToday = today.toISOString().replace("Z", "+00:00");;
-      const formattedTomorrow = tomorrow.toISOString().replace("Z", "+00:00");;
+      const pickupDate = new Date(req.params.date);
+      const pickupSlot = req.params.timeslot ;
+
+      console.log("Passed Parameter for reminder", pickupDate, pickupSlot) ;
       
-      const queryTomorrow = new Date(formattedTomorrow);
-      const queryToday = new Date(formattedToday);
-      console.log("TOMORROW:"+queryTomorrow) ;
-      console.log("TODAY:"+queryToday) ;
+      // Subtract one day from the current date to get yesterday's date
+      const yesterday = new Date(pickupDate);
+      yesterday.setDate(pickupDate.getDate() - 1)
+      yesterday.setHours(23, 59, 0, 0);
+      pickupDate.setHours(23, 59, 0, 0); // Set time to 00:00:00.000
+      const formattedpickupDate = pickupDate.toISOString().replace("Z", "+00:00");;
+      const formattedyesterday = yesterday.toISOString().replace("Z", "+00:00");;
+      
+      const queryyesterday = new Date(formattedyesterday);
+      const querypickupDate = new Date(formattedpickupDate);
+      console.log("TOMORROW:"+queryyesterday) ;
+      console.log("TODAY:"+querypickupDate) ;
       const query = {
           $and: [
-              { product_pickup_date : {$gte : queryToday,$lt:queryTomorrow } },
+              { product_pickup_date : {$gte : queryyesterday,$lt:querypickupDate } },
+              { product_pickup_timeslot :   pickupSlot }
           ],          
         };
       const findOrders: Array<IOrderStatus> | null = await orderstatus.find(query);

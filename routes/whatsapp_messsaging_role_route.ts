@@ -12,7 +12,7 @@ router.get('/fetchLenders', fetchShopifyLenders);
 router.get('/sendDeliveryReminder', sendDeliveryReminderToRenter);
 router.get('/sendReturnPickupReminder', sendReturnPickupReminderToRenter);
 router.get('/sendFeedbackToRenter', sendFeedbackMessageToRenter);
-router.get('/sendPickupReminderToLender', sendPickupReminderToLender);
+router.get('/sendPickupReminderToLender/:date/:timeslot', sendPickupReminderToLender);
 router.get('/sendUpdateOnPickupFromRenter/:id', sendUpdateOnPickupFromRenter);
 router.get('/order/:id', getOrderById);
 
