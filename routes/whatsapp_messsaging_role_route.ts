@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { sendWhatsappMsg } from '../controllers/v1/whatsapp';
-import { fetchShopifyLenders, fetchShopifyOrder,sendPickupReminderToLender,sendUpdateOnPickupFromRenter, fetchShopifyProducts,sendFeedbackMessageToRenter, getOrderById,sendDeliveryReminderToRenter,sendReturnPickupReminderToRenter } from '../controllers/v1/shopify';
+import { fetchShopifyLenders, fetchShopifyOrder,sendUpdateOnPaymentToLender,sendPickupReminderToLender,sendUpdateOnPickupFromRenter, fetchShopifyProducts,sendFeedbackMessageToRenter, getOrderById,sendDeliveryReminderToRenter,sendReturnPickupReminderToRenter } from '../controllers/v1/shopify';
 
 const router: Router = Router();
 
@@ -13,7 +13,8 @@ router.get('/sendDeliveryReminder', sendDeliveryReminderToRenter);
 router.get('/sendReturnPickupReminder', sendReturnPickupReminderToRenter);
 router.get('/sendFeedbackToRenter', sendFeedbackMessageToRenter);
 router.get('/sendPickupReminderToLender/:date/:timeslot', sendPickupReminderToLender);
-router.get('/sendUpdateOnPickupFromRenter/:id', sendUpdateOnPickupFromRenter);
+router.get('/sendUpdateOnPickupFromRenter', sendUpdateOnPickupFromRenter);
+router.get('/updateToLenderAboutPayment/:id', sendUpdateOnPaymentToLender);
 router.get('/order/:id', getOrderById);
 
 

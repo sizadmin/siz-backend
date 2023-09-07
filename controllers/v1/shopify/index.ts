@@ -141,15 +141,15 @@ const sendUpdateOnPickupFromRenter = async (req: any, res: any) => {
 }
 }
 
-const sendUpdateOnPickupFromRenterWhatsappMessage =  async (newOrder : any,renter_name:any,item_name:any) => { 
-    console.log("in sendUpdateOnPickupFromRenterWhatsappMessage Function: "+newOrder,renter_name,item_name);
-    if(renter_name == "" || renter_name == null || renter_name == undefined) renter_name = "Not Selected" ;
+const sendUpdateOnPickupFromRenterWhatsappMessage =  async (newOrder : any,lender_name:any,item_name:any) => { 
+    console.log("in sendUpdateOnPickupFromRenterWhatsappMessage Function: "+newOrder,lender_name,item_name);
+    if(lender_name == "" || lender_name == null || lender_name == undefined) lender_name = "Not Selected" ;
     if(item_name == "" || item_name == null || item_name == undefined) item_name = "Not Selected" ;
     let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
 
     setTimeout(() => {let payload = {
         messaging_product: 'whatsapp',
-        to: "+971561114006",
+        to: newOrder.lender_phone_whatsapp,
         type: 'template',
         template: {
           name: "update_pickup_drycleaner",
@@ -167,7 +167,7 @@ const sendUpdateOnPickupFromRenterWhatsappMessage =  async (newOrder : any,rente
             {
               type: 'body',
               parameters: [
-                { type: 'text', text: renter_name },
+                { type: 'text', text: lender_name },
                 { type: 'text', text: item_name },
               ]
             },
@@ -196,6 +196,94 @@ const sendUpdateOnPickupFromRenterWhatsappMessage =  async (newOrder : any,rente
       }else{
         console.log("No item found to send whatsapp notification")
       }},5000) 
+}
+
+
+const sendUpdateOnPaymentToLender = async (req: any, res: any) => {
+  try{
+
+    const order_id = req.params.id ;
+    const findOrder: Array<IOrder> | null = await Order.find({
+      $and: [
+          { order_id: order_id },
+      ],
+    });
+    if(findOrder){
+      findOrder.forEach(async (newOrder) => {
+          let lender_name = newOrder.lender_name ;
+          let rental_piece_name = newOrder.rental_piece_name ;
+          console.log("order found to send reminder:" + newOrder.renter_name);
+          sendPaymentReminderWhatsappMessage(newOrder,lender_name,rental_piece_name);
+          });
+  }else {
+      console.log("No matching orders found.");
+    }
+
+
+  }catch (err) {
+    console.error("Failed to fetch shopify order:", err);
+    res
+        .status(500)
+        .json({ success: false, error: "Failed to fetch shopify order" });
+
+}
+}
+
+const sendPaymentReminderWhatsappMessage =  async (newOrder : any,lender_name:any,item_name:any) => { 
+  console.log("in sendUpdateOnPickupFromRenterWhatsappMessage Function: "+newOrder,lender_name,item_name);
+  if(lender_name == "" || lender_name == null || lender_name == undefined) lender_name = "Not Selected" ;
+  if(item_name == "" || item_name == null || item_name == undefined) item_name = "Not Selected" ;
+  let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
+
+  setTimeout(() => {let payload = {
+      messaging_product: 'whatsapp',
+      to: newOrder.lender_phone_whatsapp,
+      type: 'template',
+      template: {
+        name: "update_on_drycleaning_complete ",
+        language: {
+          code: 'en_US',
+          policy: 'deterministic'
+        },
+        components: [
+      {        
+      "type": "header",      
+      "parameters": [         
+        { "type": "image", "image": {  "link": headerImageUrl, } }     
+      ]      
+      },
+          {
+            type: 'body',
+            parameters: [
+              { type: 'text', text: lender_name },
+              { type: 'text', text: item_name },
+            ]
+          },
+          
+        ]
+      }
+    };
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+      },
+      data: payload
+    };
+  if(newOrder.rental_piece_name != "Not Selected"){
+    axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    }else{
+      console.log("No item found to send whatsapp notification")
+    }},5000) 
 }
 
 
@@ -842,4 +930,4 @@ const getOrderById = async (req: any, res: any) => {
 }
 
 
-export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders,sendUpdateOnPickupFromRenter, getOrderById,sendDeliveryReminderToRenter,sendReturnPickupReminderToRenter,sendFeedbackMessageToRenter,sendPickupReminderToLender }
+export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders,sendUpdateOnPickupFromRenter,sendUpdateOnPaymentToLender, getOrderById,sendDeliveryReminderToRenter,sendReturnPickupReminderToRenter,sendFeedbackMessageToRenter,sendPickupReminderToLender }
