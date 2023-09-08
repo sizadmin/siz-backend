@@ -481,8 +481,8 @@ const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,renter_name:a
     let deliverySlot = delivery_time ;
     let itemName =  newOrder.rental_piece_name ;
     let duration = newOrder.rental_duration ;
-    let startDate = newOrder.rental_start_date ;
-    let endDate = newOrder.rental_end_date ;
+    let startDate = moment(newOrder.rental_start_date).format("DD-MMM-YYYY") ;
+    let endDate = moment(newOrder.rental_end_date).format("DD-MMM-YYYY") ;
     let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
 
     console.log("PARAMS: " +renterName + "," + deliverySlot + "," +itemName+ "," +duration+ "," +startDate+ "," +endDate)
