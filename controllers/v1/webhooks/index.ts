@@ -76,8 +76,8 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
           itemName = "Not Found";
           duration = "Not Found" ;
         }
-        let startDate = (dateString?.length > 0) ? dateString?.split("to")[0] : "Not Found";
-        let endDate = (dateString?.length > 0) ? dateString?.split("to")[1]: "Not Found";
+        let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
+        let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1]: "Not Found";
         console.log(startDate)
         let orderId = body.id
         let note = body.note ;
@@ -88,7 +88,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         });
 
         console.log(findBackupProduct)
-        let backupProduct = findBackupProduct? findBackupProduct .product_details.title : "No Backup Product Selected" ;
+        let backupProduct = findBackupProduct? findBackupProduct.product_details.title : "No Backup Product Selected" ;
         if(clientName == "" || clientName == null) return ;
         if(itemName == "" || itemName == null) return ;
         if(duration == "" || duration == null) duration = "Not Selected" ;
@@ -228,8 +228,8 @@ const saveOrderInDb = async (body :  any) => {
           itemName = "Not Found";
           duration = "Not Found" ;
         }
-        let startDate = (dateString?.length > 0) ? dateString?.split("to")[0] : "Not Found";
-        let endDate = (dateString?.length > 0) ? dateString?.split("to")[1]: "Not Found";
+        let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
+        let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1]: "Not Found";
         console.log(startDate)
         console.log("endDate in renter message: "+endDate)
         let orderId = body.id
@@ -320,8 +320,8 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
     itemName = "Not Found";
     duration = "Not Found" ;
   }
-  let startDate = (dateString?.length > 0) ? dateString?.split("to")[0] : "Not Found";
-  let endDate = (dateString?.length > 0) ? dateString?.split("to")[1]: "Not Found";
+  let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
+  let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1]: "Not Found";
   console.log(startDate)
   let orderId = newOrder.order_id
   let note = newOrder.order_note ;
