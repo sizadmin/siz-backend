@@ -4,6 +4,8 @@ import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
 import product from '../../../models/product';
 import lender from '../../../models/lender';
+import { IOrderStatus } from '../../../types/orderstatus';
+import orderstatus from '../../../models/orderstatus';
 
 
 // import { IProduct } from '../../../types/product';
@@ -275,6 +277,19 @@ const saveOrderInDb = async (body :  any) => {
 
     });
     const savedOrder: IOrder = await newOrder.save();
+    const newOrderStatus: IOrderStatus = new orderstatus({
+      orderID: body.id,
+      product_delivery_date: null,
+      product_pickup_date: null,
+      notes: null,
+      product_delivery_timeslot : null,
+      product_pickup_timeslot : null,
+      product_pickup_date_from_renter : null,
+      product_pickup_timeslot_from_renter : null,
+      return_picked_up : null,
+  });
+
+  const savedOrderStatus: IOrderStatus = await newOrderStatus.save();
     await sendOrderPlacementMessageToRenter(body);
     await (lender)?sendOrderReceivedMessageToLender(newOrder):"No Lender Details Found";
 }
