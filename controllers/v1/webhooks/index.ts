@@ -245,8 +245,8 @@ const saveOrderInDb = async (body :  any) => {
         if(clientName == "" || clientName == null) return ;
         if(itemName == "" || itemName == null) return ;
         if(duration == "" || duration == null) duration = "Not Selected" ;
-        if(startDate == "" || startDate == null) startDate = "Not Selected" ;
-        if(endDate == "" || endDate == null) endDate = "Not Selected" ;
+        if(startDate == "" || startDate == null) startDate = null ;
+        if(endDate == "" || endDate == null) endDate = null ;
         if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) backupProduct = "Not Selected" ;
 
 
