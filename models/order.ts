@@ -24,42 +24,75 @@ const orderSchema: Schema = new Schema(
         order_details: {
             type: Schema.Types.Mixed,
         },
-        order_items : {
-            type:Schema.Types.Mixed,
+        order_items: {
+            type: Schema.Types.Mixed,
         },
-        lender_name:{
+        lender_name: {
             type: String
         },
-        lender_address:{
+        lender_address: {
             type: String
         },
-        lender_phone_call : {
+        lender_phone_call: {
             type: String
         },
-        lender_phone_whatsapp : {
+        lender_phone_whatsapp: {
             type: String
         },
-        renter_phone_number : {
+        renter_phone_number: {
             type: String
         },
-        rental_start_date : {
+        rental_start_date: {
             type: Date
         },
-        rental_end_date : {
+        rental_end_date: {
             type: Date
         },
-        renter_name : {
+        renter_name: {
             type: String
         },
-        rental_duration : {
+        rental_duration: {
             type: String
-        }, 
-        rental_piece_name : {
+        },
+        rental_piece_name: {
             type: String
-        }, 
-        backup_piece : {
+        },
+        backup_piece: {
             type: String
-        }
+        },
+        payment_status: {
+            type: Boolean
+        },
+        lenders_share: {
+            type: Number
+        },
+        profit: {
+            type: Number
+        },
+        expenses: {
+            type: Number
+        },
+        rental_fees: {
+            type: Number
+        },
+        returned_to_lender: {
+            type: Boolean
+        },
+        returned_to_lender_by_dry_cleaner: {
+            type: Date
+        },
+        pickup_by_dry_cleaner_from_renter: {
+            type: Date
+        },
+        fitting_date: {
+            type: Date
+        },
+        // fitting_type: {
+        //     type: String
+        // },
+        order_type: {
+            type: String
+        },
     },
     {
         timestamps: true,

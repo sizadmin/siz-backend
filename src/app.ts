@@ -9,6 +9,8 @@ import userRoute from "./../routes/userRoutes";
 import webhooks from "./../routes/webhooks";
 import orderRoute from "./../routes/orderRoutes";
 import dashboardRoute from "./../routes/dashboardRoutes";
+import lendersRoute from "./../routes/lensersRoutes";
+
 
 
 require("dotenv").config();
@@ -34,6 +36,7 @@ app.use('/api/v1/', userRoute)
 app.use('/api/v1/', webhooks)
 app.use('/api/v1/order-status/', orderRoute)
 app.use('/api/v1/dashboard/', dashboardRoute)
+app.use('/api/v1/lenders/', lendersRoute)
 
 
 

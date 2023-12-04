@@ -3,6 +3,8 @@ import { IUser } from '../../../types/user';
 import Role from '../../../models/role';
 import User from '../../../models/user';
 import { ObjectId } from 'mongodb';
+import lender from '../../../models/lender';
+import { ILender } from '../../../types/lender';
 
 var _ = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -45,10 +47,14 @@ const getUsers = async (req: Request, res: Response): Promise<void> => {
                         last_name: 1,
                         phone_number: 1,
                         role: 1,
-                        address: 1
+                        address: 1,
+                        lender_info: 1,
+                        username:1
                     },
                 },
                 { $lookup: { from: 'roles', localField: 'role', foreignField: '_id', as: 'role' } },
+                { $lookup: { from: 'lenders', localField: 'lender_info', foreignField: '_id', as: 'lender_info' } },
+
                 {
                     $facet: {
                         metadata: [{ $count: 'total' }, { $addFields: { page: Number(page) } }],
@@ -74,7 +80,9 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { body } = req;
 
-        let roles: any = await Role.find({ _id: new ObjectId(body.role) });
+        // let roles: any = await Role.find({ _id: new ObjectId(body.role) });
+
+
         const user = await User.findOne({
             email: body.email,
         });
@@ -86,7 +94,19 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             });
             return;
         }
-        let selectedRole: any = roles[0];
+        let roles: any = await lender.find({ _id: new ObjectId(body.role) });
+
+        const newLenderInfo: ILender = new lender({
+            lender_id: body.lender_id,
+            name: body.first_name + ' ' + body.last_name,
+            email: body.email,
+            phone_number_call: body.phone_number,
+            phone_number_whatsapp: body.phone_number_whatsapp,
+            shopify_id: body.shopify_id,
+            address: body.address,
+        });
+        const savedLenderInfo: ILender = await newLenderInfo.save();
+        console.log(savedLenderInfo, "savedLenderInfo")
 
         const newUser: IUser = new User({
             first_name: body.first_name,
@@ -94,6 +114,10 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             email: body.email,
             phone_number: body.phone_number,
             role: body.role,
+            isActive: body.isActive,
+            lender_info: new ObjectId(savedLenderInfo._id),
+            address: body.address,
+            username: body.username
         });
         const salt = await bcrypt.genSalt(10);
         newUser.password = await bcrypt.hash(body.password, salt);
@@ -115,14 +139,40 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             params: { id },
             body,
         } = req;
-        let roles: any = await Role.find({});
         if (body.password) {
             const salt = await bcrypt.genSalt(10);
             body.password = await bcrypt.hash(body.password, salt);
         }
         let options = { new: true };
 
-        const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, body, options).select('-password').populate('role');
+
+        let lenderBody = {
+            lender_id: body.lender_id,
+            name: body.first_name + ' ' + body.last_name,
+            email: body.email,
+            phone_number_call: body.phone_number,
+            phone_number_whatsapp: body.phone_number_whatsapp,
+            shopify_id: body.shopify_id,
+            address: body.address,
+        };
+        if (body.lender_info) {
+            const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password');
+        }
+        // const savedLenderInfo: ILender = await newLenderInfo.save();
+
+        let userBody = {
+            first_name: body.first_name,
+            last_name: body.last_name,
+            email: body.email,
+            phone_number: body.phone_number,
+            role: new ObjectId(body.role),
+            isActive: body.isActive,
+            lender_info: body.lender_info ? new ObjectId(body.lender_info) : null,
+            address: body.address,
+            username: body.username
+        };
+
+        const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info');
 
 
         res.status(200).json({
@@ -160,7 +210,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
         const { body } = req;
 
         const loggedUser: IUser | null = await User.findOne({
-            email: body.email,
+            username: body.username,
         }).populate('role');
         if (!loggedUser) {
 
@@ -208,7 +258,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
                 }
 
                 User.findOneAndUpdate({ _id: loggedUser._id }, { lastLogin: new Date() })
-                    .populate('role')
+                    .populate('role lender_info')
                     .then(ud => {
                         return res.status(200).json({
                             token,

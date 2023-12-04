@@ -1,7 +1,3 @@
-
-
-
-
 import { Document, Schema } from 'mongoose';
 
 export interface IUser extends Document {
@@ -13,5 +9,4 @@ export interface IUser extends Document {
     role:Schema.Types.ObjectId
     password:string
     isActive:boolean
-
 }

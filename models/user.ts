@@ -13,6 +13,11 @@ const userSchema: Schema = new Schema(
             type: String,
             required: true
         },
+        username: {
+            type: String,
+            required: true,
+            unique: true
+        },
         phone_number: {
             type: String
         },
@@ -29,6 +34,10 @@ const userSchema: Schema = new Schema(
         isActive:{
             type:Boolean,
             default:false
+        },
+        lender_info:{
+            type: Schema.Types.ObjectId,
+            ref: 'Lender',
         }
     },
     {

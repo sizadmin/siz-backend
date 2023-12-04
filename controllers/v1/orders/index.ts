@@ -209,11 +209,11 @@ const newOrderStatus = async (req: any, res: any) => {
             product_delivery_date: body.product_delivery_date,
             product_pickup_date: body.product_pickup_date,
             notes: body.notes,
-            product_delivery_timeslot : body.product_delivery_timeslot,
-            product_pickup_timeslot : body.product_pickup_timeslot,
-            product_pickup_date_from_renter : body.product_pickup_date_from_renter,
-            product_pickup_timeslot_from_renter : body.product_pickup_timeslot_from_renter,
-            return_picked_up : body.return_picked_up,
+            product_delivery_timeslot: body.product_delivery_timeslot,
+            product_pickup_timeslot: body.product_pickup_timeslot,
+            product_pickup_date_from_renter: body.product_pickup_date_from_renter,
+            product_pickup_timeslot_from_renter: body.product_pickup_timeslot_from_renter,
+            return_picked_up: body.return_picked_up,
         });
 
         const savedProduct = await newOrderStatus.save();
@@ -235,6 +235,42 @@ const newOrderStatus = async (req: any, res: any) => {
     }
 }
 
+const updateOrderCustomFields = async (req: any, res: any) => {
+    try {
+        let body = req.body;
+        let options = { new: true };
+
+        const result = await Order.findOneAndUpdate(
+            { _id: body._id },
+            {
+                $set: {
+                    profit: body.profit, lenders_share: body.lenders_share, order_type: body.order_type, fitting_date: body.fitting_date,
+                    pickup_by_dry_cleaner_from_renter: body.pickup_by_dry_cleaner_from_renter, returned_to_lender_by_dry_cleaner: body.returned_to_lender_by_dry_cleaner,
+                    returned_to_lender: body.returned_to_lender, rental_fees: body.rental_fees, expenses: body.expenses, payment_status: body.payment_status
+                }
+            },
+            options
+        )
+
+
+        res.status(200).json({
+            success: true,
+            message: "Order status is updated successfully.",
+            data: result
+        });
+
+
+
+
+    } catch (error) {
+        // Handle errors and send an error response back to the client
+        console.error("Failed to create  order status: in updateOrderCustomFields", error);
+        res
+            .status(500)
+            .json({ success: false, error: "Failed to create order status updateOrderCustomFields", data: error });
+    }
+
+}
 const updateOrderStatusChanges = async (req: any, res: any) => {
     try {
         let body = req.body;
@@ -261,11 +297,11 @@ const updateOrderStatusChanges = async (req: any, res: any) => {
             product_delivery_date: body.product_delivery_date,
             product_pickup_date: body.product_pickup_date,
             notes: body.notes,
-            product_delivery_timeslot : body.product_delivery_timeslot,
-            product_pickup_timeslot : body.product_pickup_timeslot,
-            product_pickup_date_from_renter : body.product_pickup_date_from_renter,
-            product_pickup_timeslot_from_renter : body.product_pickup_timeslot_from_renter,
-            return_picked_up : body.return_picked_up,
+            product_delivery_timeslot: body.product_delivery_timeslot,
+            product_pickup_timeslot: body.product_pickup_timeslot,
+            product_pickup_date_from_renter: body.product_pickup_date_from_renter,
+            product_pickup_timeslot_from_renter: body.product_pickup_timeslot_from_renter,
+            return_picked_up: body.return_picked_up,
         });
 
         const savedProduct = await newOrderStatus.save();
@@ -333,28 +369,31 @@ const getDashboardOrders = async (req: any, res: any) => {
 
         let renter_name = req.query.renter_name;
         let renter_Lname = req.query.renter_Lname;
+        let payment_status = req.query.payment_status;
+        let order_type = req.query.order_type;
 
         let product = req.query.product;
-
-
+        // console.log(req.user, "header")
 
         let MatchQuery: any = {};
         if (lender_name) MatchQuery.lender_name = { $regex: lender_name, $options: 'i' };
         if (lender_Lname) MatchQuery.lender_name = { $regex: lender_Lname, $options: 'i' };
 
-        if (renter_name) MatchQuery['order_details.customer.first_name'] = { $regex: renter_name, $options: 'i' };
+        if (renter_name) MatchQuery.renter_name = { $regex: renter_name, $options: 'i' };
         if (renter_Lname) MatchQuery['order_details.customer.last_name'] = { $regex: renter_Lname, $options: 'i' };
+        if (payment_status) MatchQuery.payment_status = payment_status == 'true' ? true : false;
+        if (order_type) MatchQuery.order_type = { $regex: order_type, $options: 'i' };
+
 
         // if (product) MatchQuery['order_details.line_items.[0].name'] = { $regex: product, $options: 'i' };
 
         const sort: any = {};
-            console.log(sortProperty)
-        if (sortProperty === 'order_number' ) {
-          sort['order_number'] = 1;
+        if (sortProperty === 'order_number') {
+            sort['order_number'] = 1;
         }
-        if (sortProperty === '-order_number' ) {
+        if (sortProperty === '-order_number') {
             sort['order_number'] = -1;
-          }
+        }
 
 
         if (start_date !== undefined) {
@@ -368,7 +407,7 @@ const getDashboardOrders = async (req: any, res: any) => {
                 $lte: new Date(end_date),
             }
         }
-
+        console.log(MatchQuery, "MatchQuery")
         const agg: any = [
             {
                 $match: MatchQuery,
@@ -409,4 +448,4 @@ const getDashboardOrders = async (req: any, res: any) => {
 }
 
 
-export { getOrderDeliveryStatus, newOrderStatus, updateOrderStatus, getDashboardOrders ,updateOrderStatusChanges}
+export { getOrderDeliveryStatus, newOrderStatus, updateOrderStatus, getDashboardOrders, updateOrderStatusChanges, updateOrderCustomFields }
