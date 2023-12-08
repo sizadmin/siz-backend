@@ -813,7 +813,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
         const formattedYesterday = yesterday.toISOString().replace("Z", "-04:00");
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?created_at_min=`+formattedYesterday;
+        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json?`;
         console.log("URL : ",url);
         let config = {
             headers: {
