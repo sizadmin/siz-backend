@@ -11,6 +11,10 @@ export interface ILender extends Document {
     shopify_id: string;
     address: string;
     lender_details: Schema.Types.Mixed
+    account_number: string;
+    iban_number: string;
+    swift_code: string;
+    account_name: string;
 }
 
 

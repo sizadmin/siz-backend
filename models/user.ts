@@ -38,7 +38,11 @@ const userSchema: Schema = new Schema(
         lender_info:{
             type: Schema.Types.ObjectId,
             ref: 'Lender',
-        }
+        },
+        lender_type: {
+            type: String
+        },
+
     },
     {
         timestamps: true,

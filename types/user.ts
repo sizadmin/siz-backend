@@ -8,5 +8,6 @@ export interface IUser extends Document {
     address: string;
     role:Schema.Types.ObjectId
     password:string
-    isActive:boolean
+    isActive:boolean;
+    lender_type:string;
 }

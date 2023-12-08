@@ -80,7 +80,6 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         const response = await axios.get(url, config);
 
         for await (const product of response.data.products) {
-            console.log(response.data.products.length)
 
             const findProduct: Array<IProduct> | null = await Product.find({
                 $and: [
@@ -373,6 +372,8 @@ const getDashboardOrders = async (req: any, res: any) => {
         let order_type = req.query.order_type;
 
         let product = req.query.product;
+        console.log(payment_status, "payment_status")
+
         // console.log(req.user, "header")
 
         let MatchQuery: any = {};
@@ -407,7 +408,7 @@ const getDashboardOrders = async (req: any, res: any) => {
                 $lte: new Date(end_date),
             }
         }
-        console.log(MatchQuery, "MatchQuery")
+        // console.log(MatchQuery, "MatchQuery")
         const agg: any = [
             {
                 $match: MatchQuery,
@@ -428,12 +429,33 @@ const getDashboardOrders = async (req: any, res: any) => {
 
         const aggregatedData: any = await Order.aggregate(agg);
 
+        let totalPrice = 0;
+        let totalRentalFees = 0;
+        let totalLendersShare = 0;
+        let totalExpenses = 0;
+        let totalProfit = 0;
 
+        // console.log(aggregatedData,"aggregatedData")
+        aggregatedData.forEach(element => {
+            totalPrice = totalPrice + Number(element.order_details.total_price);
+            totalRentalFees = totalRentalFees + Number(element.rental_fees);
+            totalLendersShare = totalLendersShare + Number(element.lenders_share);
+            totalExpenses = totalExpenses + Number(element.expenses);
+            totalProfit = totalProfit + Number(element.profit);
+        });
 
         res.status(200).json({
             success: true,
             message: "Orders data is fetched successfully.",
-            data: aggregatedData
+            data: aggregatedData,
+            metadata: {
+                totalPrice: totalPrice.toFixed(2),
+                totalRentalFees: totalRentalFees.toFixed(2),
+                totalLendersShare: totalLendersShare.toFixed(2),
+                totalExpenses: totalExpenses.toFixed(2),
+                totalProfit: totalProfit.toFixed(2),
+
+            }
         });
 
 

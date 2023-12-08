@@ -5,6 +5,7 @@ const lenderSchema: Schema = new Schema(
     {
         lender_id: {
             type: String,
+            unique: true,
         },
         name: {
             type: String,
@@ -27,7 +28,18 @@ const lenderSchema: Schema = new Schema(
         address: {
             type: String
         },
-
+        account_number: {
+            type: String
+        },
+        iban_number: {
+            type: String
+        },
+        swift_code: {
+            type: String
+        },
+        account_name: {
+            type: String
+        },
         lender_details: {
             type: Schema.Types.Mixed,
         },
