@@ -440,9 +440,9 @@ const findLenderDetails = async (body : any ) => {
 }
 
 const findProductFromOrder = async (body : any) => {
-  let product_title = body.line_items[0]?.title ;
+  let product_id = body.line_items[0]?.product_id;
   const findProduct: any| null = await product.findOne({
-    "product_details.title": product_title 
+    "product_details.product_id": product_id 
   });
   console.log(findProduct)
   return findProduct ;
