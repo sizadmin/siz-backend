@@ -3,10 +3,6 @@ import { model, Schema } from 'mongoose';
 
 const lenderSchema: Schema = new Schema(
     {
-        lender_id: {
-            type: String,
-            unique: true,
-        },
         name: {
             type: String,
         },

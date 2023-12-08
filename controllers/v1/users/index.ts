@@ -152,7 +152,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 
 
         let lenderBody = {
-            lender_id: body.lender_id,
+            // lender_id: body.lender_id,
             name: body.first_name + ' ' + body.last_name,
             email: body.email,
             phone_number_call: body.phone_number,
@@ -167,7 +167,6 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
         if (body.lender_info) {
             const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password');
         }
-        // const savedLenderInfo: ILender = await newLenderInfo.save();
 
         let userBody = {
             first_name: body.first_name,

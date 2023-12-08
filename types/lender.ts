@@ -2,7 +2,6 @@ import { Document, Schema } from 'mongoose';
 
 export interface ILender extends Document {
 
-    lender_id: string;
     first_name: string;
     last_name: string;
     email: string;

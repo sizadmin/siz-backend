@@ -437,13 +437,14 @@ const getDashboardOrders = async (req: any, res: any) => {
 
         // console.log(aggregatedData,"aggregatedData")
         aggregatedData.forEach(element => {
+            console.log(element.profit,"ppp")
             totalPrice = totalPrice + Number(element.order_details.total_price);
             totalRentalFees = totalRentalFees + Number(element.rental_fees);
             totalLendersShare = totalLendersShare + Number(element.lenders_share);
             totalExpenses = totalExpenses + Number(element.expenses);
-            totalProfit = totalProfit + Number(element.profit);
+            totalProfit =element.profit !== null || element.profit !== undefined ? totalProfit + Number(element.profit) : totalProfit;
         });
-
+console.log(totalProfit,"totalProfit")
         res.status(200).json({
             success: true,
             message: "Orders data is fetched successfully.",
