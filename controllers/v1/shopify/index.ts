@@ -182,6 +182,7 @@ const sendUpdateOnPickupFromRenterWhatsappMessage =  async (newOrder : any,lende
         url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
           },
         data: payload
       };
@@ -269,7 +270,7 @@ const sendPaymentReminderWhatsappMessage =  async (newOrder : any,lender_name:an
       url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+        'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
       },
       data: payload
     };
@@ -394,7 +395,7 @@ const sendReturnPickupReminderWhatsappMessage =  async (newOrder : any,renter_na
       url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+        'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
       },
       data: payload
     };
@@ -523,7 +524,7 @@ const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,renter_name:a
         url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+          'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
         },
         data: payload
       };
@@ -666,7 +667,7 @@ const sendPickupReminderWhatsappMessage =  async (newOrder : any,lender_name:any
       url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+        'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
         },
       data: payload
     };
@@ -786,7 +787,7 @@ const sendFeedbackWhatsappMessageRenter =  async (newOrder : any,renter_name:any
         url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+          'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
           },
         data: payload
       };
@@ -865,7 +866,7 @@ const fetchShopifyLenders = async (req: any, res: any) => {
 
         let config = {
             headers: {
-                'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
+                'X-Shopify-Access-Token': process.env.AUTHORIZATION_TOKEN,
             },
         };
         const response = await axios.get(url, config);

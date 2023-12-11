@@ -147,7 +147,7 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
           url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+            'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
            },
           data: payload
         };
@@ -177,7 +177,7 @@ let config = {
   url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
   headers: { 
     'Content-Type': 'application/json', 
-    'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+    'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
   },
   data : data
 };
@@ -403,7 +403,7 @@ console.log(orderId,"order id");
     url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+      'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
     },
     data: payload
   };
