@@ -8,6 +8,7 @@ import lender from '../../../models/lender';
 import orderstatus from '../../../models/orderstatus';
 import { IOrderStatus } from '../../../types/orderstatus';
 import moment from "moment";
+const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
 
 const fetchShopifyOrder = async (req: any, res: any) => {
@@ -181,8 +182,7 @@ const sendUpdateOnPickupFromRenterWhatsappMessage =  async (newOrder : any,lende
         url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
-        },
+          },
         data: payload
       };
     if(newOrder.rental_piece_name != "Not Selected"){
@@ -269,7 +269,7 @@ const sendPaymentReminderWhatsappMessage =  async (newOrder : any,lender_name:an
       url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+        'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
       },
       data: payload
     };
@@ -394,7 +394,7 @@ const sendReturnPickupReminderWhatsappMessage =  async (newOrder : any,renter_na
       url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+        'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
       },
       data: payload
     };
@@ -523,7 +523,7 @@ const sendDeliveryReminderWhatsappMessage =  async (newOrder : any,renter_name:a
         url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+          'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
         },
         data: payload
       };
@@ -666,8 +666,8 @@ const sendPickupReminderWhatsappMessage =  async (newOrder : any,lender_name:any
       url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
-      },
+        'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+        },
       data: payload
     };
   if(newOrder.rental_piece_name != "Not Found"){
@@ -786,8 +786,8 @@ const sendFeedbackWhatsappMessageRenter =  async (newOrder : any,renter_name:any
         url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
-        },
+          'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+          },
         data: payload
       };
     if(newOrder.rental_piece_name != "Not Found"){
