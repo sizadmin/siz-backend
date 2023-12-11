@@ -6,6 +6,7 @@ import product from '../../../models/product';
 import lender from '../../../models/lender';
 import { IOrderStatus } from '../../../types/orderstatus';
 import orderstatus from '../../../models/orderstatus';
+const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
 
 // import { IProduct } from '../../../types/product';
@@ -146,8 +147,8 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
           url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
-          },
+            'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
+           },
           data: payload
         };
       if(itemName != "Not Found"){
@@ -176,7 +177,7 @@ let config = {
   url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
   headers: { 
     'Content-Type': 'application/json', 
-    'Authorization': 'Bearer EAAIl8Exy9ZCMBAMzDV2UjtgBD9v4tr58p7auaT4S4nQay1btQ61lKJx0VFnUEq86AROVyK9ZAKp42O0R4uXuqVed04dVckklh8xGmRWt1pVKhpZAUBpbAES9RBFoEUbQz4UEDKBZCioydf7k57ZCyRtaSGXvXSyDq5ZAvstrAQkAZAkZCvFkPYMl1ciTeZCofA23PFCt67mssDbtz9aJRdTWrZCc0KhOiHYQsZD'
+    'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
   },
   data : data
 };
@@ -402,7 +403,7 @@ console.log(orderId,"order id");
     url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer EAAIl8Exy9ZCMBABBxmqksvO8yXsXuBoZAfWXtCDcfSmQhZAZBUbrGSWKaJqtyZAOxS23XmBkZAkCxqIZCfhsTOobwUmhLZA3VJ57JLBiTdBS9ZA2JDY6rbIT1ZADcsECfJASUakyJHkB9gPEzUPpDtztLvH1VLeZCZBlrG2VCi5cZA6Px4NJWeky4CFBzfNGZBy6TJ6QvEyiogJa6ZBNwZDZD'
+      'Authorization': "Bearer " + AUTHORIZATION_TOKEN,
     },
     data: payload
   };
