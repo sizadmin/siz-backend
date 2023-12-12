@@ -79,6 +79,10 @@ const fetchShopifyOrder = async (req: any, res: any) => {
                     lender_address:lender_address,
                     lender_phone_call : lender_phone_call,
                     lender_phone_whatsapp : lender_phone_whatsapp,
+                    profit: 0,
+                    expenses: 0,
+                    lenders_share: 0,
+                    rental_fees:order.total_price,
 
                 });
                 const savedOrder: IOrder = await newOrder.save();

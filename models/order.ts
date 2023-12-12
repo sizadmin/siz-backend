@@ -64,13 +64,16 @@ const orderSchema: Schema = new Schema(
             type: Boolean
         },
         lenders_share: {
-            type: Number
+            type: Number,
+            default:0
         },
         profit: {
-            type: Number
+            type: Number,
+            default:0
         },
         expenses: {
-            type: Number
+            type: Number,
+            default:0
         },
         rental_fees: {
             type: Number

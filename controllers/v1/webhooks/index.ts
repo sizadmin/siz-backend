@@ -275,6 +275,10 @@ const saveOrderInDb = async (body :  any) => {
         lender_address:lenderObj?.address,
         lender_phone_call : lenderObj?.phone_number_call,
         lender_phone_whatsapp : lenderObj?.phone_number_whatsapp,
+        profit: 0,
+        expenses: 0,
+        lenders_share: 0,
+        rental_fees:body.total_price
 
     });
     const savedOrder: IOrder = await newOrder.save();
