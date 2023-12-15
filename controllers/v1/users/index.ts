@@ -28,7 +28,7 @@ const getUsers = async (req: Request, res: Response): Promise<void> => {
             return;
         } else {
             const page = Number(req.query.page) || 1;
-            const size = Number(req.query.size) || 10;
+            const size = Number(req.query.size) || 100;
             const searchAccName = req.query.searchAccName;
             let MatchQuery: any = {};
             if (searchAccName) MatchQuery.account_name = { $regex: searchAccName, $options: 'i' };
