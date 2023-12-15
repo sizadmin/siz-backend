@@ -178,7 +178,8 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             lender_info: body.lender_info ? new ObjectId(body.lender_info) : null,
             address: body.address,
             username: body.username,
-            lender_type: body.lender_type
+            lender_type: body.lender_type,
+            password: body.password
         };
 
         const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info');
@@ -235,6 +236,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
             return;
         }
         //   compare the saved password with login Password
+        
         const isMatch = await bcrypt.compare(body.password, loggedUser.password);
 
         if (!isMatch) {
