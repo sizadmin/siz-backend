@@ -224,6 +224,7 @@ const saveOrderInDb = async (body :  any) => {
               dateString = "Not Found" ;
             } 
         }else if(arrayLength == 1){
+          console.log("single item flow"+order_items_array[0]);
           itemName = order_items_array[0]?.name.split("-")[0] ; 
           lender_name_string = order_items_array[0].lender[0].name  ;
           lender_address_string = order_items_array[0].lender[0].address ;
@@ -315,6 +316,7 @@ const populateLineItems =  async (line_items : any) => {
   for (const item of line_items) {
       let product_id = item.product_id ;
       let lender = await findLenderFromProductId(product_id);
+      console.log("lender found " + lender) ;
       order_items_array.lender = lender ;
   };
   return order_items_array;
