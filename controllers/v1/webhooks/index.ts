@@ -312,11 +312,11 @@ const saveOrderInDb = async (body :  any) => {
 const populateLineItems =  async (line_items : any) => {
   console.log("In populate function: "+line_items.length) ;
   let order_items_array = line_items ;
-  line_items.forEach(item => {
+  for (const item of line_items) {
       let product_id = item.product_id ;
-      let lender = findLenderFromProductId(product_id);
+      let lender = await findLenderFromProductId(product_id);
       order_items_array.lender = lender ;
-  });
+  };
   return order_items_array;
 }
 
