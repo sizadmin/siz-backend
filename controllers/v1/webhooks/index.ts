@@ -210,9 +210,9 @@ const saveOrderInDb = async (body :  any) => {
         let backupPieceName = "" ;
         console.log(arrayLength);
         if(arrayLength > 1){
-          lender_name_string = order_items_array[0].lender[0].name + " & " + (arrayLength-1) + " Others" ;
-          lender_address_string = order_items_array[0].lender[0].address + " & " + (arrayLength-1) + " Others" ;
-          lender_phone_string = order_items_array[0].lender[0].phone_number_call + " & " + (arrayLength-1) + " Others" ;
+          lender_name_string = order_items_array[0].lender.name + " & " + (arrayLength-1) + " Others" ;
+          lender_address_string = order_items_array[0].lender.address + " & " + (arrayLength-1) + " Others" ;
+          lender_phone_string = order_items_array[0].lender.phone_number_call + " & " + (arrayLength-1) + " Others" ;
           itemName = order_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + " Others" ; 
             duration = (order_items_array[0]?.name.split("/").length > 0 && order_items_array[0].name.split("/").length == 4) ? order_items_array[0].name.split("/")[3] :  order_items_array[0].name.split("/")[2] ;
             if(order_items_array[0]?.properties?.length > 0 ){
@@ -226,9 +226,9 @@ const saveOrderInDb = async (body :  any) => {
         }else if(arrayLength == 1){
           console.log("single item flow "+order_items_array[0].name+ "---" + order_items_array[0].lender);
           itemName = order_items_array[0]?.name.split("-")[0] ; 
-          lender_name_string = order_items_array[0].lender[0].name  ;
-          lender_address_string = order_items_array[0].lender[0].address ;
-          lender_phone_string = order_items_array[0].lender[0].phone_number_call ;
+          lender_name_string = order_items_array[0].lender.name  ;
+          lender_address_string = order_items_array[0].lender.address ;
+          lender_phone_string = order_items_array[0].lender.phone_number_call ;
           duration = (order_items_array[0]?.name.split("/").length > 0 && order_items_array[0].name.split("/").length == 4) ? order_items_array[0].name.split("/")[3] :  order_items_array[0].name.split("/")[2] ;
           if(order_items_array[0]?.properties?.length > 0 ){
             let key = order_items_array[0].properties[0].name ;
@@ -307,7 +307,7 @@ const saveOrderInDb = async (body :  any) => {
 
   const savedOrderStatus: IOrderStatus = await newOrderStatus.save();
     await sendOrderPlacementMessageToRenter(body);
-    await (lender)?sendOrderReceivedMessageToLender(newOrder):"No Lender Details Found";
+    await sendOrderReceivedMessageToLender(newOrder);
 }
 
 const populateLineItems =  async (line_items : any) => {
