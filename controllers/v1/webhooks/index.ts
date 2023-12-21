@@ -18,7 +18,7 @@ const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = proces
 const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
     try {
         const { body } = req;
-        console.log(body);
+        console.log("got new order from shopify");
         await saveOrderInDb(body);
         console.log("Order saved in DB");
         
@@ -335,7 +335,8 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
   console.log("array captured");
   let orderId = newOrder.order_id ;
   line_items_array.forEach(item => {
-    let to_Number = item.lender.lender_phone_whatsapp ;
+    let to_Number = item.lender.phone_number_whatsapp ;
+    console.log(to_Number)
     let LenderName = item.lender.name ;
     let headerImageUrl="https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png" ;
     let itemName = item.title ;
@@ -397,7 +398,7 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
         ]
       }
     };
-  console.log(orderId,"order id");
+  //console.log(orderId,"order id");
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
