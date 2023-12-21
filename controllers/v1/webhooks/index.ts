@@ -306,8 +306,8 @@ const saveOrderInDb = async (body :  any) => {
   });
 
   const savedOrderStatus: IOrderStatus = await newOrderStatus.save();
-    await sendOrderPlacementMessageToRenter(body);
-    await sendOrderReceivedMessageToLender(newOrder);
+     sendOrderPlacementMessageToRenter(body);
+     sendOrderReceivedMessageToLender(newOrder);
 }
 
 const populateLineItems =  async (line_items : any) => {
