@@ -196,6 +196,7 @@ const saveOrderInDb = async (body :  any) => {
 
     let lenderObj = await findLenderDetails(body);
     let order_items_array = await populateLineItems(body.line_items);
+    console.log("line itesms populated ")
         let renter_phone_number = (body.billing_address?.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
         let clientName = (body.billing_address?.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
         let line_items_array = body.line_items ;
@@ -309,12 +310,13 @@ const saveOrderInDb = async (body :  any) => {
 }
 
 const populateLineItems =  async (line_items : any) => {
+  console.log("In populate function: "+line_items.length) ;
+  let order_items_array = line_items ;
   line_items.forEach(item => {
       let product_id = item.product_id ;
       let lender = findLenderFromProductId(product_id);
-      line_items.lender = lender ;
+      order_items_array.lender = lender ;
   });
-  let order_items_array = line_items ;
   return order_items_array;
 }
 
@@ -447,6 +449,7 @@ const findLenderDetails = async (body : any ) => {
 }
 
 const findLenderFromProductId = async (product_id : any ) => {
+  console.log("in findLenderFromProductId");
   let product = await findProductByProductId(product_id);
   let tags = product?.product_details?.tags ;
   const regex = /(INFLUENCER_[A-Za-z0-9_\\s]+)/;
@@ -466,6 +469,7 @@ const findLenderFromProductId = async (product_id : any ) => {
 }
 
 const findProductByProductId = async (product_id : any) => {
+  console.log("in findProductByProductId");
   const findProduct: any| null = await product.findOne({
     "product_id": product_id 
   });
