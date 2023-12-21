@@ -196,7 +196,7 @@ const saveOrderInDb = async (body :  any) => {
 
     let lenderObj = await findLenderDetails(body);
     let order_items_array = await populateLineItems(body.line_items);
-    console.log("line itesms populated ")
+    console.log("line itesms populated "+ order_items_array)
         let renter_phone_number = (body.billing_address?.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
         let clientName = (body.billing_address?.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
         let line_items_array = body.line_items ;
@@ -213,26 +213,26 @@ const saveOrderInDb = async (body :  any) => {
           lender_name_string = order_items_array[0].lender[0].name + " & " + (arrayLength-1) + " Others" ;
           lender_address_string = order_items_array[0].lender[0].address + " & " + (arrayLength-1) + " Others" ;
           lender_phone_string = order_items_array[0].lender[0].phone_number_call + " & " + (arrayLength-1) + " Others" ;
-          itemName = line_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + " Others" ; 
-            duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
-            if(line_items_array[0]?.properties?.length > 0 ){
-              let key = line_items_array[0].properties[0].name ;
+          itemName = order_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + " Others" ; 
+            duration = (order_items_array[0]?.name.split("/").length > 0 && order_items_array[0].name.split("/").length == 4) ? order_items_array[0].name.split("/")[3] :  order_items_array[0].name.split("/")[2] ;
+            if(order_items_array[0]?.properties?.length > 0 ){
+              let key = order_items_array[0].properties[0].name ;
               if(key == "Date"){
-                dateString = line_items_array[0].properties[0].value ;
+                dateString = order_items_array[0].properties[0].value ;
               }
             }else{
               dateString = "Not Found" ;
             } 
         }else if(arrayLength == 1){
-          itemName = line_items_array[0]?.name.split("-")[0] ; 
+          itemName = order_items_array[0]?.name.split("-")[0] ; 
           lender_name_string = order_items_array[0].lender[0].name  ;
           lender_address_string = order_items_array[0].lender[0].address ;
           lender_phone_string = order_items_array[0].lender[0].phone_number_call ;
-          duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
-          if(line_items_array[0]?.properties?.length > 0 ){
-            let key = line_items_array[0].properties[0].name ;
+          duration = (order_items_array[0]?.name.split("/").length > 0 && order_items_array[0].name.split("/").length == 4) ? order_items_array[0].name.split("/")[3] :  order_items_array[0].name.split("/")[2] ;
+          if(order_items_array[0]?.properties?.length > 0 ){
+            let key = order_items_array[0].properties[0].name ;
             if(key == "Date"){
-              dateString = line_items_array[0].properties[0].value ;
+              dateString = order_items_array[0].properties[0].value ;
             }
           }else{
             dateString = "Not Found" ;
