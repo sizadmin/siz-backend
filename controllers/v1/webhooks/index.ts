@@ -20,6 +20,8 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
         const { body } = req;
         console.log("got new order from shopify");
         await saveOrderInDb(body);
+        await sendOrderPlacementMessageToRenter(body);
+        await sendOrderReceivedMessageToLender(newOrder);
         console.log("Order saved in DB");
         
         //sendOrderPlacementMessageToRenter("971561114006","order_placement_with_delivery",image_url,renter_name,item_name,duration,start_date,"13 July 2023",order_id);
@@ -306,8 +308,7 @@ const saveOrderInDb = async (body :  any) => {
   });
 
   const savedOrderStatus: IOrderStatus = await newOrderStatus.save();
-     sendOrderPlacementMessageToRenter(body);
-     sendOrderReceivedMessageToLender(newOrder);
+    
 }
 
 const populateLineItems =  async (line_items : any) => {
