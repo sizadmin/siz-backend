@@ -224,7 +224,7 @@ const saveOrderInDb = async (body :  any) => {
               dateString = "Not Found" ;
             } 
         }else if(arrayLength == 1){
-          console.log("single item flow "+order_items_array[0].name+ "---" + )order_items_array[0].lender;
+          console.log("single item flow "+order_items_array[0].name+ "---" + order_items_array[0].lender);
           itemName = order_items_array[0]?.name.split("-")[0] ; 
           lender_name_string = order_items_array[0].lender[0].name  ;
           lender_address_string = order_items_array[0].lender[0].address ;
