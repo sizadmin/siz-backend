@@ -396,7 +396,7 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
       ]
     }
   };
-console.log(orderId,"order id");
+console.log("token "+process.env.AUTHORIZATION_TOKEN );
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
