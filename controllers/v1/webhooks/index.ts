@@ -311,7 +311,7 @@ const populateLineItems = async (line_items : any) =>{
     let product = await findProductFromId(product_id);
     let lenderObj = await findLenderfromProduct(product) ;
     itm.lender = lenderObj ;
-    itm.images - product.product_details.images ;
+    itm.images = product.product_details.images ;
   }
   return line_items ;
 }
