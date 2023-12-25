@@ -195,7 +195,7 @@ axios.request(config)
 const saveOrderInDb = async (body :  any) => {
 
     let lenderObj = await findLenderDetails(body);
-
+    let line_items = await populateLineItems(body.line_items);
         let renter_phone_number = (body.billing_address?.phone.length > 0 ) ? body.billing_address.phone : "Phone Not Found" ; ;
         let clientName = (body.billing_address?.first_name.length > 0 ) ? body.billing_address.first_name : "Client Name Not Found" ;
         let line_items_array = body.line_items ;
@@ -204,10 +204,16 @@ const saveOrderInDb = async (body :  any) => {
         let duration = "" ;
         let dateString = "" ;
         let backupPieceName = "" ;
+        let lender_name = "" ;
+        let lender_address = "" ;
+        let lender_phone_call = "" ;
+        let lender_phone_whatsapp = "" ;
         console.log(arrayLength);
         if(arrayLength > 1){
-            itemName = line_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + "Others" ; 
+            itemName = line_items_array[0]?.name.split("-")[0] + " & " + (arrayLength-1) + " More" ; 
             duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+            lender_name = line_items[0].lender.name + " & " + " More" ;
+            lender_address = line_items[0].lender.address + " & " + " More" ;
             if(line_items_array[0]?.properties?.length > 0 ){
               let key = line_items_array[0].properties[0].name ;
               if(key == "Date"){
@@ -219,6 +225,8 @@ const saveOrderInDb = async (body :  any) => {
         }else if(arrayLength == 1){
           itemName = line_items_array[0]?.name.split("-")[0] ; 
           duration = (line_items_array[0]?.name.split("/").length > 0 && line_items_array[0].name.split("/").length == 4) ? line_items_array[0].name.split("/")[3] :  line_items_array[0].name.split("/")[2] ;
+          lender_name = line_items[0].lender.name ;
+          lender_address = line_items[0].lender.address  ;
           if(line_items_array[0]?.properties?.length > 0 ){
             let key = line_items_array[0].properties[0].name ;
             if(key == "Date"){
@@ -250,6 +258,8 @@ const saveOrderInDb = async (body :  any) => {
         if(duration == "" || duration == null) duration = "Not Selected" ;
         if(startDate == "" || startDate == null) startDate = null ;
         if(endDate == "" || endDate == null) endDate = null ;
+        if(lender_name == "" || lender_name == null) lender_name = " Not Found" ;
+        if(lender_address == "" || lender_address == null) lender_address = " Not Found" ;
         if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) backupProduct = "Not Selected" ;
 
 
@@ -269,10 +279,10 @@ const saveOrderInDb = async (body :  any) => {
         rental_duration : duration ,
         rental_piece_name : itemName ,
         backup_piece : backupProduct ,
-        order_items: body.line_items,
+        order_items: line_items,
         order_note:body.note,
-        lender_name:lenderObj?.name,
-        lender_address:lenderObj?.address,
+        lender_name:lender_name,
+        lender_address:lender_address,
         lender_phone_call : lenderObj?.phone_number_call,
         lender_phone_whatsapp : lenderObj?.phone_number_whatsapp,
 
@@ -294,6 +304,19 @@ const saveOrderInDb = async (body :  any) => {
     await sendOrderPlacementMessageToRenter(body);
     await (lender)?sendOrderReceivedMessageToLender(newOrder):"No Lender Details Found";
 }
+
+const populateLineItems = async (line_items : any) =>{
+  for(let itm of line_items){
+    let product_id = itm.product_id ;
+    let product = await findProductFromId(product_id);
+    let lenderObj = await findLenderfromProduct(product) ;
+    itm.lender = lenderObj ;
+    itm.images - product.product_details.images ;
+  }
+  return line_items ;
+}
+
+
 const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
   console.log("sending message to lender")
   console.log(newOrder);
@@ -440,10 +463,42 @@ const findLenderDetails = async (body : any ) => {
   }
 }
 
+const findLenderfromProduct = async (product : any ) => {
+//  let product = await findProductFromOrder(body);
+  let product_id = product?.product_id ;
+  let tags = product?.product_details?.tags ;
+  const regex = /(INFLUENCER_[A-Za-z0-9_\\s]+)/;
+  const matches = tags?.toUpperCase().match(regex);
+  let influencerTag = "" ;
+  if (matches && matches.length >= 2) {
+    influencerTag = matches[1];
+    console.log("Influencer Tag:", influencerTag);
+    const findLender: any| null = await lender.findOne({
+      "shopify_id": influencerTag
+    });
+    return findLender;
+  } else {
+    console.log("Influencer Tag not found.");
+    return null ;
+  }
+}
+
+
+
 const findProductFromOrder = async (body : any) => {
   let product_title = body.line_items[0]?.title ;
   const findProduct: any| null = await product.findOne({
     "product_details.title": product_title 
+  });
+  console.log(findProduct)
+  return findProduct ;
+  
+}
+
+const findProductFromId = async (productId : any) => {
+  //let product_title = body.line_items[0]?.title ;
+  const findProduct: any| null = await product.findOne({
+    "product_id": productId 
   });
   console.log(findProduct)
   return findProduct ;
