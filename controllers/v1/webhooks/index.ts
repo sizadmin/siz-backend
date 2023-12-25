@@ -99,7 +99,10 @@ const sendOrderPlacementMessageToRenter =  async (body : any) => {
         if(endDate == "" || endDate == null) endDate = "Not Selected" ;
         if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) backupProduct = "Not Selected" ;
 
-
+        duration = duration.trim();
+        itemName = itemName.trim();
+        clientName = clientName.trim() ;
+        backupProduct = backupProduct.trim();
         setTimeout(() => {let payload = {
           messaging_product: 'whatsapp',
           to: to_Number,
@@ -380,7 +383,9 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
   if(endDate == "" || endDate == null) endDate = "Not Selected" ;
   // if(backupProduct == "" || backupProduct == null || backupProduct == "No Backup Product Selected"  ) endDate = "Not Selected" ;
 
-  
+  duration = duration.trim();
+  itemName = itemName.trim();
+  LenderName = LenderName.trim() ;
   setTimeout(() => {let payload = {
     messaging_product: 'whatsapp',
     to: to_Number,
