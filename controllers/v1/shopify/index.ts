@@ -831,7 +831,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         const response = await axios.get(url, config);
 
         for await (const product of response.data.products) {
-            console.log(response.data.products.length)
+            //console.log(response.data.products.length)
 
             const findProduct: Array<IProduct> | null = await Product.find({
                 $and: [
