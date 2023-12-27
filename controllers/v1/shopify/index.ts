@@ -813,16 +813,19 @@ const sendFeedbackWhatsappMessageRenter =  async (newOrder : any,renter_name:any
 const fetchShopifyProducts = async (req: any, res: any) => {
     try {
         const today = new Date();
-
+        const visitedPages = new Set();
         // Subtract one day from the current date to get yesterday's date
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        const formattedYesterday = yesterday.toISOString().replace("Z", "-04:00");
+        let nextPage = 'eyJkaXJlY3Rpb24iOiJuZXh0IiwibGFzdF9pZCI6Nzk2NjMzNjY4MDE1NiwibGFzdF92YWx1ZSI6Ik1pZGkgYnVzdGllciBkcmVzcyB3aXRoIHN0dWRzIGFjY2Vzc29yeSJ9'; 
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
         console.log("URL : ",url);
-        let config = {
+        while (nextPage && !visitedPages.has(nextPage)) {
+          let config = {
             headers: {
                 'X-Shopify-Access-Token': process.env.SHOPIFY_TOKEN,
+            },
+            params: {
+              page_info: nextPage,
+              limit: 250,
             },
         };
         const response = await axios.get(url, config);
@@ -844,14 +847,32 @@ const fetchShopifyProducts = async (req: any, res: any) => {
 
                 });
                 const savedProduct: IProduct = await newProduct.save();
+            }else{
+              for(const prod of findProduct){
+                  prod.product_details = product ;
+
+                  const updateProduct : IProduct = await prod.save();
+              }
             }
         }
+        visitedPages.add(nextPage);
+        const linkHeader = response.headers.Link;
+        const nextPageMatch = linkHeader && linkHeader.match(/<([^>]+)>;\s*rel="next"/);
 
+        nextPage = nextPageMatch ? new URLSearchParams(nextPageMatch[1]).get('page_info') : null;
+
+
+        // Break if the page ID is already visited
+        if (visitedPages.has(nextPage)) {
+          break;
+        }
         res.status(200).json({
-            success: true,
-            message: "Shopify products fetched successfully.",
-            data: response.data
-        });
+          success: true,
+          message: "Shopify products fetched successfully.",
+          data: response.data
+      });
+      }
+       
 
 
 
