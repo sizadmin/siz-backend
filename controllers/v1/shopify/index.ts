@@ -858,10 +858,11 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         console.log("pageID: "+nextPage)
         visitedPages.add(nextPage);
         const linkHeader = response.headers.Link;
+        console.log(linkHeader) ;
         const nextPageMatch = linkHeader && linkHeader.match(/<([^>]+)>;\s*rel="next"/);
-
+        console.log(nextPageMatch) ;
         nextPage = nextPageMatch ? new URLSearchParams(nextPageMatch[1]).get('page_info') : null;
-
+        console.log("extracted pageID: "+nextPage)
 
         // Break if the page ID is already visited
         if (visitedPages.has(nextPage)) {
