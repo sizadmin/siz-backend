@@ -855,6 +855,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
               }
             }
         }
+        console.log("pageID: "+nextPage)
         visitedPages.add(nextPage);
         const linkHeader = response.headers.Link;
         const nextPageMatch = linkHeader && linkHeader.match(/<([^>]+)>;\s*rel="next"/);
