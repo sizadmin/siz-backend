@@ -815,7 +815,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         const today = new Date();
         const visitedPages = new Set();
         // Subtract one day from the current date to get yesterday's date
-        let nextPage = 'eyJkaXJlY3Rpb24iOiJuZXh0IiwibGFzdF9pZCI6Nzk2NjMzNjY4MDE1NiwibGFzdF92YWx1ZSI6Ik1pZGkgYnVzdGllciBkcmVzcyB3aXRoIHN0dWRzIGFjY2Vzc29yeSJ9'; 
+        let nextPage = 'eyJkaXJlY3Rpb24iOiJwcmV2IiwibGFzdF9pZCI6ODE0Njk3Nzk4MDYzNiwibGFzdF92YWx1ZSI6Ik1pZGkgRHJlc3MgV2l0aCBUd28tdG9uZSBQbGVhdGVkIFNraXJ0In0'; 
         let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
         console.log("URL : ",url);
         while (nextPage && !visitedPages.has(nextPage)) {
@@ -857,7 +857,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         }
         console.log("pageID: "+nextPage)
         visitedPages.add(nextPage);
-        const linkHeader = response.headers.Link;
+        const linkHeader = response.headers.link;
         console.log(linkHeader) ;
         const nextPageMatch = linkHeader && linkHeader.match(/<([^>]+)>;\s*rel="next"/);
         console.log(nextPageMatch) ;
