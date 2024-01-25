@@ -394,7 +394,7 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
     let lender_name = itm.lender.name;
     let itemName = itm.title;
     let duration = (itm?.name.split("/").length > 0 && itm.name.split("/").length == 4) ? itm.name.split("/")[3] : itm.name.split("/")[2];
-    let lender_number = itm.lender.lender_phone_whatsapp ;
+    let lender_number = itm.lender.phone_number_whatsapp ;
     if (itm?.properties?.length > 0) {
       let key = itm.properties[0].name;
       if (key == "Date") {
