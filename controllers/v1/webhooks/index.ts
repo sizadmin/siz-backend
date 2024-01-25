@@ -394,6 +394,7 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
     let lender_name = itm.lender.name;
     let itemName = itm.title;
     let duration = (itm?.name.split("/").length > 0 && itm.name.split("/").length == 4) ? itm.name.split("/")[3] : itm.name.split("/")[2];
+    let lender_number = itm.lender_phone_whatsapp ;
     if (itm?.properties?.length > 0) {
       let key = itm.properties[0].name;
       if (key == "Date") {
@@ -408,7 +409,7 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
 
       let payload = {
         messaging_product: 'whatsapp',
-        to: to_Number,
+        to: lender_number,
         type: 'template',
         template: {
           name: "order_placement_pickup_schedule_lender",
