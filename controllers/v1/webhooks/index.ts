@@ -389,66 +389,86 @@ const sendOrderReceivedMessageToLender = async (newOrder : any) =>{
   duration = duration.trim();
   itemName = itemName.trim();
   LenderName = LenderName.trim() ;
-  setTimeout(() => {let payload = {
-    messaging_product: 'whatsapp',
-    to: to_Number,
-    type: 'template',
-    template: {
-      name: "order_placement_pickup_schedule_lender",
-      language: {
-        code: 'en_US',
-        policy: 'deterministic'
-      },
-      components: [
-    {        
-    "type": "header",      
-    "parameters": [         
-      { "type": "image", "image": {  "link": headerImageUrl, } }     
-    ]      
-    },
-        {
-          type: 'body',
-          parameters: [
-            { type: 'text', text: LenderName },
-            { type: 'text', text: itemName },
-            { type: 'text', text: duration },
-            { type: 'text', text: startDate },
-            { type: 'text', text: endDate },
-          ]
-        },
-        {
-          type: 'button',
-          sub_type: 'url',
-          index: '0',
-          parameters: [
-            { type: 'text', text: orderId }
+  for await (const itm of newOrder.order_details.line_items) {
+
+    let lender_name = itm.lender.name;
+    let itemName = itm.title;
+    let duration = (itm?.name.split("/").length > 0 && itm.name.split("/").length == 4) ? itm.name.split("/")[3] : itm.name.split("/")[2];
+    if (itm?.properties?.length > 0) {
+      let key = itm.properties[0].name;
+      if (key == "Date") {
+        dateString = itm.properties[0].value;
+      }
+    } else {
+      dateString = "Not Found";
+    }
+    let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
+    let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1] : "Not Found";
+    setTimeout(() => {
+
+      let payload = {
+        messaging_product: 'whatsapp',
+        to: to_Number,
+        type: 'template',
+        template: {
+          name: "order_placement_pickup_schedule_lender",
+          language: {
+            code: 'en_US',
+            policy: 'deterministic'
+          },
+          components: [
+            {
+              "type": "header",
+              "parameters": [
+                { "type": "image", "image": { "link": headerImageUrl, } }
+              ]
+            },
+            {
+              type: 'body',
+              parameters: [
+                { type: 'text', text: lender_name },
+                { type: 'text', text: itemName },
+                { type: 'text', text: duration },
+                { type: 'text', text: startDate },
+                { type: 'text', text: endDate },
+              ]
+            },
+            {
+              type: 'button',
+              sub_type: 'url',
+              index: '0',
+              parameters: [
+                { type: 'text', text: orderId }
+              ]
+            }
           ]
         }
-      ]
-    }
-  };
-console.log("token "+process.env.AUTHORIZATION_TOKEN );
-  const config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
-    },
-    data: payload
-  };
-if(itemName != "Not Found"){
-  axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  }else{
-    console.log("No item found to send whatsapp notification")
-  }},5000) 
+      };
+      console.log("token " + process.env.AUTHORIZATION_TOKEN);
+      const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'https://graph.facebook.com/v17.0/105942389228737/messages',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
+        },
+        data: payload
+      };
+      if (itemName != "Not Found") {
+        axios.request(config)
+          .then((response) => {
+            console.log(JSON.stringify(response.data));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        console.log("No item found to send whatsapp notification")
+      }
+    }, 5000)
+
+  }
 
 }
 const findLenderDetails = async (body : any ) => {
