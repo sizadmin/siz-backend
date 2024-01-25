@@ -8,6 +8,7 @@ import lender from '../../../models/lender';
 import orderstatus from '../../../models/orderstatus';
 import { IOrderStatus } from '../../../types/orderstatus';
 import moment from "moment";
+import { populateLineItems } from '../webhooks';
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
 
@@ -41,25 +42,29 @@ const fetchShopifyOrder = async (req: any, res: any) => {
                 ],
             });
             if (findOrder.length == 0) {
-                let product_title = order.line_items[0]?.title ;
+                let productId = order.line_items[0]?.product_id ;
                 const findProduct: any| null = await product.findOne({
-                  "product_details.title": product_title 
+                  "product_id": productId 
                 });
+                console.log(findProduct)
+                let line_items = await populateLineItems(order.line_items);
 
                 let tags = findProduct?.product_details?.tags ;
-                const regex = /(influencer_[A-Za-z0-9_]+)/;
-                const matches = tags?.match(regex);
+                const regex = /(INFLUENCER_[A-Za-z0-9_\\s]+)/;
+                const matches = tags.toUpperCase()?.match(regex);
                 let influencerTag = "" ;
                 let lender_name = "" ;
                 let lender_address = "" ;
                 let lender_phone_call = "" ;
                 let lender_phone_whatsapp = "" ;
+                let dateString = "" ;
                 if (matches && matches.length >= 2) {
                     influencerTag = matches[1];
-                    console.log("Influencer Tag:", influencerTag);
+                    console.log("Influencer Tag in fetchorder:", influencerTag);
                     const findLender: any| null = await lender.findOne({
                         "shopify_id": influencerTag
                     });
+                    console.log(findLender);
                      lender_name = findLender?findLender.name : "Not Found";
                      lender_address = findLender?findLender.address : "Not Found";
                      lender_phone_call = findLender?findLender.phone_number_call : "Not Found";
@@ -67,6 +72,12 @@ const fetchShopifyOrder = async (req: any, res: any) => {
                 } else {
                     console.log("Influencer Tag not found.");
                 }
+                let key = order.line_items[0].properties[0].name ;
+                if(key == "Date"){
+                  dateString = order.line_items[0].properties[0].value ;
+                }
+                let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
+                let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1]: "Not Found";
                 const newOrder: IOrder = new Order({
                     order_id: order.id,
                     order_date: order.created_at,
@@ -79,10 +90,14 @@ const fetchShopifyOrder = async (req: any, res: any) => {
                     lender_address:lender_address,
                     lender_phone_call : lender_phone_call,
                     lender_phone_whatsapp : lender_phone_whatsapp,
+                    rental_start_date : startDate ,
+                    rental_end_date : endDate ,
                     profit: 0,
                     expenses: 0,
                     lenders_share: 0,
                     rental_fees:order.total_price,
+                    order_items:line_items,
+
 
                 });
                 const savedOrder: IOrder = await newOrder.save();

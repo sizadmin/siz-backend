@@ -311,8 +311,11 @@ const saveOrderInDb = async (body :  any) => {
 const populateLineItems = async (line_items : any) =>{
   for(let itm of line_items){
     let product_id = itm.product_id ;
+    console.log(product_id)
     let product = await findProductFromId(product_id);
+    console.log(product)
     let lenderObj = await findLenderfromProduct(product) ;
+    console.log(lenderObj)
     itm.lender = lenderObj ;
     itm.images = product.product_details.images ;
   }
@@ -510,4 +513,4 @@ const findProductFromId = async (productId : any) => {
   
 }
 
-export { fetchShopifyOrderUsingWebhook }
+export { fetchShopifyOrderUsingWebhook ,populateLineItems}
