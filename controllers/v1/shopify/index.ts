@@ -14,7 +14,7 @@ const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = proces
 
 const fetchShopifyOrder = async (req: any, res: any) => {
     try {
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00&limit=250`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2024-01/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00&limit=250`;
 
         let config = {
             headers: {
@@ -831,7 +831,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
         const visitedPages = new Set();
         // Subtract one day from the current date to get yesterday's date
         let nextPage = 'eyJkaXJlY3Rpb24iOiJwcmV2IiwibGFzdF9pZCI6ODE0Njk3Nzk4MDYzNiwibGFzdF92YWx1ZSI6Ik1pZGkgRHJlc3MgV2l0aCBUd28tdG9uZSBQbGVhdGVkIFNraXJ0In0'; 
-        let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
+        let url = `https://siz-ae.myshopify.com/admin/api/2024-01/products.json`;
         console.log("URL : ",url);
         while (nextPage && !visitedPages.has(nextPage)) {
           let config = {
