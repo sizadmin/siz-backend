@@ -20,6 +20,8 @@ const PORT: string | number = process.env.PORT || 5001;
 const { DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST, MONGO_URL } = process.env;
 
 app.use(cors());
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb'})
 
 //***init middleware***//
 
