@@ -95,7 +95,7 @@ const fetchShopifyOrder = async (req: any, res: any) => {
                     profit: 0,
                     expenses: 0,
                     lenders_share: 0,
-                    rental_fees:order.total_price,
+                    rental_fees:order.total_price ?? 0,
                     order_items:line_items,
 
 
