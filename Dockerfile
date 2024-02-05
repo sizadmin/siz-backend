@@ -15,6 +15,7 @@ COPY . .
 
 # Install TypeScript locally
 RUN npm install typescript
+RUN npm install @types/node --save-dev
 
 # Install mongoose dependency
 RUN npm install mongoose
