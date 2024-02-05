@@ -16,6 +16,9 @@ COPY . .
 # Install TypeScript locally
 RUN npm install typescript
 
+# Install mongoose dependency
+RUN npm install mongoose
+
 # Build TypeScript code
 RUN npx tsc
 
