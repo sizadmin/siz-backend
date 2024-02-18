@@ -18,58 +18,48 @@ const CONFIG = process.env;
 
 const getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
-        if (req.query.client !== undefined && req.query.client == 'true') {
-            let users: IUser[] = await User.find().select('-password ').populate('role').sort({ account_name: 1 });
-            users = await _.filter(users, function (o: any) {
-                return o.role?.role_name == 'Client';
-            });
 
-            res.status(200).json({ results: users });
-            return;
-        } else {
-            const page = Number(req.query.page) || 1;
-            const size = Number(req.query.size) || 100;
-            const searchAccName = req.query.searchAccName;
-            let MatchQuery: any = {};
-            if (searchAccName) MatchQuery.account_name = { $regex: searchAccName, $options: 'i' };
+        const page = Number(req.query.page) || 1;
+        const size = Number(req.query.size) || 5;
+        let MatchQuery: any = {};
+        // if (searchAccName) MatchQuery.account_name = { $regex: searchAccName, $options: 'i' };
 
 
-            const agg: any = [
-                {
-                    $match: MatchQuery,
+        const agg: any = [
+            {
+                $match: MatchQuery,
+            },
+            {
+                $project: {
+                    _id: 1,
+                    email: 1,
+                    first_name: 1,
+                    isActive: 1,
+                    last_name: 1,
+                    phone_number: 1,
+                    role: 1,
+                    address: 1,
+                    lender_info: 1,
+                    username: 1,
+                    lender_type: 1
                 },
-                {
-                    $project: {
-                        _id: 1,
-                        email: 1,
-                        first_name: 1,
-                        isActive: 1,
-                        last_name: 1,
-                        phone_number: 1,
-                        role: 1,
-                        address: 1,
-                        lender_info: 1,
-                        username: 1,
-                        lender_type:1
-                    },
-                },
-                { $lookup: { from: 'roles', localField: 'role', foreignField: '_id', as: 'role' } },
-                { $lookup: { from: 'lenders', localField: 'lender_info', foreignField: '_id', as: 'lender_info' } },
+            },
+            { $lookup: { from: 'roles', localField: 'role', foreignField: '_id', as: 'role' } },
+            { $lookup: { from: 'lenders', localField: 'lender_info', foreignField: '_id', as: 'lender_info' } },
 
-                {
-                    $facet: {
-                        metadata: [{ $count: 'total' }, { $addFields: { page: Number(page) } }],
-                        data: [{ $skip: (page - 1) * size }, { $limit: size }],
-                    },
+            {
+                $facet: {
+                    metadata: [{ $count: 'total' }, { $addFields: { page: Number(page) } }],
+                    data: [{ $skip: (page - 1) * size }, { $limit: size }],
                 },
-            ];
+            },
+        ];
 
-            const aggregatedData: any = await User.aggregate(agg);
-            const users: any = {};
-            users.data = aggregatedData[0].data.map((user: any) => ({ ...user, role: user.role[0] }));
-            users.metadata = aggregatedData[0].metadata;
-            res.status(200).json({ metadata: users.metadata, results: users.data });
-        }
+        const aggregatedData: any = await User.aggregate(agg);
+        const users: any = {};
+        users.data = aggregatedData[0].data.map((user: any) => ({ ...user, role: user.role[0] }));
+        users.metadata = aggregatedData[0].metadata;
+        res.status(200).json({ metadata: users.metadata, results: users.data });
     } catch (error) {
         console.log(error);
         res.status(400).json({ error });
@@ -236,7 +226,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
             return;
         }
         //   compare the saved password with login Password
-        
+
         const isMatch = await bcrypt.compare(body.password, loggedUser.password);
 
         if (!isMatch) {

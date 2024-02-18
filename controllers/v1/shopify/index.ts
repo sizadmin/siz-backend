@@ -15,7 +15,7 @@ const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = proces
 
 const fetchShopifyOrder = async (req: any, res: any) => {
   try {
-    let url = `https://siz-ae.myshopify.com/admin/api/2024-01/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00&limit=250`;
+    let url = `https://siz-ae.myshopify.com/admin/api/2023-04/orders.json?status=any&created_at_min=2023-01-01T00:00:00-00:00&limit=250`;
 
     let config = {
       headers: {
@@ -24,6 +24,16 @@ const fetchShopifyOrder = async (req: any, res: any) => {
     };
     const response = await axios.get(url, config);
 
+
+    // const response = await axios.post(
+    //     '/api/webhook',
+    //     {},
+    //     {
+    //       headers: {
+    //         'X-Shopify-Hmac-Sha256': process.env.REACT_APP_SHOPIFY_WEBHOOK_SECRET,
+    //       },
+    //     }
+    //   );
 
     for await (const order of response.data.orders) {
 
@@ -69,7 +79,6 @@ const fetchShopifyOrder = async (req: any, res: any) => {
         }
         let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
         let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1] : "Not Found";
-
         const newOrder: IOrder = new Order({
           order_id: order.id,
           order_date: order.created_at,
@@ -92,13 +101,15 @@ const fetchShopifyOrder = async (req: any, res: any) => {
 
 
         });
-        basicLogger.info({
+        const savedOrder: IOrder = await newOrder.save();
+
+        basicLogger.error({
           controller: 'fetchShopifyOrder',
           method: 'GET',
-          terror: 'Saved Order in fetchShopifyOrder method',
+          terror: `shopify order webhook`,
           body: newOrder
         });
-        const savedOrder: IOrder = await newOrder.save();
+
       }
     }
 
@@ -113,14 +124,12 @@ const fetchShopifyOrder = async (req: any, res: any) => {
   } catch (error) {
     // Handle errors and send an error response back to the client
     console.error("Failed to fetch shopify orders:", error);
-
     basicLogger.error({
       controller: 'fetchShopifyOrder',
       method: 'GET',
-      terror: 'Error in fetchShopifyOrder method',
+      terror: `Invalid Token for ${req.url}`,
       error: error
     });
-
     res
       .status(500)
       .json({ success: false, error: "Failed to fetch shopify orders" });
@@ -849,7 +858,7 @@ const fetchShopifyProducts = async (req: any, res: any) => {
     const visitedPages = new Set();
     // Subtract one day from the current date to get yesterday's date
     let nextPage = 'eyJkaXJlY3Rpb24iOiJwcmV2IiwibGFzdF9pZCI6ODE0Njk3Nzk4MDYzNiwibGFzdF92YWx1ZSI6Ik1pZGkgRHJlc3MgV2l0aCBUd28tdG9uZSBQbGVhdGVkIFNraXJ0In0';
-    let url = `https://siz-ae.myshopify.com/admin/api/2024-01/products.json`;
+    let url = `https://siz-ae.myshopify.com/admin/api/2023-04/products.json`;
     console.log("URL : ", url);
     while (nextPage && !visitedPages.has(nextPage)) {
       let config = {

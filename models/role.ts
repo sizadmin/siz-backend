@@ -4,7 +4,7 @@ import { model, Schema } from 'mongoose';
 const roleSchema: Schema = new Schema(
     {
         role_name: {
-            type: String
+            type: String,
         }
     },
     {

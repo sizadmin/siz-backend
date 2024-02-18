@@ -65,15 +65,15 @@ const orderSchema: Schema = new Schema(
         },
         lenders_share: {
             type: Number,
-            default:0
+            default: 0
         },
         profit: {
             type: Number,
-            default:0
+            default: 0
         },
         expenses: {
             type: Number,
-            default:0
+            default: 0
         },
         rental_fees: {
             type: Number
@@ -95,6 +95,15 @@ const orderSchema: Schema = new Schema(
         // },
         order_type: {
             type: String
+        },
+        drycleaner_payment: {
+            type: Boolean,
+            default: false
+        },
+        order_status: {
+            type: String,
+            enum: ['new_order', 'fulfilled', 'pickedup_drycleaner', 'delivered', 'completed', 'cancelled'],
+            default: 'new_order'
         },
     },
     {
