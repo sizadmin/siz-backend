@@ -112,7 +112,8 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             lender_info: new ObjectId(savedLenderInfo._id),
             address: body.address,
             username: body.username,
-            lender_type: body.lender_type
+            lender_type: body.lender_type,
+            profilePicture: body.profilePicture
         });
         const salt = await bcrypt.genSalt(10);
         newUser.password = await bcrypt.hash(body.password, salt);
@@ -158,19 +159,20 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password');
         }
 
-        let userBody = {
+        let userBody:any = {
             first_name: body.first_name,
             last_name: body.last_name,
             email: body.email,
             phone_number: body.phone_number,
-            role: new ObjectId(body.role),
             isActive: body.isActive,
             lender_info: body.lender_info ? new ObjectId(body.lender_info) : null,
             address: body.address,
             username: body.username,
             lender_type: body.lender_type,
-            password: body.password
+            password: body.password,
+            profilePicture: body.profilePicture
         };
+        if (body.role) userBody.role = new ObjectId(body.role);
 
         const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info');
 

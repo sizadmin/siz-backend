@@ -561,8 +561,8 @@ const getDashboardData = async (req: any, res: any) => {
         let start_date = req.query.start_date;
         let end_date = req.query.end_date;
 
-
-
+        let unpaidOrdersCount = 0
+        console.log(req)
 
         let MatchQuery: any = {};
         if (req.user.user.role.role_name === "Admin") {
@@ -578,8 +578,16 @@ const getDashboardData = async (req: any, res: any) => {
                     $lte: new Date(end_date),
                 }
             }
+            // if (drycleaner_payment) MatchQuery.drycleaner_payment = drycleaner_payment == 'true' ? true : false;
 
-
+            const findUnpaidOrders: Array<IOrder> | null = await Order.find({
+                drycleaner_payment: false,
+                order_date: {
+                    $gte: new Date(start_date),
+                    $lt: new Date(end_date)
+                }
+            });
+            unpaidOrdersCount = findUnpaidOrders.length
         } else if (req.user.user.role.role_name === "Dry Cleaner") {
             MatchQuery.order_status = { $ne: 'new_order' };
 
@@ -598,7 +606,22 @@ const getDashboardData = async (req: any, res: any) => {
 
 
         }
+        else if (req.user.user.role.role_name === "Lender") {
+            if (start_date !== undefined) {
+                MatchQuery.order_date = {
+                    $gte: new Date(start_date),
+                }
+            }
+            if (end_date !== undefined) {
+                MatchQuery.order_date = {
+                    ...MatchQuery.order_date,
+                    $lte: new Date(end_date),
+                }
+            }
+            MatchQuery['lender_name'] = { $regex:`${req.user.user.first_name} ${req.user.user.last_name}` , $options: 'i' };
 
+        }
+        console.log(MatchQuery, "MatchQuery")
         const sort: any = {};
         const agg: any = [
 
@@ -609,14 +632,21 @@ const getDashboardData = async (req: any, res: any) => {
             {
                 $group: {
                     _id: '$order_status',
-                    count: { $sum: 1 }
+                    count: { $sum: 1 },
                 },
             },
 
 
         ];
+        let totalOrders = 0;
+        let aggregatedData: any = await Order.aggregate(agg);
+        aggregatedData?.forEach(element => {
+            totalOrders += element.count
+        })
+        console.log(aggregatedData)
+        aggregatedData.push({ _id: 'total', count: totalOrders })
+        if (req.user.user.role.role_name === "Admin") aggregatedData.push({ _id: 'unpaid', count: unpaidOrdersCount })
 
-        const aggregatedData: any = await Order.aggregate(agg);
 
         res.status(200).json({
             success: true,

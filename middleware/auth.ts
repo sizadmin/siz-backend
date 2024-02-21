@@ -19,6 +19,7 @@ const verifyToken = (req: any, res: Response, next: any) => {
   }
   try {
     const decoded = jwt.verify(token, config.TOKEN_KEY);
+    delete decoded.profilePicture;
     req.user = decoded;
   } catch (err) {
     basicLogger.error({

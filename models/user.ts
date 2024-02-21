@@ -28,20 +28,24 @@ const userSchema: Schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Role',
         },
-        password:{
-            type:String
+        password: {
+            type: String
         },
-        isActive:{
-            type:Boolean,
-            default:false
+        isActive: {
+            type: Boolean,
+            default: false
         },
-        lender_info:{
+        lender_info: {
             type: Schema.Types.ObjectId,
             ref: 'Lender',
         },
         lender_type: {
             type: String
         },
+        profilePicture: {
+            type: String,
+            default: null
+        }
 
     },
     {
