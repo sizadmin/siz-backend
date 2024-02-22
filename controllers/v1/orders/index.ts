@@ -562,7 +562,7 @@ const getDashboardData = async (req: any, res: any) => {
         let end_date = req.query.end_date;
 
         let unpaidOrdersCount = 0
-        console.log(req)
+        // console.log(req)
 
         let MatchQuery: any = {};
         if (req.user.user.role.role_name === "Admin") {
@@ -578,16 +578,13 @@ const getDashboardData = async (req: any, res: any) => {
                     $lte: new Date(end_date),
                 }
             }
-            // if (drycleaner_payment) MatchQuery.drycleaner_payment = drycleaner_payment == 'true' ? true : false;
 
-            const findUnpaidOrders: Array<IOrder> | null = await Order.find({
+                const findUnpaidOrders: Array<IOrder> | null = await Order.find({
                 drycleaner_payment: false,
-                order_date: {
-                    $gte: new Date(start_date),
-                    $lt: new Date(end_date)
-                }
+                ...MatchQuery
             });
             unpaidOrdersCount = findUnpaidOrders.length
+        // }
         } else if (req.user.user.role.role_name === "Dry Cleaner") {
             MatchQuery.order_status = { $ne: 'new_order' };
 
@@ -618,7 +615,7 @@ const getDashboardData = async (req: any, res: any) => {
                     $lte: new Date(end_date),
                 }
             }
-            MatchQuery['lender_name'] = { $regex:`${req.user.user.first_name} ${req.user.user.last_name}` , $options: 'i' };
+            MatchQuery['lender_name'] = { $regex: `${req.user.user.first_name} ${req.user.user.last_name}`, $options: 'i' };
 
         }
         console.log(MatchQuery, "MatchQuery")
