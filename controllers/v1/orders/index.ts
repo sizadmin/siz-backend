@@ -470,8 +470,38 @@ const getDashboardOrders = async (req: any, res: any) => {
             // }
             // }
 
+        } else if (req.user.user.role.role_name === "Lender") {
+            if (lender_name) MatchQuery.lender_name = { $regex: lender_name, $options: 'i' };
+            if (lender_Lname) MatchQuery.lender_name = { $regex: lender_Lname, $options: 'i' };
+
+            // if (renter_name) MatchQuery.renter_name = { $regex: renter_name, $options: 'i' };
+            if (renter_Lname) MatchQuery['order_details.customer.last_name'] = { $regex: renter_Lname, $options: 'i' };
+            if (payment_status) MatchQuery.payment_status = payment_status == 'true' ? true : false;
+            if (order_type) MatchQuery.order_type = { $regex: order_type, $options: 'i' };
+            if (order_status) MatchQuery.order_status = order_status;
+
+            if (order_number) MatchQuery.order_number = Number(order_number);
+            if (drycleaner_payment) MatchQuery.drycleaner_payment = drycleaner_payment == 'true' ? true : false;
+
+            if (pickupDate) MatchQuery.pickup_by_dry_cleaner_from_renter = {
+                $gte: new Date(pickupDate + 'T00:00:00'),
+                $lte: new Date(pickupDate + 'T23:59:59'),
+            }
+            if (start_date !== undefined) {
+                MatchQuery.pickup_by_dry_cleaner_from_renter = {
+                    $gte: new Date(start_date),
+                }
+            }
+            if (end_date !== undefined) {
+                MatchQuery.pickup_by_dry_cleaner_from_renter = {
+                    ...MatchQuery.pickup_by_dry_cleaner_from_renter,
+                    $lte: new Date(end_date),
+                }
+            }
+            if (renter_name) MatchQuery['order_details.customer.first_name'] = { $regex: renter_name, $options: 'i' }
+
+
         }
-        // if (product) MatchQuery['order_details.line_items.[0].name'] = { $regex: product, $options: 'i' };
 
         const sort: any = {};
         if (sortProperty === 'order_number') {
@@ -561,7 +591,9 @@ const getDashboardData = async (req: any, res: any) => {
         let start_date = req.query.start_date;
         let end_date = req.query.end_date;
 
-        let unpaidOrdersCount = 0
+        let unpaidOrdersCount = 0;
+        let lendersShare = 0;
+        let paidOrdersCount= 0;
         // console.log(req)
 
         let MatchQuery: any = {};
@@ -579,12 +611,12 @@ const getDashboardData = async (req: any, res: any) => {
                 }
             }
 
-                const findUnpaidOrders: Array<IOrder> | null = await Order.find({
+            const findUnpaidOrders: Array<IOrder> | null = await Order.find({
                 drycleaner_payment: false,
                 ...MatchQuery
             });
             unpaidOrdersCount = findUnpaidOrders.length
-        // }
+            // }
         } else if (req.user.user.role.role_name === "Dry Cleaner") {
             MatchQuery.order_status = { $ne: 'new_order' };
 
@@ -616,9 +648,17 @@ const getDashboardData = async (req: any, res: any) => {
                 }
             }
             MatchQuery['lender_name'] = { $regex: `${req.user.user.first_name} ${req.user.user.last_name}`, $options: 'i' };
+            const findLenderShare: any | null = await Order.find({
+                ...MatchQuery
+            });
+            const findPaidOrders: any | null = await Order.find({
+                ...MatchQuery
+            });
+            paidOrdersCount = findPaidOrders.length;
+            lendersShare = findLenderShare.reduce(function (acc, obj) { return acc + obj.lenders_share; }, 0);
+
 
         }
-        console.log(MatchQuery, "MatchQuery")
         const sort: any = {};
         const agg: any = [
 
@@ -643,6 +683,12 @@ const getDashboardData = async (req: any, res: any) => {
         console.log(aggregatedData)
         aggregatedData.push({ _id: 'total', count: totalOrders })
         if (req.user.user.role.role_name === "Admin") aggregatedData.push({ _id: 'unpaid', count: unpaidOrdersCount })
+        if (req.user.user.role.role_name === "Lender") {
+            aggregatedData.push({ _id: 'lendersShare', count: lendersShare });
+            aggregatedData.push({ _id: 'paid', count: paidOrdersCount })
+
+            
+        }
 
 
         res.status(200).json({

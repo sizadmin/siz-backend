@@ -159,7 +159,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password');
         }
 
-        let userBody:any = {
+        let userBody: any = {
             first_name: body.first_name,
             last_name: body.last_name,
             email: body.email,
@@ -179,7 +179,8 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
 
         res.status(200).json({
             message: 'User updated',
-            result: updateUser,
+            loggedUser: updateUser,
+            token:req.headers.authorization
         });
         return;
     } catch (error) {
@@ -213,7 +214,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
 
         const loggedUser: IUser | null = await User.findOne({
             username: body.username,
-        }).populate('role');
+        }).select('-profilePicture').populate('role');
         if (!loggedUser) {
 
             res.status(400).json({
@@ -242,7 +243,6 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
         const payload = {
             user: loggedUser,
         };
-
         //   generating the Token
         jwt.sign(
             payload,
