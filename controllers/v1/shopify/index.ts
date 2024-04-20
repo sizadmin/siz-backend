@@ -63,7 +63,7 @@ const fetchShopifyOrder = async (req: any, res: any) => {
         } else {
           console.log("Influencer Tag not found.");
         }
-        let key = (order.line_items[0]) ? order.line_items[0].properties[0].name : "";
+        let key = (order.line_items) ? order.line_items[0].properties[0].name : "";
         if (key == "Date") {
           dateString = order.line_items[0].properties[0].value;
         }
