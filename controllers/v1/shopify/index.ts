@@ -56,19 +56,19 @@ const fetchShopifyOrder = async (req: any, res: any) => {
             "shopify_id": influencerTag
           });
           console.log(findLender);
-         // lender_name = (findLender) ? findLender.name : "Not Found";
-          //lender_address = (findLender)  ? findLender.address : "Not Found";
-          //lender_phone_call = (findLender)  ? findLender.phone_number_call : "Not Found";
-          //lender_phone_whatsapp = (findLender)  ? findLender.phone_number_whatsapp : "Not Found";
-        } else {
-          console.log("Influencer Tag not found.");
-        }
-        let key = order.line_items[0].properties[0].name;
-        if (key == "Date") {
-          dateString = order.line_items[0].properties[0].value;
-        }
-        let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
-        let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1] : "Not Found";
+        //  lender_name = (findLender) ? findLender.name : "Not Found";
+        //   lender_address = (findLender)  ? findLender.address : "Not Found";
+        //   lender_phone_call = (findLender)  ? findLender.phone_number_call : "Not Found";
+        //   lender_phone_whatsapp = (findLender)  ? findLender.phone_number_whatsapp : "Not Found";
+        // } else {
+        //   console.log("Influencer Tag not found.");
+        // }
+        // let key = order.line_items[0].properties[0].name;
+        // if (key == "Date") {
+        //   dateString = order.line_items[0].properties[0].value;
+        // }
+        // let startDate = (dateString?.length > 0) ? dateString?.split(" to ")[0] : "Not Found";
+        // let endDate = (dateString?.length > 0) ? dateString?.split(" to ")[1] : "Not Found";
 
         const newOrder: IOrder = new Order({
           order_id: order.id,
