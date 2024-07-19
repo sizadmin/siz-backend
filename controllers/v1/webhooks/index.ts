@@ -4,7 +4,9 @@ import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
 import product from '../../../models/product';
 import lender from '../../../models/lender';
+import WhatsappMessage from '../../../models/WhatsappMEssage';
 import { IOrderStatus } from '../../../types/orderstatus';
+import { IWhatsappMessage } from '../../../types/whatsappMessage';
 import orderstatus from '../../../models/orderstatus';
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
@@ -13,6 +15,82 @@ const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = proces
 // import Product from '../../../models/product';
 
 
+const verifyTokenWhatsapp = async(req: any, res: any) => {
+  /**
+   * UPDATE YOUR VERIFY TOKEN
+   *This will be the Verify Token value when you set up webhook
+  **/
+   const verify_token = "qwaszxcderfvbgthSDD";
+
+   // Parse params from the webhook verification request
+   let mode = req.query["hub.mode"];
+   let token = req.query["hub.verify_token"];
+   let challenge = req.query["hub.challenge"];
+ 
+   // Check if a token and mode were sent
+   if (mode && token) {
+     // Check the mode and token sent are correct
+     if (mode === "subscribe" && token === verify_token) {
+       // Respond with 200 OK and challenge token from the request
+       console.log("WEBHOOK_VERIFIED");
+       res.status(200).send(challenge);
+     } else {
+       // Responds with '403 Forbidden' if verify tokens do not match
+       res.sendStatus(403);
+     }
+   }
+
+}
+
+const listenRepliesFromWebhook = async(req: any, res: any) => {
+  try {
+    // Extract relevant data from the request body
+    console.log(req.body);
+    const { entry } = req.body;
+    const { from, name, text } = entry[0].changes[0].value.messages[0];
+    console.log("ENTRYYYYY: ",entry);
+
+    var sender_name = entry[0].changes[0].value.contacts[0].profile.name;
+    var sender_phone = entry[0].changes[0].value.contacts[0].wa_id;
+    var type = entry[0].changes[0].value.messages[0].type;
+    var timestamp = convertUnixEpochToMySQLDatetime(entry[0].changes[0].value.messages[0].timestamp);
+    var message = "" ;
+    if(type == "button"){
+      message = entry[0].changes[0].value.messages[0].button.text ;
+    }else if(type == "text"){
+      message = entry[0].changes[0].value.messages[0].text.body ;
+    }
+    console.log(message)
+    // Insert data into RDS table
+    await insertMessage(sender_phone, sender_name, message,timestamp);
+
+    // Respond with success
+    res.status(200).json({ message: 'Data inserted successfully' });
+  } catch (error) {
+    console.error('Error processing webhook:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+async function insertMessage(from, name, text,timestamp) {
+  try {
+    const newMessage: IWhatsappMessage = new WhatsappMessage({
+      phone: from,
+      name: name,
+      message: text,
+      timestamp: timestamp,
+      
+    });
+    const savedMessage: IWhatsappMessage = await newMessage.save();
+  } catch (error) {
+    console.error('Error inserting data into RDS:', error);
+    throw error; // Rethrow the error to handle it in the caller function
+  }
+}
+
+ async function convertUnixEpochToMySQLDatetime(epoch : any) {
+  return new Date(epoch * 1000).toISOString().slice(0, 19).replace('T', ' ');
+}
 
 
 const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
@@ -534,4 +612,4 @@ const findProductFromId = async (productId : any) => {
   
 }
 
-export { fetchShopifyOrderUsingWebhook ,populateLineItems}
+export { fetchShopifyOrderUsingWebhook ,populateLineItems,listenRepliesFromWebhook,verifyTokenWhatsapp}
