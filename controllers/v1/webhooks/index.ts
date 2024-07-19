@@ -53,7 +53,7 @@ const listenRepliesFromWebhook = async(req: any, res: any) => {
     var sender_name = entry[0].changes[0].value.contacts[0].profile.name;
     var sender_phone = entry[0].changes[0].value.contacts[0].wa_id;
     var type = entry[0].changes[0].value.messages[0].type;
-    var timestamp = convertUnixEpochToMySQLDatetime(entry[0].changes[0].value.messages[0].timestamp);
+    var timestamp = entry[0].changes[0].value.messages[0].timestamp;
     var message = "" ;
     if(type == "button"){
       message = entry[0].changes[0].value.messages[0].button.text ;
