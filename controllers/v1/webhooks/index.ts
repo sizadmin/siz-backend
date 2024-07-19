@@ -4,7 +4,7 @@ import Order from '../../../models/order';
 import { IProduct } from '../../../types/product';
 import product from '../../../models/product';
 import lender from '../../../models/lender';
-import WhatsappMessage from '../../../models/WhatsappMEssage';
+import WhatsappMessage from '../../../models/WhatsappMessage';
 import { IOrderStatus } from '../../../types/orderstatus';
 import { IWhatsappMessage } from '../../../types/whatsappMessage';
 import orderstatus from '../../../models/orderstatus';
