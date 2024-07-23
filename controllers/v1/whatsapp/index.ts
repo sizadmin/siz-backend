@@ -42,4 +42,28 @@ const sendWhatsappMsg = async (req: any, res: any) => {
     }
 }
 
-export { sendWhatsappMsg }
+const getMessageTemplates = async () => {
+
+    setTimeout(() => {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://graph.facebook.com/v17.0/105942389228737/message_templates?fields=name,status,language,components&status=APPROVED',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
+            }
+          };
+            axios.request(config)
+              .then((response) => {
+                console.log(JSON.stringify(response.data));
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          
+    }, 5000) ;
+
+}
+
+export { sendWhatsappMsg ,getMessageTemplates}
