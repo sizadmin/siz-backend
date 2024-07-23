@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 import { Response, Request } from 'express';
+const { API_AUTH_TOKEN } = process.env;
 
 const config = process.env;
 
@@ -18,7 +19,7 @@ const verifyToken = (req: any, res: Response, next: any) => {
     return res.status(403).send('A token is required for authentication');
   }
   try {
-    const decoded = jwt.verify(token, config.TOKEN_KEY);
+    const decoded = jwt.verify(token, process.env.API_AUTH_TOKEN);
     req.user = decoded;
   } catch (err) {
     basicLogger.error({

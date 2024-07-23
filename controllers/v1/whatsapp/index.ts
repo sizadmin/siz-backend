@@ -5,6 +5,8 @@ const app = express();
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
 
+
+
 const sendWhatsappMsg = async (req: any, res: any) => {
     try {
         const { phoneNumber } = req.body;
@@ -45,6 +47,7 @@ const sendWhatsappMsg = async (req: any, res: any) => {
 }
 
 const getMessageTemplates = async (req: any, res: any) => {
+   
     console.log("Getting Message Templates");
     try {
          let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED`;
