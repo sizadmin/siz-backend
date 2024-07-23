@@ -46,24 +46,22 @@ const sendWhatsappMsg = async (req: any, res: any) => {
 
 const getMessageTemplates = async (req: any, res: any) => {
     console.log("Getting Message Templates");
-    setTimeout(() => {
-        const config = {
+    let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED'`;
+    let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
             }
           };
-          const response =  axios.request(config);   
+          const response = await axios.get(url, config);
           res.status(200).json({
             success: true,
-            message: "Shopify orders fetched successfully.",
+            message: "Message Templates Fetched Succesfully",
              data: response ,
           });
-          
-    }, 5000) ;
+
    
 }
 
