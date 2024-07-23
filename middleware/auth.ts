@@ -19,7 +19,7 @@ const verifyToken = (req: any, res: Response, next: any) => {
     return res.status(403).send('A token is required for authentication');
   }
   try {
-    const decoded = jwt.verify(token, process.env.API_AUTH_TOKEN);
+    const decoded = jwt.verify(token, config.TOKEN_KEY);
     req.user = decoded;
   } catch (err) {
     basicLogger.error({
@@ -39,4 +39,30 @@ const verifyToken = (req: any, res: Response, next: any) => {
   return next();
 };
 
-export { verifyToken };
+
+
+const verifyTokenForApi = (req: any, res: Response, next: any) => {
+  const authHeader = req.headers['authorization'];
+  const auth_token = authHeader && authHeader.split(' ')[1];
+
+  if (!auth_token) {
+      return res.status(401).send({ message: 'Authorization token missing' });
+  }
+  const secretKey = 'your_secret_key_here';
+    return new Promise((resolve, reject) => {
+      if (auth_token == null) {
+        return reject({ status: 401, message: 'Unauthorized' });
+      }
+      console.log(auth_token);
+      jwt.verify(auth_token, secretKey, { algorithms: ['HS256'] }, (err, decoded) => {
+        if (err) {
+          console.error('Token verification failed:', err.message);
+          return reject({ status: 403, message: 'Forbidden' });
+        }
+        resolve(decoded);
+      });
+    });
+    return next();
+};
+
+export { verifyToken,verifyTokenForApi };
