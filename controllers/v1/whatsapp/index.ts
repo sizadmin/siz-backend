@@ -43,7 +43,7 @@ const sendWhatsappMsg = async (req: any, res: any) => {
 }
 
 const getMessageTemplates = async () => {
-
+    console.log("Getting Message Templates");
     setTimeout(() => {
         const config = {
             method: 'get',
