@@ -60,7 +60,7 @@ const getMessageTemplates = async (req: any, res: any) => {
           res.status(200).json({
             success: true,
             message: "Message Templates Fetched Succesfully",
-             data: response ,
+             data: response.data,
           });
         }catch (error) {
             console.error("Failed to fetch shopify orders:", error);
