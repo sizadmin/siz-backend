@@ -48,7 +48,7 @@ const getMessageTemplates = async () => {
         const config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://graph.facebook.com/v17.0/105942389228737/message_templates?fields=name,status,language,components&status=APPROVED',
+            url: 'https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
