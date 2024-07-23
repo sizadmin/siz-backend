@@ -60,9 +60,10 @@ const verifyTokenForApi = (req: any, res: Response, next: any) => {
           return reject({ status: 403, message: 'Forbidden' });
         }
         resolve(decoded);
+        return next();
       });
     });
-    return next();
+    
 };
 
 export { verifyToken,verifyTokenForApi };
