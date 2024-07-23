@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { Response, Request } from 'express';
+const express = require('express');
+const app = express();
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
 
@@ -42,7 +44,7 @@ const sendWhatsappMsg = async (req: any, res: any) => {
     }
 }
 
-const getMessageTemplates = async () => {
+const getMessageTemplates = async (req: any, res: any) => {
     console.log("Getting Message Templates");
     setTimeout(() => {
         const config = {
@@ -54,16 +56,15 @@ const getMessageTemplates = async () => {
               'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
             }
           };
-            axios.request(config)
-              .then((response) => {
-                console.log(JSON.stringify(response.data));
-              })
-              .catch((error) => {
-                console.log(error);
-              });
+          const response =  axios.request(config);   
+          res.status(200).json({
+            success: true,
+            message: "Shopify orders fetched successfully.",
+             data: response ,
+          });
           
     }, 5000) ;
-
+   
 }
 
 export { sendWhatsappMsg ,getMessageTemplates}
