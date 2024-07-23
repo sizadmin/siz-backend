@@ -46,7 +46,8 @@ const sendWhatsappMsg = async (req: any, res: any) => {
 
 const getMessageTemplates = async (req: any, res: any) => {
     console.log("Getting Message Templates");
-    let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED'`;
+    try {
+         let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED'`;
     let config = {
             method: 'get',
             maxBodyLength: Infinity,
@@ -61,7 +62,9 @@ const getMessageTemplates = async (req: any, res: any) => {
             message: "Message Templates Fetched Succesfully",
              data: response ,
           });
-
+        }catch (error) {
+            console.error("Failed to fetch shopify orders:", error);
+        }
    
 }
 
