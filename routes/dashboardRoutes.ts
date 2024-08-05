@@ -5,7 +5,4 @@ const router: Router = Router();
 
 router.get('/getorders',verifyToken, getDashboardOrders);
 
-
-
-
 export default router;

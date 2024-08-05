@@ -9,9 +9,10 @@ import userRoute from "./../routes/userRoutes";
 import webhooks from "./../routes/webhooks";
 import orderRoute from "./../routes/orderRoutes";
 import dashboardRoute from "./../routes/dashboardRoutes";
-import lendersRoute from "./../routes/lensersRoutes";
-
-
+import lendersRoute from "../routes/lendersRoutes";
+import contactListRoutes from "./../routes/contactListRoutes";
+import marketingUsersRoutes from "./../routes/marketingUsers";
+import campaignRoutes from "./../routes/campaignRoutes"
 
 require("dotenv").config();
 
@@ -30,8 +31,8 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb'}));
+app.use(bodyParser.urlencoded({ extended: true,limit: '50mb', }));
 app.use('/api/v1/', roleRoute)
 app.use('/api/v1/', whatsappRoutes)
 app.use('/api/v1/', userRoute)
@@ -39,6 +40,9 @@ app.use('/api/v1/', webhooks)
 app.use('/api/v1/order-status/', orderRoute)
 app.use('/api/v1/dashboard/', dashboardRoute)
 app.use('/api/v1/lenders/', lendersRoute)
+app.use('/api/v1/contact_list/', contactListRoutes)
+app.use('/api/v1/marketing_users/', marketingUsersRoutes)
+app.use('/api/v1/campaign/', campaignRoutes)
 
 
 

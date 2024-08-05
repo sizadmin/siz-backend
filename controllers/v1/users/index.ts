@@ -219,7 +219,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { body } = req;
 
-        const loggedUser: IUser | null = await User.findOne({
+        let loggedUser: IUser | null = await User.findOne({
             username: body.username,
         }).populate('role');
         if (!loggedUser) {
@@ -246,7 +246,6 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
             });
             return;
         }
-
         const payload = {
             user: loggedUser,
         };

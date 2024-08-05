@@ -62,7 +62,7 @@ const getMessageTemplates = async (req: any, res: any) => {
           const response = await axios.get(url, config);
           res.status(200).json({
             success: true,
-            message: "Message Templates Fetched Succesfully",
+            message: "Message Templates Fetched Successfully",
              data: response.data,
           });
         }catch (error) {

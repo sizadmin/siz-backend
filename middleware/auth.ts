@@ -9,7 +9,6 @@ import { basicLogger } from './logger';
 const verifyToken = (req: any, res: Response, next: any) => {
   const { body } = req;
   const token = req.headers.authorization;
-  console.log(token,"ggg")
   if (!token) {
     basicLogger.error({
       controller: 'token verification',
@@ -43,12 +42,12 @@ const verifyToken = (req: any, res: Response, next: any) => {
 
 const verifyTokenForApi = (req: any, res: Response, next: any) => {
   const authHeader = req.headers['authorization'];
-  const auth_token = authHeader && authHeader.split(' ')[1];
-
+  const auth_token = authHeader;
+  console.log(req.headers,"auth_token",auth_token,authHeader)
   if (!auth_token) {
       return res.status(401).send({ message: 'Authorization token missing' });
   }
-  const secretKey = 'your_secret_key_here';
+  const secretKey = process.env.TOKEN_KEY;
     return new Promise((resolve, reject) => {
       if (auth_token == null) {
         return reject({ status: 401, message: 'Unauthorized' });
