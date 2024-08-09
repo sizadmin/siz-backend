@@ -205,7 +205,7 @@ const sendDynamicMessage = (obj: any) => {
     setTimeout(() => {
         let payload = {
             messaging_product: 'whatsapp',
-            to: '919405744310',
+            to: obj.phone_number,
             type: 'template',
             template: {
                 name: obj.label,
