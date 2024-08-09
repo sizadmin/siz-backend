@@ -43,7 +43,7 @@ const verifyToken = (req: any, res: Response, next: any) => {
 const verifyTokenForApi = (req: any, res: Response, next: any) => {
   const authHeader = req.headers['authorization'];
   const auth_token = authHeader;
-  console.log(req.headers,"auth_token",auth_token,authHeader)
+  // console.log(req.headers,"auth_token",auth_token,authHeader)
   if (!auth_token) {
       return res.status(401).send({ message: 'Authorization token missing' });
   }
@@ -52,7 +52,6 @@ const verifyTokenForApi = (req: any, res: Response, next: any) => {
       if (auth_token == null) {
         return reject({ status: 401, message: 'Unauthorized' });
       }
-      console.log(auth_token);
       jwt.verify(auth_token, secretKey, { algorithms: ['HS256'] }, (err, decoded) => {
         if (err) {
           console.error('Token verification failed:', err.message);

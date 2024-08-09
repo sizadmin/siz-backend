@@ -41,6 +41,17 @@ const addMarketingUser = async (req: Request, res: Response): Promise<void> => {
     try {
         const { body } = req;
 
+        const checkUserExist: IMarketingUsers[] = await markettingusers.findOne({ phone_number: body.phone_number });
+
+
+        if (checkUserExist) {
+
+            res.status(400).json({
+                message: 'User Already Exists with provided phone number',
+            });
+            return;
+        }
+
 
         const newUser: IMarketingUsers = new markettingusers(body);
 

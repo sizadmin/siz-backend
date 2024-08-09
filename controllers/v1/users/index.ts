@@ -255,7 +255,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
             payload,
             CONFIG.TOKEN_KEY,
             {
-                expiresIn: '30m',
+                expiresIn: '300m',
             },
 
             (err: any, token: Response) => {

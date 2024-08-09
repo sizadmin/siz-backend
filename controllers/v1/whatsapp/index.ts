@@ -47,28 +47,28 @@ const sendWhatsappMsg = async (req: any, res: any) => {
 }
 
 const getMessageTemplates = async (req: any, res: any) => {
-   
+
     console.log("Getting Message Templates");
     try {
-         let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED`;
-    let config = {
+        let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&status=APPROVED`;
+        let config = {
             method: 'get',
             maxBodyLength: Infinity,
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
             }
-          };
-          const response = await axios.get(url, config);
-          res.status(200).json({
+        };
+        const response = await axios.get(url, config);
+        res.status(200).json({
             success: true,
             message: "Message Templates Fetched Successfully",
-             data: response.data,
-          });
-        }catch (error) {
-            console.error("Failed to fetch shopify orders:", error);
-        }
-   
+            data: response.data,
+        });
+    } catch (error) {
+        console.error("Failed to fetch shopify orders:", error);
+    }
+
 }
 
-export { sendWhatsappMsg ,getMessageTemplates}
+export { sendWhatsappMsg, getMessageTemplates }
