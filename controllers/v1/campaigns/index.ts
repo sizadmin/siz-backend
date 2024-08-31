@@ -6,6 +6,8 @@ import { IMarketingUsers } from '../../../types/marketingusers';
 import markettingusers from '../../../models/markettingusers';
 import moment from 'moment';
 import axios from 'axios';
+import { IWTemplate } from '../../../types/WTemplate';
+import template from '../../../models/template';
 
 var _ = require('lodash');
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
@@ -86,7 +88,7 @@ const deleteCampaign = async (req: Request, res: Response): Promise<void> => {
 
 const sendCampaignMessages = async (req: Request, res: Response): Promise<void> => {
     try {
-        let final_obj = []
+        let final_obj = [];
         const oneMinuteAgo = moment().subtract(15, 'minutes').toISOString();
         const oneMinuteFromNow = moment().add(1, 'minutes').toISOString();
 
@@ -106,20 +108,33 @@ const sendCampaignMessages = async (req: Request, res: Response): Promise<void> 
                     campaign.contact_list.phone_number = findAllContacts;
                 }
 
-                const result: any = await hasCurlyBraces(campaign.template);
-
+                // const result: any = await hasCurlyBraces(campaign.template);
+                // const result: any = campaign.template.bodyVariables.map((itm) => {
+                //     itm.key = 'placeholder_' + itm.label;
+                //     itm.value = itm.field
+                //     return itm
+                // });
+                const findTemplate: IWTemplate[] | null = await template.find({ name: campaign.template.label });
+                console.log(findTemplate, "findTemplate")
                 // Create an array of promises for each user
                 const userPromises = campaign.contact_list.phone_number.map((user: any) => {
 
                     if (user?.info?.whatsapp_messaging === true || user?.whatsapp_messaging === true) {
-
+                        console.log(findTemplate[0], ":result")
                         let obj = {
                             ...campaign.template,
                             phone_number: user.value,
-                            [result.key]: user[result.value] ?? user?.info?.[result.value]
+                            user: { ...user, ...user?.info },
+                            template: findTemplate[0]
                         };
+                        // result.map((o: any) => {
+                        //     obj = { ...obj, [o.key]: user[o.value] ?? user?.info?.[o.value] }
+                        // })
                         // Push to final_obj inside the promise
+                        // setTimeout(() => {
                         if (obj.phone_number) sendDynamicMessage(obj);
+
+                        // }, 2000)
                         final_obj.push(obj);
                     }
                 });
@@ -143,74 +158,70 @@ const sendCampaignMessages = async (req: Request, res: Response): Promise<void> 
 };
 
 
-const hasCurlyBraces = (obj: any) => {
-    const regex = /{{|}}/g;
+// const hasCurlyBraces = (obj: any) => {
+//     const regex = /{{|}}/g;
 
-    for (const key in obj) {
-        if (typeof obj[key] === 'string' && regex.test(obj[key])) {
+//     for (const key in obj) {
+//         if (typeof obj[key] === 'string' && regex.test(obj[key])) {
 
-            obj[key] = obj[key].replace(regex, '');
-            console.log(obj[key], "obj[key]")
+//             obj[key] = obj[key].replace(regex, '');
+//             console.log(obj[key], "obj[key]")
 
-            return { key: key, value: obj[key] };
-        }
-    }
-    return false;
-};
+//             return { key: key, value: obj[key] };
+//         }
+//     }
+//     return false;
+// };
 
-const sendDynamicMessage = (obj: any) => {
-    delete obj.components;
-
-    let headerImageUrl = "https://whatsappimagessiz.s3.eu-north-1.amazonaws.com/siz-logo.png"
-
-
-    const getMatchingValues = (obj: any, searchText: any) => {
-        // Use Object.entries to iterate over key-value pairs
-        return Object.entries(obj)
-            .filter(([key, value]) => key.includes(searchText)) // Filter based on the key
-            .map(([key, value]) => value); // Extract values
-    };
-    const bodyParams = getMatchingValues(obj, 'placeholder');
-    const headerParams = getMatchingValues(obj, 'header');
-    const footerParams = getMatchingValues(obj, 'button');
-
-    console.log(bodyParams, "bodyParams", headerParams, "headerParams", footerParams, "footerParams")
-
-    let components = []
-    headerParams.length > 0 &&
+const sendDynamicMessage = async (obj: any) => {
+    // delete obj.template.components;
+    let components = [];
+    obj.template.headerImageUrl !== "" &&
         components.push({
             "type": "header",
-            parameters: headerParams.map(itm => ({ type: 'image', "image": { "link": itm } }))
-            // "parameters": [
-            //     { "type": "image", "image": { "link": headerImageUrl } }
-            // ]
+            "parameters": [
+                { "type": "image", "image": { "link": obj.template.headerImageUrl } }
+            ]
         });
-    bodyParams.length > 0 &&
+
+
+
+    obj.template.headerVariables.length > 0 &&
         components.push({
-            type: 'body',
-            parameters: bodyParams.map(itm => ({ type: 'text', text: itm }))
+            type: 'header',
+            parameters: obj.template.headerVariables.map((itm: any) => ({ type: 'text', text: itm.field === 'TEXT' ? itm.value : obj.user[itm.field] }))
             // parameters: [
             //     { type: 'text', text: 'Deepak' },
             //   ]
         })
-    footerParams.length > 0 &&
+    obj.template.bodyVariables.length > 0 &&
         components.push({
-            type: 'button',
-            sub_type: 'url',
-            index: '0',
-            parameters: footerParams.map(itm => ({ type: 'text', text: itm }))
+            type: 'body',
+            parameters: obj.template.bodyVariables.map((itm: any) => ({ type: 'text', text: itm.field === 'TEXT' ? itm.value : obj.user[itm.field] }))
+            // parameters: [
+            //     { type: 'text', text: 'Deepak' },
+            //   ]
         })
 
 
+    // obj.buttonEnabled === true && obj.buttons.length > 0 &&
+    //     components.push({
+    //         type: 'button',
+    //         sub_type: 'url',
+    //         index: '0',
+    //         parameters: obj.buttons.map(itm => ({ type: 'text', text: itm.url }))
+    //     })
+
+    console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj)
     setTimeout(() => {
         let payload = {
             messaging_product: 'whatsapp',
-            to: obj.phone_number,
+            to: obj.user.phone_number,
             type: 'template',
             template: {
                 name: obj.label,
                 language: {
-                    code: obj.language,
+                    code: obj.template.language,
                     policy: 'deterministic'
                 },
                 components: components
@@ -236,11 +247,11 @@ const sendDynamicMessage = (obj: any) => {
             });
     }, 5000)
 }
+
 export {
     getCampaign,
     addCampaign,
     deleteCampaign,
     updateCampaign,
     sendCampaignMessages,
-    hasCurlyBraces
 };

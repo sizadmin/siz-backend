@@ -5,6 +5,8 @@ import User from '../../../models/user';
 import { ObjectId } from 'mongodb';
 import lender from '../../../models/lender';
 import { ILender } from '../../../types/lender';
+import { transporter } from '../../../middleware/helperFuc';
+import user from '../../../models/user';
 
 var _ = require('lodash');
 const bcrypt = require('bcryptjs');
@@ -50,7 +52,7 @@ const getUsers = async (req: Request, res: Response): Promise<void> => {
                         address: 1,
                         lender_info: 1,
                         username: 1,
-                        lender_type:1
+                        lender_type: 1
                     },
                 },
                 { $lookup: { from: 'roles', localField: 'role', foreignField: '_id', as: 'role' } },
@@ -165,7 +167,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             account_name: body.account_name,
         };
         if (body.lender_info) {
-            const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password');
+            const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password role');
         }
 
         let userBody = {
@@ -182,7 +184,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             password: body.password
         };
 
-        const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info');
+        const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info role');
 
 
         res.status(200).json({
@@ -236,7 +238,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
             return;
         }
         //   compare the saved password with login Password
-        
+
         const isMatch = await bcrypt.compare(body.password, loggedUser.password);
 
         if (!isMatch) {
@@ -284,11 +286,61 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.body;
+
+    // Verify if the transporter is working
+    try {
+        // Email content
+        const mailOptions = {
+            from: 'deepakbhangaledeveloper@gmail.com', // Your verified email address
+            to: email, // Recipient email
+            subject: 'Password Reset Request',
+            text: `You requested for a password reset. Please use the following link to reset your password: http://localhost:3000/reset-password?email=${email}`,
+            html: `
+          <p>You requested for a password reset.</p>
+          <p>Please use the following link to reset your password:</p>
+          <a href="http://localhost:3000/reset-password?email=${email}">Reset Password</a>
+        `,
+        };
+
+        // Send email
+        const info = await transporter.sendMail(mailOptions);
+        res.status(200).json({
+            message: 'Password reset email sent successfully!',
+            info,
+        });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: 'Error sending email',
+            error,
+        });
+    }
+}
+
+const getUserById = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { params: { id } } = req;
+        const userFound: IUser[] = await user.find({ _id: id }).populate("role");
+
+        res.status(200).json({ message: 'Data fetched Successfully', results: userFound });
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error });
+        throw error;
+    }
+};
+
+
 
 export {
     getUsers,
     addUser,
     deleteUser,
     loginUser,
-    updateUser
+    updateUser,
+    forgotPassword,
+    getUserById
 };

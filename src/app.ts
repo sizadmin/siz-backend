@@ -13,6 +13,7 @@ import lendersRoute from "../routes/lendersRoutes";
 import contactListRoutes from "./../routes/contactListRoutes";
 import marketingUsersRoutes from "./../routes/marketingUsers";
 import campaignRoutes from "./../routes/campaignRoutes"
+import templateRoutes from "./../routes/template"
 
 require("dotenv").config();
 
@@ -21,8 +22,8 @@ const PORT: string | number = process.env.PORT || 5001;
 const { DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST, MONGO_URL } = process.env;
 
 app.use(cors());
-app.use(express.json({limit: '50mb'}));
-app.use(express.urlencoded({limit: '50mb'}));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb' }));
 
 //***init middleware***//
 
@@ -31,8 +32,8 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(bodyParser.json({ limit: '50mb'}));
-app.use(bodyParser.urlencoded({ extended: true,limit: '50mb', }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', }));
 app.use('/api/v1/', roleRoute)
 app.use('/api/v1/', whatsappRoutes)
 app.use('/api/v1/', userRoute)
@@ -43,10 +44,7 @@ app.use('/api/v1/lenders/', lendersRoute)
 app.use('/api/v1/contact_list/', contactListRoutes)
 app.use('/api/v1/marketing_users/', marketingUsersRoutes)
 app.use('/api/v1/campaign/', campaignRoutes)
-
-
-
-
+app.use('/api/v1/template/', templateRoutes)
 
 app.get("/", (req, res) => res.send("Welcome to My-Backend!"));
 app.get("/api", (req, res) => res.send("Welcome to My-Backend! API"));

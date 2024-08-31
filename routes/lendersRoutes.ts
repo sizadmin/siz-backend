@@ -4,9 +4,4 @@ const router: Router = Router();
 
 router.get('/', getLendersInfo);
 
-
-
-
-
-
 export default router;

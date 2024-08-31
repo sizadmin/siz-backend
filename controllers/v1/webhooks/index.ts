@@ -8,8 +8,10 @@ import WhatsappMessage from '../../../models/WhatsappMessage';
 import { IOrderStatus } from '../../../types/orderstatus';
 import { IWhatsappMessage } from '../../../types/whatsappMessage';
 import orderstatus from '../../../models/orderstatus';
+import user from '../../../models/user';
+import markettingusers from '../../../models/markettingusers';
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
-
+let options = { new: true };
 
 // import { IProduct } from '../../../types/product';
 // import Product from '../../../models/product';
@@ -82,6 +84,20 @@ async function insertMessage(from, name, text, timestamp) {
 
     });
     const savedMessage: IWhatsappMessage = await newMessage.save();
+
+    text.forEach(async (message: any) => {
+      if (message.text && message.text.body.toLowerCase() === 'stop') {
+        const phoneNumber = message.from;
+        const existingUser = await markettingusers.findOne({ phone_number: phoneNumber });
+
+        if (existingUser) {
+          console.log(existingUser)
+          existingUser.whatsapp_messaging = false;
+          const updatedUser = await markettingusers.findByIdAndUpdate({ _id: existingUser._id }, existingUser, options);
+
+        }
+      }
+    });
   } catch (error) {
     console.error('Error inserting data into RDS:', error);
     throw error; // Rethrow the error to handle it in the caller function

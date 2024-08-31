@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sendWhatsappMsg } from '../controllers/v1/whatsapp';
+import { fetchTemplateStatus, sendWhatsappMsg } from '../controllers/v1/whatsapp';
 import { verifyTokenForApi } from '../middleware/auth';
 import { fetchShopifyLenders, fetchShopifyOrder,sendUpdateOnPaymentToLender,sendPickupReminderToLender,sendUpdateOnPickupFromRenter, fetchShopifyProducts,sendFeedbackMessageToRenter, getOrderById,sendDeliveryReminderToRenter,sendReturnPickupReminderToRenter } from '../controllers/v1/shopify';
 import {getMessageTemplates} from '../controllers/v1/whatsapp';
@@ -18,6 +18,9 @@ router.get('/sendUpdateOnPickupFromRenter', sendUpdateOnPickupFromRenter);
 router.get('/updateToLenderAboutPayment/:id', sendUpdateOnPaymentToLender);
 router.get('/getMessageTemplates', verifyTokenForApi ,getMessageTemplates);
 router.get('/order/:id', getOrderById);
+router.get('/fetchWTemplateStatus', verifyTokenForApi ,fetchTemplateStatus);
+
+
 
 
 

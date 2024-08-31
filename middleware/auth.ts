@@ -55,7 +55,7 @@ const verifyTokenForApi = (req: any, res: Response, next: any) => {
       jwt.verify(auth_token, secretKey, { algorithms: ['HS256'] }, (err, decoded) => {
         if (err) {
           console.error('Token verification failed:', err.message);
-          return reject({ status: 403, message: 'Forbidden' });
+          return res.status(403).send('Forbidden');
         }
         resolve(decoded);
         return next();

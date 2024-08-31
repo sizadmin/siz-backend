@@ -372,7 +372,7 @@ const getDashboardOrders = async (req: any, res: any) => {
         let order_type = req.query.order_type;
 
         let product = req.query.product;
-        console.log(payment_status, "payment_status")
+        // console.log(payment_status, "payment_status")
 
         // console.log(req.user, "header")
 
@@ -443,7 +443,7 @@ const getDashboardOrders = async (req: any, res: any) => {
             totalExpenses = element.expenses !== null || element.expenses !== undefined ? totalExpenses + Number(element.expenses) : totalExpenses;
             totalProfit = element.profit !== null || element.profit !== undefined ? totalProfit + Number(element.profit) : totalProfit;
         });
-        console.log(totalProfit, "totalProfit")
+        // console.log(totalProfit, "totalProfit")
         res.status(200).json({
             success: true,
             message: "Orders data is fetched successfully.",

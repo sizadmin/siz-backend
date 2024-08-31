@@ -5,4 +5,5 @@ export interface IMarketingUsers extends Document {
     last_name: string;
     phone_number: string;
     isActive: boolean;
+    whatsapp_messaging:boolean;
 }
