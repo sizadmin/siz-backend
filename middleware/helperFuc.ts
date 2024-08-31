@@ -15,8 +15,8 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: '7a7ef6001@smtp-brevo.com', // Your Sendinblue email
-        pass: 'nKLGjya93tZhbrO0', // Your Sendinblue API key
+        user: '', // Your Sendinblue email
+        pass: '', // Your Sendinblue API key
     },
 
 });
