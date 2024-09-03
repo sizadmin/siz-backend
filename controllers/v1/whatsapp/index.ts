@@ -136,7 +136,7 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
         // let imageURL: any = await uploadImageToFB(req, res);
         let componentsData = []
 
-        if (savedList.imageMediaCode !== "") {
+        if (savedList.imageMediaCode && savedList.imageMediaCode !== "" ) {
             componentsData.push({
 
                 "type": "HEADER",
