@@ -342,7 +342,7 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
                 .catch((error) => {
                     reject(error.response.data);
                     console.error('Error sending message:', error.response ? error.response.data : error.message);
-                    throw error;
+                    //throw error;
                 });
         });
     } catch (e) {
