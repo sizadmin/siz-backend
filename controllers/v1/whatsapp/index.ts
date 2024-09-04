@@ -135,8 +135,8 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
 
         // let imageURL: any = await uploadImageToFB(req, res);
         let componentsData = []
-
-        if (savedList.imageMediaCode && savedList.imageMediaCode !== "" ) {
+        console.log(savedList, "savedList")
+        if (savedList?.imageMediaCode && savedList?.imageMediaCode !== "") {
             componentsData.push({
 
                 "type": "HEADER",
@@ -342,11 +342,11 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
                 .catch((error) => {
                     reject(error.response.data);
                     console.error('Error sending message:', error.response ? error.response.data : error.message);
-                    //throw error;
+                    // throw error;
                 });
         });
     } catch (e) {
-        console.log(e)
+        console.log(e,"error in update template")
     }
 
 }

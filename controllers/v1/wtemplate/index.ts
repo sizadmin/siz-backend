@@ -84,7 +84,7 @@ const SubmitTemplateForReview = async (req: Request, res: Response): Promise<voi
         return;
     } catch (error) {
         res.status(400).json({ message: error.error.error_user_msg, error: error.error });
-        throw error;
+        // throw error;
     }
 };
 
@@ -102,7 +102,7 @@ const updateTemplate = async (req: Request, res: Response): Promise<void> => {
         return;
     } catch (error) {
 
-        // res.status(400).json({ message: 'Something went wrong', error });
+        res.status(400).json({ message: 'Something went wrong', error });
         // throw error;
     }
 };
@@ -122,7 +122,7 @@ const deleteTemplate = async (req: Request, res: Response): Promise<void> => {
     } catch (error) {
 
         res.status(400).json({ error });
-        throw error;
+        // throw error;
     }
 };
 

@@ -89,12 +89,12 @@ const deleteCampaign = async (req: Request, res: Response): Promise<void> => {
 const sendCampaignMessages = async (req: Request, res: Response): Promise<void> => {
     try {
         let final_obj = [];
-        const fiveMinuteAgo = moment().subtract(5, 'minutes').toISOString();
-        const oneMinuteFromNow = moment().toISOString();
+        const oneMinuteAgo = moment().subtract(15, 'minutes').toISOString();
+        const oneMinuteFromNow = moment().add(1, 'minutes').toISOString();
 
         const findCampaigns: ICampaign[] | null = await campaign.find({
             isActive: true,
-            schedule_date: { $gte: fiveMinuteAgo, $lte: oneMinuteFromNow }
+            schedule_date: { $gte: oneMinuteAgo, $lte: oneMinuteFromNow }
         }).populate("contact_list");
 
         const findAllContacts: IMarketingUsers[] | null = await markettingusers.find({ whatsapp_messaging: true }).select("-user_data");
