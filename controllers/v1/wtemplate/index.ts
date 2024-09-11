@@ -144,13 +144,6 @@ const getTemplatesById = async (req: Request, res: Response): Promise<void> => {
 };
 
 const uploadImageToFB = async (req: any, res: any) => {
-    // try {
-
-    // console.log(req.file.location, "req.file.location")
-    // console.log(process.env.AWS_REGION, "vvv")
-
-
-
 
     try {
         const file = req.file;
@@ -167,7 +160,7 @@ const uploadImageToFB = async (req: any, res: any) => {
             Bucket: process.env.S3_BUCKET_NAME, // S3 bucket name
             Key: file.originalname, // File name in S3
             Body: file.buffer, // File content
-            'ContentType':file.mimetype,
+            'ContentType': file.mimetype,
         };
         // console.log(uploadParams,"file")
 
@@ -227,7 +220,7 @@ const uploadImageToFB = async (req: any, res: any) => {
 
                 console.log('Image uploaded data:', response1.data);
                 // return response1.data
-                res.status(200).json({ message: 'Image Uploaded successfully', data: { ...response1.data, fileUrl }});
+                res.status(200).json({ message: 'Image Uploaded successfully', data: { ...response1.data, fileUrl } });
 
 
             } catch (error) {

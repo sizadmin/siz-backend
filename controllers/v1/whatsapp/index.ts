@@ -129,13 +129,19 @@ const fetchTemplateStatus = async (req: any, res: any) => {
 
 const createTemplate = async (req: any, res: any, savedList: any) => {
     try {
+        let bodyText = savedList.body.replace(/<strong>/g, '*')
+            .replace(/<\/strong>/g, '*')
+            .replace(/<em>/g, '_')
+            .replace(/<\/em>/g, '_')
+            .replace(/<del>/g, '~')
+            .replace(/<\/del>/g, '~');
 
         // Set the access token for your WhatsApp Business API
         const accessToken = process.env.AUTHORIZATION_TOKEN;
 
         // let imageURL: any = await uploadImageToFB(req, res);
         let componentsData = []
-        console.log(savedList, "savedList")
+        // console.log(savedList, "savedList")
         if (savedList?.imageMediaCode && savedList?.imageMediaCode !== "") {
             componentsData.push({
 
@@ -166,11 +172,11 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
         }
         let body: any = {
             type: 'body',
-            text: htmlToText(savedList.body),
+            text: htmlToText(bodyText),
         }
         if (savedList.body.length > 0 && savedList.bodyVariables.length > 0) {
             body = {
-                ...body, example: {
+                ...bodyText, example: {
                     "body_text": [
                         savedList.bodyVariables.map((itm: any) => itm.field === 'TEXT' && itm.value)
                     ]
@@ -242,6 +248,13 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
 
 const updateTemplateToFB = (req: any, res: any, savedList: any) => {
     try {
+        let bodyText = savedList.body.replace(/<strong>/g, '*')
+            .replace(/<\/strong>/g, '*')
+            .replace(/<em>/g, '_')
+            .replace(/<\/em>/g, '_')
+            // .replace(/<del>/g, '~')
+            // .replace(/<\/del>/g, '~');
+
 
         // Set the access token for your WhatsApp Business API
         const accessToken = process.env.AUTHORIZATION_TOKEN;
@@ -250,7 +263,7 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
         let componentsData = []
         // need to handle image upload to the meta first using session then upload file.
 
-        savedList.imageMediaCode !== "" &&
+        if (savedList?.imageMediaCode && savedList?.imageMediaCode !== null && savedList?.imageMediaCode !== "")
             componentsData.push({
                 "type": "HEADER",
                 "format": "IMAGE",
@@ -279,7 +292,7 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
         }
         let body: any = {
             type: 'body',
-            text: htmlToText(savedList.body),
+            text: htmlToText(bodyText),
         }
         if (savedList.body.length > 0 && savedList.bodyVariables.length > 0) {
             body = {
@@ -316,8 +329,8 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
             })
         }
 
-        console.log(JSON.stringify(componentsData, null, 2), "componentsData update");
-        console.log(JSON.stringify(savedList, null, 2), "componentsData update2", htmlToText(savedList.body));
+        // console.log(JSON.stringify(componentsData, null, 2), "componentsData update");
+        console.log(JSON.stringify(componentsData, null, 2), "componentsData update2", htmlToText(savedList.body));
 
         // Define the WhatsApp Business API endpoint
         const apiURL = 'https://graph.facebook.com/v17.0/' + savedList.templateId;
@@ -346,7 +359,7 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
                 });
         });
     } catch (e) {
-        console.log(e,"error in update template")
+        console.log(e, "error in update template")
     }
 
 }
@@ -361,8 +374,6 @@ const deleteTemplateFromFB = (req: any, res: any, savedList: any) => {
         const apiURL = 'https://graph.facebook.com/v17.0/104160086072686/message_templates?hsm_id=' + savedList.templateId + '&name=' + savedList.name;
 
 
-
-        console.log(apiURL, "apiURL")
         return new Promise((resolve, reject) => {
             axios.delete(apiURL, {
                 headers: {
