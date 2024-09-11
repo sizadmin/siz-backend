@@ -176,7 +176,7 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
         }
         if (savedList.body.length > 0 && savedList.bodyVariables.length > 0) {
             body = {
-                ...bodyText, example: {
+                ...body, example: {
                     "body_text": [
                         savedList.bodyVariables.map((itm: any) => itm.field === 'TEXT' && itm.value)
                     ]
