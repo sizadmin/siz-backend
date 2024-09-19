@@ -14,6 +14,7 @@ import contactListRoutes from "./../routes/contactListRoutes";
 import marketingUsersRoutes from "./../routes/marketingUsers";
 import campaignRoutes from "./../routes/campaignRoutes"
 import templateRoutes from "./../routes/template"
+import permissionRoutes from "./../routes/permissionRoutes"
 
 require("dotenv").config();
 
@@ -22,6 +23,7 @@ const PORT: string | number = process.env.PORT || 5001;
 const { DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST, MONGO_URL } = process.env;
 
 app.use(cors());
+app.use(express.text({ type: 'text/csv' })); // To handle raw CSV text
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb' }));
 
@@ -45,6 +47,8 @@ app.use('/api/v1/contact_list/', contactListRoutes)
 app.use('/api/v1/marketing_users/', marketingUsersRoutes)
 app.use('/api/v1/campaign/', campaignRoutes)
 app.use('/api/v1/template/', templateRoutes)
+app.use('/api/v1/permission/', permissionRoutes)
+
 
 app.get("/", (req, res) => res.send("Welcome to My-Backend!"));
 app.get("/api", (req, res) => res.send("Welcome to My-Backend! API"));

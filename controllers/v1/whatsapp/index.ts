@@ -52,7 +52,7 @@ const sendWhatsappMsg = async (req: any, res: any) => {
 
 const getMessageTemplates = async (req: any, res: any) => {
 
-    console.log("Getting Message Templates");
+    // console.log("Getting Message Templates");
     try {
         let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components`;
         let config = {

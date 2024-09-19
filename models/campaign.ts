@@ -24,6 +24,10 @@ const campaignSchema: Schema = new Schema(
         isActive: {
             type: Boolean
         },
+        status: {
+            type: Boolean,
+            default:false
+        },
 
 
     },

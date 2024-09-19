@@ -5,5 +5,6 @@ export interface ICampaign extends Document {
     isActive: boolean;
     contact_list: Schema.Types.ObjectId;
     schedule_date: Date;
+    status:boolean;
     // template: Schema.Types.ObjectId;
 }

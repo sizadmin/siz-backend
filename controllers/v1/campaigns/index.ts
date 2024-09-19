@@ -52,6 +52,7 @@ const updateCampaign = async (req: Request, res: Response): Promise<void> => {
         } = req;
 
         let options = { new: true };
+        body.status = false;
 
         const updatedList: ICampaign | null = await campaign.findByIdAndUpdate({ _id: id }, body, options);
 
@@ -103,45 +104,36 @@ const sendCampaignMessages = async (req: Request, res: Response): Promise<void> 
         const processCampaigns = async () => {
             const final_obj: any[] = [];
 
-            await Promise.all(findCampaigns.map(async (campaign: any) => {
-                if (campaign.contact_list.select_all === true) {
-                    campaign.contact_list.phone_number = findAllContacts;
+            await Promise.all(findCampaigns.map(async (campaign1: any) => {
+                if (campaign1.contact_list.select_all === true) {
+                    campaign1.contact_list.phone_number = findAllContacts;
                 }
-
-                // const result: any = await hasCurlyBraces(campaign.template);
-                // const result: any = campaign.template.bodyVariables.map((itm) => {
-                //     itm.key = 'placeholder_' + itm.label;
-                //     itm.value = itm.field
-                //     return itm
-                // });
-                const findTemplate: IWTemplate[] | null = await template.find({ name: campaign.template.label });
-                console.log(findTemplate, "findTemplate")
+                const findTemplate: IWTemplate[] | null = await template.find({ name: campaign1.template.label });
                 // Create an array of promises for each user
-                const userPromises = campaign.contact_list.phone_number.map((user: any) => {
+                const userPromises = campaign1.contact_list.phone_number.map((user: any) => {
 
                     if (user?.info?.whatsapp_messaging === true || user?.whatsapp_messaging === true) {
-                        console.log(findTemplate[0], ":result")
                         let obj = {
-                            ...campaign.template,
+                            ...campaign1.template,
                             phone_number: user.value,
                             user: { ...user, ...user?.info },
                             template: findTemplate[0]
                         };
-                        // result.map((o: any) => {
-                        //     obj = { ...obj, [o.key]: user[o.value] ?? user?.info?.[o.value] }
-                        // })
-                        // Push to final_obj inside the promise
-                        // setTimeout(() => {
                         if (obj.phone_number) sendDynamicMessage(obj);
-
-                        // }, 2000)
                         final_obj.push(obj);
                     }
                 });
 
-                // Wait for all user promises to resolve
+                let options = { new: true };
+
+                campaign1.status = true;
+                const isCampaignUpdated: ICampaign | null = await campaign.findByIdAndUpdate({ _id: campaign1._id }, campaign1, options);
+
                 await Promise.all(userPromises);
+
             }));
+
+
 
             res.status(200).json({
                 message: final_obj.length > 0 ? 'Campaign found' : 'Campaign not found',

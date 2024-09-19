@@ -21,7 +21,7 @@ const CONFIG = process.env;
 const getUsers = async (req: Request, res: Response): Promise<void> => {
     try {
         if (req.query.client !== undefined && req.query.client == 'true') {
-            let users: IUser[] = await User.find().select('-password ').populate('role').sort({ account_name: 1 });
+            let users: IUser[] = await User.find().select('-password ').populate('role permissions').sort({ account_name: 1 });
             users = await _.filter(users, function (o: any) {
                 return o.role?.role_name == 'Client';
             });
@@ -52,11 +52,13 @@ const getUsers = async (req: Request, res: Response): Promise<void> => {
                         address: 1,
                         lender_info: 1,
                         username: 1,
-                        lender_type: 1
+                        lender_type: 1,
+                        permission:1
                     },
                 },
                 { $lookup: { from: 'roles', localField: 'role', foreignField: '_id', as: 'role' } },
                 { $lookup: { from: 'lenders', localField: 'lender_info', foreignField: '_id', as: 'lender_info' } },
+                { $lookup: { from: 'permissions', localField: 'permission', foreignField: '_id', as: 'permission' } },
 
                 {
                     $facet: {
@@ -110,6 +112,7 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             iban_number: body.iban_number,
             swift_code: body.swift_code,
             account_name: body.account_name,
+            permission:body.permission
         });
         const savedLenderInfo: ILender = await newLenderInfo.save();
         console.log(savedLenderInfo, "savedLenderInfo")
@@ -124,7 +127,8 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             lender_info: new ObjectId(savedLenderInfo._id),
             address: body.address,
             username: body.username,
-            lender_type: body.lender_type
+            lender_type: body.lender_type,
+            permission:body.permission
         });
         const salt = await bcrypt.genSalt(10);
         newUser.password = await bcrypt.hash(body.password, salt);
@@ -165,9 +169,10 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             iban_number: body.iban_number,
             swift_code: body.swift_code,
             account_name: body.account_name,
+            // permission: body.permission
         };
         if (body.lender_info) {
-            const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password role');
+            const savedLenderInfo: ILender | null = await lender.findByIdAndUpdate({ _id: body.lender_info }, lenderBody, options).select('-password');
         }
 
         let userBody = {
@@ -181,10 +186,11 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             address: body.address,
             username: body.username,
             lender_type: body.lender_type,
-            password: body.password
+            password: body.password,
+            permission:body.permission
         };
 
-        const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info role');
+        const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info role permission');
 
 
         res.status(200).json({
@@ -195,7 +201,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
     } catch (error) {
 
         res.status(400).json({ message: 'Something went wrong', error });
-        throw error;
+        // throw error;
     }
 };
 
@@ -223,7 +229,8 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
 
         let loggedUser: IUser | null = await User.findOne({
             username: body.username,
-        }).populate('role');
+        }).populate('role permission');
+        console.log(loggedUser,"loggedUser1111")
         if (!loggedUser) {
 
             res.status(400).json({
@@ -270,7 +277,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
                 }
 
                 User.findOneAndUpdate({ _id: loggedUser._id }, { lastLogin: new Date() })
-                    .populate('role lender_info')
+                    .populate('role lender_info permission')
                     .then(ud => {
                         return res.status(200).json({
                             token,
@@ -322,7 +329,7 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
 const getUserById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { params: { id } } = req;
-        const userFound: IUser[] = await user.find({ _id: id }).populate("role");
+        const userFound: IUser[] = await user.find({ _id: id }).populate("role permission");
 
         res.status(200).json({ message: 'Data fetched Successfully', results: userFound });
 

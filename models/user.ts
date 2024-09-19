@@ -42,6 +42,10 @@ const userSchema: Schema = new Schema(
         lender_type: {
             type: String
         },
+        permission: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Permission',
+        }],
 
     },
     {

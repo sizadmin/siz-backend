@@ -14,7 +14,7 @@ const marketingUsersSchema: Schema = new Schema(
         },
         phone_number: {
             type: String,
-            unique:true
+            unique: true
         },
         isActive: {
             type: Boolean,
@@ -27,6 +27,9 @@ const marketingUsersSchema: Schema = new Schema(
         user_data: {
             type: Schema.Types.Mixed,
         },
+        tags: [{
+            type: Schema.Types.Mixed,
+        }]
 
     },
     {

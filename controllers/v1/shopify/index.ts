@@ -37,7 +37,7 @@ const fetchShopifyOrder = async (req: any, res: any) => {
         const findProduct: any | null = await product.findOne({
           "product_id": productId
         });
-        console.log(findProduct)
+        // console.log(findProduct)
         let line_items = await populateLineItems(order.line_items);
 
         let tags = findProduct?.product_details?.tags;
@@ -51,7 +51,7 @@ const fetchShopifyOrder = async (req: any, res: any) => {
         let dateString = "";
         if (matches && matches.length >= 2) {
           influencerTag = matches[1];
-          console.log("Influencer Tag in fetchorder:", influencerTag);
+          // console.log("Influencer Tag in fetchorder:", influencerTag);
           const findLender: any | null = await lender.findOne({
             "shopify_id": influencerTag
           });

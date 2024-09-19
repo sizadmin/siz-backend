@@ -2,31 +2,31 @@ import { Response, Request } from 'express';
 import markettingusers from '../../../models/markettingusers';
 import { IMarketingUsers } from '../../../types/marketingusers';
 import axios from 'axios';
-
+import csv from 'csv-parser';
+import { Readable } from 'stream'; // To convert string to a stream
 var _ = require('lodash');
-const bcrypt = require('bcryptjs');
-
-const crypto = require('crypto');
-
-const jwt = require('jsonwebtoken');
-const CONFIG = process.env;
+import fs from 'fs';
+import path from 'path';
 
 
 
 const getMarketingUsers = async (req: Request, res: Response): Promise<void> => {
     try {
         const searchAccName: any = req.query.value;
+
+        let searchCriteria = [{ first_name: new RegExp(searchAccName, 'i') },
+        { email: new RegExp(searchAccName, 'i') },];
+        if (!searchAccName) {
+            searchCriteria.push({ first_name: null }
+            )
+        }
         const usersList: IMarketingUsers[] = await markettingusers.find(
             {
                 whatsapp_messaging: true,
-                $or: [
-                    { first_name: new RegExp(searchAccName, 'i') },
-                    { email: new RegExp(searchAccName, 'i') },
-                    { address: new RegExp(searchAccName, 'i') }
-                ]
+                $or: searchCriteria
             }
+        ).sort({ updatedAt: -1 }); // Sort by updatedAt in descending order
 
-        );
 
         res.status(200).json({ count: usersList.length, results: usersList });
 
@@ -161,11 +161,67 @@ const fetchMarketingUsers = async (req: Request, res: Response): Promise<void> =
     }
 };
 
+const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
+
+    try {
+        if (!req.file) {
+            res.status(400).send('No file uploaded.');
+        }
+
+        const filePath = req.file.path; // Get the uploaded file's path
+        const results = [];
+        let newUsers = [];
+
+        const createNewUser = async (data: any) => {
+            const checkUserExist: IMarketingUsers[] = await markettingusers.findOne({ phone_number: data.phone_number });
+
+            if (!checkUserExist) {
+                const newUser: IMarketingUsers = new markettingusers(data);
+
+                const savedList: IMarketingUsers = await newUser.save();
+
+                console.log(savedList, "checkUserExist")
+                return savedList
+
+            }
+        }
+        // Read and parse the CSV file
+        fs.createReadStream(filePath)
+            .pipe(csv()) // Pipe the file into csv-parser
+            .on('data', async (data) =>
+                results.push(data)
+
+            ) // Push parsed rows into the results array
+            .on('end', async () => {
+                // Remove the file after processing
+                fs.unlinkSync(filePath);
+
+                for (const user of results) {
+                    let newUser = await createNewUser(user); // Wait for each user to be saved before proceeding
+                    if (newUser) newUsers.push(newUser)
+                }
+                // Respond with the parsed CSV data
+                res.json({
+                    message: 'CSV processed successfully!',
+                    data: newUsers,
+                });
+
+            })
+            .on('error', (err) => {
+                // Handle any errors during file reading or parsing
+                res.status(500).json({ error: 'Error reading the CSV file', details: err });
+            });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
 
 export {
     getMarketingUsers,
     addMarketingUser,
     deleteMarketingUser,
     updateMarketingUser,
-    fetchMarketingUsers
+    fetchMarketingUsers,
+    fetchContactsFromCSVFile
 };

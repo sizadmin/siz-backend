@@ -202,10 +202,10 @@ const uploadImageToFB = async (req: any, res: any) => {
                 }
             );
 
-            console.log('Image upload id:', response.data);
+            // console.log('Image upload id:', response.data);
             try {
                 let url2 = response.data.id
-                console.log(url2, "url2")
+                // console.log(url2, "url2")
                 const response1 = await axios.post(
                     'https://graph.facebook.com/v17.0/' + url2,
                     binaryData,
@@ -218,7 +218,7 @@ const uploadImageToFB = async (req: any, res: any) => {
                     }
                 );
 
-                console.log('Image uploaded data:', response1.data);
+                // console.log('Image uploaded data:', response1.data);
                 // return response1.data
                 res.status(200).json({ message: 'Image Uploaded successfully', data: { ...response1.data, fileUrl } });
 

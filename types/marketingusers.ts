@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 
 export interface IMarketingUsers extends Document {
     first_name: string;
@@ -6,4 +6,5 @@ export interface IMarketingUsers extends Document {
     phone_number: string;
     isActive: boolean;
     whatsapp_messaging:boolean;
+    tags:Schema.Types.Mixed
 }

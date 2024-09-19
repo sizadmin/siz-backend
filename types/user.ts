@@ -10,4 +10,5 @@ export interface IUser extends Document {
     password:string
     isActive:boolean;
     lender_type:string;
+    permission:Schema.Types.ObjectId
 }
