@@ -230,7 +230,6 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
         let loggedUser: IUser | null = await User.findOne({
             username: body.username,
         }).populate('role permission');
-        console.log(loggedUser,"loggedUser1111")
         if (!loggedUser) {
 
             res.status(400).json({

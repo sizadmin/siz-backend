@@ -7,6 +7,8 @@ import { Readable } from 'stream'; // To convert string to a stream
 var _ = require('lodash');
 import fs from 'fs';
 import path from 'path';
+import { IContactList } from '../../../types/conatctlist';
+import contactlist from '../../../models/contactlist';
 
 
 
@@ -167,11 +169,12 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
         if (!req.file) {
             res.status(400).send('No file uploaded.');
         }
+        let { _id, contact_list_name, isActive } = req.body;
 
         const filePath = req.file.path; // Get the uploaded file's path
         const results = [];
         let newUsers = [];
-
+        let list_phone_numbers = []
         const createNewUser = async (data: any) => {
             const checkUserExist: IMarketingUsers[] = await markettingusers.findOne({ phone_number: data.phone_number });
 
@@ -183,6 +186,8 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
                 console.log(savedList, "checkUserExist")
                 return savedList
 
+            } else {
+                return checkUserExist
             }
         }
         // Read and parse the CSV file
@@ -198,8 +203,40 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
 
                 for (const user of results) {
                     let newUser = await createNewUser(user); // Wait for each user to be saved before proceeding
-                    if (newUser) newUsers.push(newUser)
+                    if (newUser) {
+                        newUsers.push(newUser)
+                        list_phone_numbers.push({ label: user.first_name, value: user.phone_number })
+                    }
                 }
+                if (_id) {
+                    let options = { new: true };
+                    let payload = {
+                        name: contact_list_name,
+                        _id: _id,
+                        isActive: isActive,
+                        select_all: false,
+                        phone_number: list_phone_numbers
+                    }
+                    const updatedList: IContactList | null = await contactlist.findByIdAndUpdate({ _id: _id }, payload, options);
+                    console.log("existing list",updatedList);
+
+
+                } else {
+                    let payload = {
+                        name: contact_list_name,
+                        _id: _id,
+                        isActive: isActive,
+                        select_all: false,
+                        phone_number: list_phone_numbers
+                    }
+
+                    const newContactList: IContactList = new contactlist(payload);
+
+                    const savedList: IContactList = await newContactList.save();
+                    console.log("new list",savedList);
+
+                }
+
                 // Respond with the parsed CSV data
                 res.json({
                     message: 'CSV processed successfully!',
