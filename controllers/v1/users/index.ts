@@ -53,13 +53,13 @@ const getUsers = async (req: Request, res: Response): Promise<void> => {
                         lender_info: 1,
                         username: 1,
                         lender_type: 1,
-                        permission:1
+                        permission: 1
                     },
                 },
                 { $lookup: { from: 'roles', localField: 'role', foreignField: '_id', as: 'role' } },
                 { $lookup: { from: 'lenders', localField: 'lender_info', foreignField: '_id', as: 'lender_info' } },
                 { $lookup: { from: 'permissions', localField: 'permission', foreignField: '_id', as: 'permission' } },
-
+                { $sort: { updatedAt: 1 } },
                 {
                     $facet: {
                         metadata: [{ $count: 'total' }, { $addFields: { page: Number(page) } }],
@@ -112,7 +112,7 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             iban_number: body.iban_number,
             swift_code: body.swift_code,
             account_name: body.account_name,
-            permission:body.permission
+            permission: body.permission
         });
         const savedLenderInfo: ILender = await newLenderInfo.save();
         console.log(savedLenderInfo, "savedLenderInfo")
@@ -128,7 +128,7 @@ const addUser = async (req: Request, res: Response): Promise<void> => {
             address: body.address,
             username: body.username,
             lender_type: body.lender_type,
-            permission:body.permission
+            permission: body.permission
         });
         const salt = await bcrypt.genSalt(10);
         newUser.password = await bcrypt.hash(body.password, salt);
@@ -187,7 +187,7 @@ const updateUser = async (req: Request, res: Response): Promise<void> => {
             username: body.username,
             lender_type: body.lender_type,
             password: body.password,
-            permission:body.permission
+            permission: body.permission
         };
 
         const updateUser: IUser | null = await User.findByIdAndUpdate({ _id: id }, userBody, options).select('-password').populate('lender_info role permission');
