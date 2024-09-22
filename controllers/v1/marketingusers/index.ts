@@ -15,37 +15,22 @@ import contactlist from '../../../models/contactlist';
 const getMarketingUsers = async (req: Request, res: Response): Promise<void> => {
     try {
         const searchAccName: any = req.query.value;
-        const page = Number(req.query.page) || 1;
-        const size = Number(req.query.size) || 20;
-        const skip = (page - 1) * size;
-
-
 
         let searchCriteria = [{ first_name: new RegExp(searchAccName, 'i') },
-        { last_name: new RegExp(searchAccName, 'i') },];
+        { email: new RegExp(searchAccName, 'i') },];
         if (!searchAccName) {
             searchCriteria.push({ first_name: null }
             )
         }
-        const [usersList, totalCount] = await Promise.all([
-            // Fetch the paginated data
-            markettingusers.find({
+        const usersList: IMarketingUsers[] = await markettingusers.find(
+            {
                 whatsapp_messaging: true,
                 $or: searchCriteria
-            })
-                .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
-                .limit(size)
-                .skip(skip),
-
-            // Get the total count of documents that match the criteria
-            markettingusers.countDocuments({
-                whatsapp_messaging: true,
-                $or: searchCriteria
-            })
-        ]);
+            }
+        ).sort({ updatedAt: -1 }); // Sort by updatedAt in descending order
 
 
-        res.status(200).json({ total: totalCount, results: usersList, page: page });
+        res.status(200).json({ count: usersList.length, results: usersList });
 
     } catch (error) {
         console.log(error);
@@ -130,29 +115,6 @@ const deleteMarketingUser = async (req: Request, res: Response): Promise<void> =
         throw error;
     }
 };
-const deleteBulkMarketingUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-        // const deleteUser: IMarketingUsers | null = await markettingusers.findByIdAndDelete(req.params.id);
-
-        const result = await markettingusers.deleteMany({
-            _id: { $in: req.body }
-        });
-
-
-
-        res.status(200).json({
-            message: 'User deleted',
-            result: [result],
-        });
-        return;
-    } catch (error) {
-
-        res.status(400).json({ error });
-        throw error;
-    }
-};
-
-
 
 const fetchMarketingUsers = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -256,7 +218,7 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
                         phone_number: list_phone_numbers
                     }
                     const updatedList: IContactList | null = await contactlist.findByIdAndUpdate({ _id: _id }, payload, options);
-                    console.log("existing list", updatedList);
+                    console.log("existing list",updatedList);
 
 
                 } else {
@@ -271,7 +233,7 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
                     const newContactList: IContactList = new contactlist(payload);
 
                     const savedList: IContactList = await newContactList.save();
-                    console.log("new list", savedList);
+                    console.log("new list",savedList);
 
                 }
 
@@ -298,6 +260,5 @@ export {
     deleteMarketingUser,
     updateMarketingUser,
     fetchMarketingUsers,
-    fetchContactsFromCSVFile,
-    deleteBulkMarketingUser
+    fetchContactsFromCSVFile
 };
