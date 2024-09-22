@@ -1,0 +1,579 @@
+/* input[type="text"],
+input[type="password"] {
+    height: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+} */
+
+/* 
+input[type="submit"] {
+    cursor: pointer;
+    font-size: 15px;
+    background: #af1010;
+    border: 1px solid #af1010;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+} */
+
+/* input[type="submit"]:hover {
+    background: #af1010;
+} */
+
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.loginForm {
+    background-color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    width: 50vw;
+    min-width: 315px;
+    max-width: 600px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.listContainer {
+    display: flex;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}
+
+.title {
+    font-size: 1.6rem;
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px;
+}
+
+.logoStyle {
+    width: 25vw;
+    min-width: 2vw;
+    max-width: 4vw;
+}
+
+.checkedStyle {
+    min-width: 2vw;
+    max-width: 10vw;
+    margin-left: -25%;
+}
+
+label {
+    margin-top: 0.6rem;
+    margin-bottom: 0;
+}
+
+.link {
+    color: #000 !important;
+    cursor: pointer;
+    /* text-decoration: none !important; */
+}
+
+.link:hover {
+    color: #af1010 !important;
+    cursor: pointer;
+    text-decoration: underline !important;
+}
+
+/* new */
+.box1style {
+    margin-top: 4%;
+    padding: 20px;
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    border-radius: 5px;
+}
+
+.imgCount {
+    position: relative;
+
+    right: -60px;
+    top: -10px;
+
+}
+
+.countOuter {
+    height: 20px;
+    width: 20px;
+    background: rgba(114, 114, 114, 0.9);
+    border-radius: 50%;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    color: #fff;
+}
+
+.prodctThumbnail {
+    width: 4.6em;
+    height: 4.6em;
+    border-radius: 8px;
+    background: #fff;
+    position: relative;
+}
+
+.productImg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    /* z-index: 1; */
+}
+
+.pricingBlock {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 27px;
+}
+
+.totalAmount {
+    font-size: 22px;
+}
+
+.productListing>div,
+.productListing>span {
+    font-size: 14px;
+
+}
+
+.block1Outer {
+    /* border-right: ridge; */
+    /* padding-right: 4em !imp,ortant; */
+}
+
+.scheduleBlock {
+    display: flex;
+    justify-content: space-between;
+    /* padding: 15px 27px; */
+    flex-direction: column;
+
+}
+
+.dateTimePickerContainer {
+    display: flex !important;
+    /* width: 100% !important;
+    justify-content: flex-start !important; */
+    margin: 20px 0;
+    height: 20px !important;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.timePickerContainer {
+    margin-top: 50px;
+    flex-direction: row;
+    align-items: center;
+    display: flex;
+}
+
+.Savebutton {
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 15px;
+    background: #af1010;
+    border: 1px solid #af1010;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.dropdownStyle {
+    height: 40px;
+    background: #fff;
+    padding: 10px 10px;
+    width: 100%;
+    border-radius: 5px;
+}
+
+td,
+th {
+    padding: 8px;
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+Td {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+
+}
+
+.second_titile {
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-decoration: underline;
+}
+
+.third_titile {
+    font-weight: 600;
+    margin-bottom: 0px;
+    /* max-width: 200px; */
+}
+
+
+/* .Completed{
+    background: green !important;
+    height: 10px !important;
+    width: 10px !important;
+    border-radius: 50%;
+}
+.delivered_renter{
+    background: yellow !important;
+    height: 10px !important;
+    width: 10px !important;
+    border-radius: 50%;
+}
+.confirmed{
+    background: yellow !important;
+    height: 10px !important;
+    width: 10px !important;
+    border-radius: 50%;
+}
+.pickuped_lender{
+    background: yellow !important;
+    height: 10px !important;
+    width: 10px !important;
+    border-radius: 50%;
+}
+
+.pickuped_renter{
+    background: yellow !important;
+    height: 10px !important;
+    width: 10px !important;
+    border-radius: 50%;
+}
+
+
+.delivered_lender{
+    background: yellow !important;
+    height: 10px !important;
+    width: 10px !important;
+    border-radius: 50%;
+} */
+td {
+    font-size: small;
+}
+
+th {
+    font-size: small;
+}
+
+.lenderInfoBlock {
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 48px;
+    /* height: 150px; */
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    margin-left: 1px;
+    margin-right: 1px;
+    border-radius: 8px;
+}
+
+.customModal .modal-content {
+    max-width: 90vw !important;
+
+}
+
+.my-modal {
+    max-width: 90vw !important;
+}
+
+.dropdownStyle {
+    height: 40px;
+    background: #fff;
+    padding: 10px 10px;
+    border-radius: 5px;
+}
+
+.modalElementStyle {
+    padding: 18px 30px;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.modalElementDivStyle {
+    width: 47%;
+}
+
+.customInputStyle {
+    width: 100%;
+    height: 40px;
+    border : 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+.applyBtn {
+    background: rgb(175, 16, 16);
+    color: white;
+    padding: 10px 30px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.customTextareaStyle {
+    width: 100%;
+    border : 1px solid rgba(0, 0, 0, 0.2) !important;
+
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+/* input[type="text"] {
+  height: 40px !important;
+  line-height: 10px !important;
+
+} */
+
+
+
+.templateCreator {
+    /* max-width: 800px; */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.formGroup {
+    display: flex;
+    align-items:  baseline;
+    margin-bottom: 15px;
+}
+
+.formGroup label {
+    flex: 1;
+    margin-right: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.inputField,
+.textareaField,
+.selectField {
+    flex: 2;
+    padding: 8px;
+    font-size: 16px;
+    border: 0.5px solid #ccc;
+    border-radius: 4px;
+    height: fit-content;
+}
+
+.toggleSwitch {
+    flex: none;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.templatePreview {
+    margin-top: 30px;
+}
+
+.templatePreview h3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.previewContent {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.headerImage {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    height: 150px;
+    margin-top: 10px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.buttonPreview {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    display: block;
+}
+
+.buttonPreview:hover {
+    background-color: #0056b3;
+}
+
+
+.profileImage {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.profileInfo {
+    flex: 1;
+    line-height: 0.1;
+}
+
+.profileInfo h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.verifiedIcon {
+    color: green;
+    font-size: 12px;
+    margin-left: 5px;
+    height: 25px;
+}
+
+.profileInfo .status {
+    color: gray;
+    font-size: 12px;
+}
+
+.whatsappActions span {
+    font-size: 18px;
+    color: #007bff;
+    margin-left: 15px;
+}
+.whatsappActions{
+    display: flex;
+    align-items: center;
+}
+
+.whatsappMessage {
+    /* background-color: white; */
+    border-radius: 10px;
+    padding: 10px;
+    position: relative;
+}
+
+.messageDate {
+    font-size: 12px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 5px;
+    background-color: #999;
+    width: fit-content;
+    text-align: center;
+    margin: auto;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.messageContent {
+    background-color: #e1ffc7;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.messageContent h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+.messageFooter {
+    font-size: 12px;
+    color: gray;
+    margin-top: 5px;
+}
+
+.messageTimestamp {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 12px;
+    color: gray;
+}
+
+.closeIcon_template {
+    height: 25px;
+}
+
+
+/* preview css */
+.whatsappPreview {
+    width: 400px;
+    border-radius: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    background-image: url('../../../assets/imgs/whatsapp_bg.png'); /* relative path from the CSS file */
+    background-size: cover;
+    background-position: center;
+
+}
+
+.whatsappHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    background: #fff;
+    padding: 0.8rem 1rem;
+}
+
+.variablesInputWidth {
+    width: 160px;
+}
+
+.errorField {
+    border-color: red;
+}
+
+.errorMessage {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+}
+.guZdik{
+    border: none !important;
+    height: 100% !important;
+    height: 150px !important;
+}

@@ -1,0 +1,40 @@
+.uploaderContainer {
+    height: 500px;
+}
+
+.buttonContainer {
+    background: #f0f0f0;
+    padding: 10px;
+    margin: 10px;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+.whatsappContainer {
+    position: relative;
+    /* Add this to make the close icon position correctly */
+    /* height: 300px; */
+    border-radius: 20px;
+    background-color: #f5f5f5;
+    padding: 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.clearIcon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #fff;
+    background-color: #ef3e3e;
+    border-radius: 50%;
+    padding: 2px 5px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.clearIcon:hover {
+    color: #fff;
+    background-color: #ef3e3e;
+}

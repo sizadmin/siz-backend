@@ -1,0 +1,212 @@
+input[type="text"],
+input[type="password"] {
+    height: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+/* 
+input[type="submit"] {
+    cursor: pointer;
+    font-size: 15px;
+    background: #af1010;
+    border: 1px solid #af1010;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+} */
+
+/* input[type="submit"]:hover {
+    background: #af1010;
+} */
+
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.loginForm {
+    background-color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    width: 50vw;
+    min-width: 315px;
+    max-width: 600px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.listContainer {
+    display: flex;
+}
+
+.error {
+    color: red;
+}
+
+.success {
+    color: green;
+}
+
+.title {
+    font-size: 1.6rem;
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px;
+}
+
+.logoStyle {
+    width: 25vw;
+    min-width: 2vw;
+    max-width: 4vw;
+}
+
+.checkedStyle {
+    min-width: 2vw;
+    max-width: 10vw;
+    margin-left: -25%;
+}
+
+label {
+    margin-top: 0.6rem;
+    margin-bottom: 0;
+}
+
+.link {
+    color: #000 !important;
+    cursor: pointer;
+    /* text-decoration: none !important; */
+}
+
+.link:hover {
+    color: #af1010 !important;
+    cursor: pointer;
+    text-decoration: underline !important;
+}
+
+/* new */
+.box1style {
+    margin-top: 4%;
+    padding: 20px;
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    border-radius: 5px;
+}
+
+.imgCount {
+    position: relative;
+
+    right: -60px;
+    top: -10px;
+
+}
+
+.countOuter {
+    height: 20px;
+    width: 20px;
+    background: rgba(114, 114, 114, 0.9);
+    border-radius: 50%;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    color: #fff;
+}
+
+.prodctThumbnail {
+    width: 4.6em;
+    height: 4.6em;
+    border-radius: 8px;
+    background: #fff;
+    position: relative;
+}
+
+.productImg {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    /* z-index: 1; */
+}
+
+.pricingBlock {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 27px;
+}
+
+.totalAmount {
+    font-size: 22px;
+}
+
+.productListing>div,
+.productListing>span {
+    font-size: 14px;
+
+}
+
+.block1Outer {
+    /* border-right: ridge; */
+    /* padding-right: 4em !imp,ortant; */
+}
+
+.scheduleBlock {
+    display: flex;
+    justify-content: space-between;
+    /* padding: 15px 27px; */
+    flex-direction: column;
+
+}
+
+.dateTimePickerContainer {
+    display: flex !important;
+    /* width: 100% !important;
+    justify-content: flex-start !important; */
+    margin: 20px 0;
+    height: 20px !important; 
+    flex-direction: row;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.timePickerContainer {
+    margin-top: 50px;
+    flex-direction: row;
+    align-items: center;
+    display: flex;
+}
+
+.Savebutton {
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 15px;
+    background: #af1010;
+    border: 1px solid #af1010;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.dropdownStyle {
+    height: 40px;
+    background: #fff;
+    padding: 10px 10px;
+    border-radius: 5px;
+}
+
+@media (max-width:500px) {
+    .logoStyle {
+        width: 25vw;
+        min-width: 14vw;
+        max-width: 14vw;
+    }
+    .box1style {
+        padding: 15px;
+       
+    }
+}

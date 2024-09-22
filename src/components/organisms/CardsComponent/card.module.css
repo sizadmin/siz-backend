@@ -1,0 +1,39 @@
+.filterBlock {
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 48px;
+    padding: 1em;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.applyBtn {
+    background: rgb(175, 16, 16);
+    color: white;
+    padding: 10px 30px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.cancelBtn {
+    background: rgb(184, 180, 180);
+    color: black;
+    padding: 10px 30px;
+    border-radius: 6px;
+}
+
+.cardStyle {
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    height: 90px;
+    border-radius: 5px;
+    justify-content: space-around;
+    display: flex !important;
+    align-items: center;
+    flex-direction: column;
+    margin: 10px;
+    background-color: #fff;
+}
+
+.cardDiv{
+    justify-content: center;
+} 

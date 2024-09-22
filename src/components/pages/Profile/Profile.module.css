@@ -1,0 +1,16 @@
+/* src/components/ProfileEdit.module.css */
+
+.form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .form label {
+    font-weight: bold;
+  }
+  
+  .form .btn-primary {
+    width: 100%;
+  }
+  

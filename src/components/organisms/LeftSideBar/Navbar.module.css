@@ -1,0 +1,159 @@
+.navbarContainer {
+    height: 100vh;
+    width: 250px;
+    position: fixed;
+    left: 0;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .username {
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  .email {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+  }
+  
+  .logo {
+    height: 46px;
+    width: 46px;
+  }
+  
+  .navbarToggleButton {
+    border: none;
+    top:0;
+    right: 0;
+    position: absolute;
+  }
+  .offCanvasHeader {
+    display: flex;
+    flex-direction: column;
+    padding-top: 40px;
+    /* height: 70px; */
+  }
+  
+  .offcanvasBody {
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+  }
+  
+  .profileContainer {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 140px;
+    width: 140px;
+    border-radius: 50%;
+    align-self: center;
+  }
+  
+  .profileImage {
+    width: 116px;
+    height: 116px;
+  }
+  
+  .navLink {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #808080;
+    margin-left: 15px;
+    font-weight: 500;
+    width: 100%;
+    margin: 0;
+  }
+  
+  .navLink:hover {
+    color: #000;
+  }
+  
+  .vectorIcon {
+    width: 30px;
+    margin-right: 20px;
+  }
+  
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: #808080;
+    margin-top: 10px;
+  }
+  
+  .navbarBrand {
+    margin-top: 2rem;
+    border-bottom: 1px solid #808080;
+  }
+  
+  .nav {
+    display: flex;
+    flex-direction: column;
+    margin: 4rem;
+    width: 100%;
+    border-bottom: 1px solid #808080;
+    padding-left: 10px;
+  }
+  
+  .image {
+    height: 30px;
+    width: 30px;
+  }
+  
+  .imageContainer {
+    display: flex;
+    gap: 20px;
+    position: fixed;
+    right: 80px;
+  }
+  
+  @media (max-width: 767px) {
+    .offcanvas {
+      width: 100% !important;
+    }
+    .imageContainer {
+      display: flex;
+      gap: 20px;
+      position: fixed;
+      right: 80px;
+      align-items: center;
+    }
+  
+    .image {
+      height: 35px;
+      width: 35px;
+    }
+  
+    .profileContainer {
+      height: 40px;
+      width: 40px;
+      margin-top: 10px;
+      border-radius: 50%;
+    }
+  
+    .profileImage {
+      width: 30px;
+      height: 30px;
+    }
+  }
+  
+  .activeNavLink{
+    background-color:#f7f2e5;
+    border-radius: 5px;
+    /* color: red !important; */
+    font-weight: 600 !important;
+  }
+  .smallNavbarContainer{
+    min-height: 40px;
+  }
+  .navBarTitle{
+    font-size: 2rem;
+    font-weight: bold;
+    color: #af1010;
+    margin-bottom: 0px !important;
+  }

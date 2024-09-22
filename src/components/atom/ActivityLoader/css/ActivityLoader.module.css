@@ -1,0 +1,5 @@
+.modalContainer {
+    overflow: hidden !important;
+    background-color: #fff;
+    opacity: 0.5 !important;
+}

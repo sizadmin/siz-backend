@@ -1,0 +1,178 @@
+/* src/Login.css */
+  .loginContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 1rem;
+    box-sizing: border-box;
+    background-color: #f7f2e8;
+  }
+  
+  .loginBox {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .loginBox h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #af1010;
+  }
+  
+  .loginBox h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .inputGroup {
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  
+  .inputGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .inputGroup input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .inputGroup input:focus {
+    outline: none;
+    border-color: #4CAF50;
+  }
+  
+  .loginButton {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+  }
+  
+  .loginButton:hover {
+    background-color: #555;
+  }
+  
+  .alternative-login {
+    text-align: center;
+  }
+  
+  .alternative-login span {
+    display: block;
+    margin: 1rem 0;
+    color: #888;
+  }
+  
+  .googleLogin, .appleLogin {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .googleLogin {
+    background-color: white;
+    color: #4285F4;
+  }
+  
+  .appleLogin {
+    background-color: black;
+    color: white;
+  }
+  
+  .loginFooter {
+    /* margin-top: 1.5rem; */
+    text-align: right;
+  }
+  
+  .loginFooter a {
+    margin: 0 0.5rem;
+    color: #333;
+    text-decoration: none;
+  }
+  
+  .loginFooter a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .loginBox {
+      padding: 1.5rem;
+    }
+  
+    .loginBox h1 {
+      font-size: 1.75rem;
+    }
+  
+    .loginBox h2 {
+      font-size: 1.25rem;
+    }
+  
+    .inputGroup input, .loginButton, .googleLogin, .appleLogin {
+      padding: 0.65rem;
+      font-size: 0.95rem;
+    }
+  
+    .loginFooter a {
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .loginBox {
+      padding: 1rem;
+      max-width: 90%;
+    }
+  
+    .loginBox h1 {
+      font-size: 1.5rem;
+    }
+  
+    .loginBox h2 {
+      font-size: 1.1rem;
+    }
+  
+    .inputGroup input, .loginButton, .googleLogin, .appleLogin {
+      padding: 0.5rem;
+      font-size: 0.85rem;
+    }
+  
+    .loginFooter a {
+      font-size: 0.8rem;
+    }
+  }
+  
+  .error {
+    color: red !important;
+  }
+  .logoStyle {
+    width: 25vw;
+    min-width: 2vw;
+    max-width: 10vw;
+  }

@@ -1,0 +1,19 @@
+
+.ql-container ql-snow {
+  border-bottom: none !important;
+}
+
+.toolbar ql-toolbar ql-snow {
+  border-top: none !important;
+}
+
+.ql-toolbar.ql-snow {
+  border-top: none !important;
+}
+.ql-container.ql-snow{
+  border-bottom: none !important;
+
+}
+.toolbar{
+  background: white;
+}
