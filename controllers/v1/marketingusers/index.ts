@@ -205,7 +205,7 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
                     let newUser = await createNewUser(user); // Wait for each user to be saved before proceeding
                     if (newUser) {
                         newUsers.push(newUser)
-                        list_phone_numbers.push({ label: user.first_name, value: user.phone_number })
+                        list_phone_numbers.push({ label: user.first_name, value: user.phone_number ,info: newUser})
                     }
                 }
                 if (_id) {
