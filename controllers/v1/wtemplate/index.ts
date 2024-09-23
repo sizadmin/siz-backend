@@ -162,7 +162,7 @@ const uploadImageToFB = async (req: any, res: any) => {
             Body: file.buffer, // File content
             'ContentType': file.mimetype,
         };
-        console.log(file,"file")
+        // console.log(uploadParams,"file")
 
         const upload = new Upload({
             client: s3,

@@ -9,6 +9,7 @@ const campaignSchema: Schema = new Schema(
         },
         schedule_date: {
             type: Date,
+            required: true
         },
         contact_list: {
             type: Schema.Types.ObjectId,

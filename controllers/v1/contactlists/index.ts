@@ -2,13 +2,13 @@ import { Response, Request } from 'express';
 import contactlist from '../../../models/contactlist';
 import { IContactList } from '../../../types/conatctlist';
 
-// var _ = require('lodash');
+var _ = require('lodash');
 
 
 const getContactList = async (req: Request, res: Response): Promise<void> => {
     try {
 
-        const contactList: IContactList[] = await contactlist.find().sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
+        const contactList: IContactList[] = await contactlist.find();
 
         res.status(200).json({ count: contactList.length, results: contactList });
 
