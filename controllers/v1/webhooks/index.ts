@@ -48,6 +48,9 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
   try {
     // Extract relevant data from the request body
     console.log(req.body);
+
+
+    
     const { entry } = req.body;
     const { from, name, text } = entry[0].changes[0].value.messages[0];
     console.log("ENTRYYYYY: ", entry);

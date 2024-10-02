@@ -12,8 +12,9 @@ const whatsappMessageSchema: Schema = new Schema(
         message: {
             type: String
         },
-        timestamp :{
-            type: String 
+        timestamp: {
+            type: String,
+            unique: true
         }
     },
     {

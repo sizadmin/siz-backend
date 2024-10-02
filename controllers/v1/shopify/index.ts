@@ -11,6 +11,8 @@ import moment from "moment";
 import { populateLineItems } from '../webhooks';
 import { basicLogger } from '../../../middleware/logger';
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
+const { SHOPIFY_STORE_DOMAIN, SHOPIFY_ACCESS_TOKEN } = process.env;
+require("dotenv").config();
 
 
 const fetchShopifyOrder = async (req: any, res: any) => {
@@ -56,16 +58,16 @@ const fetchShopifyOrder = async (req: any, res: any) => {
             "shopify_id": influencerTag
           });
           console.log(findLender);
-         lender_name = (findLender) ? findLender.name : "Not Found";
-          lender_address = (findLender)  ? findLender.address : "Not Found";
-          lender_phone_call = (findLender)  ? findLender.phone_number_call : "Not Found";
-          lender_phone_whatsapp = (findLender)  ? findLender.phone_number_whatsapp : "Not Found";
+          lender_name = (findLender) ? findLender.name : "Not Found";
+          lender_address = (findLender) ? findLender.address : "Not Found";
+          lender_phone_call = (findLender) ? findLender.phone_number_call : "Not Found";
+          lender_phone_whatsapp = (findLender) ? findLender.phone_number_whatsapp : "Not Found";
         } else {
           console.log("Influencer Tag not found.");
         }
         console.log("lender details added ");
         console.log(order);
-        let key = (order.line_items) ? ((order.line_items[0].properties.length > 0)  ? order.line_items[0].properties[0].name : "") : "";
+        let key = (order.line_items) ? ((order.line_items[0].properties.length > 0) ? order.line_items[0].properties[0].name : "") : "";
         if (key == "Date") {
           dateString = order.line_items[0].properties[0].value;
         }
@@ -993,4 +995,37 @@ const getOrderById = async (req: any, res: any) => {
 }
 
 
-export { fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, sendUpdateOnPickupFromRenter, sendUpdateOnPaymentToLender, getOrderById, sendDeliveryReminderToRenter, sendReturnPickupReminderToRenter, sendFeedbackMessageToRenter, sendPickupReminderToLender }
+// Shopify API URL
+
+// Function to create a product on Shopify
+const createShopifyProduct = async (req: any, res: any) => {
+  const shopifyUrl = `https://${process.env.SHOPIFY_STORE_DOMAIN}/admin/api/2024-10/products.json`;
+
+  try {
+    const response = await axios.post(shopifyUrl, req.body, {
+      headers: {
+        'X-Shopify-Access-Token': process.env.SHOPIFY_ACCESS_TOKEN,
+        'Content-Type': 'application/json',
+      },
+    });
+    res.status(200).json({
+      success: true,
+      message: "Shopify product created successfully.",
+      data: response.data
+    });
+  } catch (error) {
+    console.log("Error creating product:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch shopify product" });
+
+  }
+}
+
+
+export {
+  fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, sendUpdateOnPickupFromRenter,
+  sendUpdateOnPaymentToLender, getOrderById, sendDeliveryReminderToRenter, sendReturnPickupReminderToRenter,
+  sendFeedbackMessageToRenter, sendPickupReminderToLender,
+  createShopifyProduct
+}

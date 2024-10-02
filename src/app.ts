@@ -15,12 +15,14 @@ import marketingUsersRoutes from "./../routes/marketingUsers";
 import campaignRoutes from "./../routes/campaignRoutes"
 import templateRoutes from "./../routes/template"
 import permissionRoutes from "./../routes/permissionRoutes"
+import appRoutes from "./../routes/mysqlRoutes/routes"
 
+import mysql from "mysql2"
 require("dotenv").config();
 
 const app: Express = express();
 const PORT: string | number = process.env.PORT || 5001;
-const { DB_USERNAME, DB_PASSWORD, DB_NAME, DB_HOST, MONGO_URL } = process.env;
+const { DB_USERNAME, DB_PASSWORD, DB_NAME, MONGO_URL, MYSQL_HOST, MYSQL_USER_NAME, MYSQL_PASSWORD, MYSQL_DB_NAME } = process.env;
 
 app.use(cors());
 app.use(express.text({ type: 'text/csv' })); // To handle raw CSV text
@@ -48,6 +50,8 @@ app.use('/api/v1/marketing_users/', marketingUsersRoutes)
 app.use('/api/v1/campaign/', campaignRoutes)
 app.use('/api/v1/template/', templateRoutes)
 app.use('/api/v1/permission/', permissionRoutes)
+app.use('/api/v1/siz-app/', appRoutes)
+
 
 
 app.get("/", (req, res) => res.send("Welcome to My-Backend!"));
@@ -67,3 +71,24 @@ mongoose
     console.log(`error : ${error}`);
     throw error;
   });
+
+
+
+
+// Configure MySQL
+const mysqlConnection = mysql.createConnection({
+  host: MYSQL_HOST,
+  user: MYSQL_USER_NAME,
+  password: MYSQL_PASSWORD,
+  database: MYSQL_DB_NAME,
+});
+
+// Connect to MySQL
+mysqlConnection.connect((err) => {
+  if (err) {
+    console.error('MySQL Connection Error: ', err);
+    return;
+  }
+  console.log('Connected to MySQL');
+});
+export { mysqlConnection }

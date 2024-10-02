@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Order Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+
+        .order-summary {
+            margin-top: 20px;
+        }
+
+        .order-header h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .view-order-btn {
+            background-color: #af1010;
+            color: white !important;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .summary-title {
+            font-weight: bold;
+        }
+
+        .order-details {
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table img {
+            display: block;
+        }
+
+        .container-div {
+            width: 100%;
+            display: table;
+            table-layout: fixed;
+        }
+
+        .container-div h4 {
+            display: table-cell;
+            font-size: 14px;
+            padding: 5px 0;
+        }
+
+        .bold-block {
+            font-weight: bold !important;
+        }
+
+        .right-align {
+            text-align: right;
+        }
+        h4{
+            font-weight: 100 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div style="text-align: center;">
+            <img src="https://sizters.s3.ap-south-1.amazonaws.com/Copy+of+siz.png" alt="siz_logo"
+                style="height: 70px;width: 70px;" />
+        </div>
+        <div class="order-header">
+            <h4>${customerName} placed order #${orderId} on ${orderDate}.</h4>
+            <a href="${redirect_url}" class="view-order-btn">View order</a>
+        </div>
+        <hr>
+        <div class="order-summary">
+            <p><span class="summary-title">Order Summary</span></p>
+            <div class="order-details">
+                <table>
+                    <tr>
+                        <td>
+                            <img src="${productImage}" alt="siz_logo"
+                                style="height: 70px;width: 70px;" />
+                        </td>
+                        <td>
+                            <p>
+                                <span>${orderItem}</span><br />
+                                <span>${totalAmount} × 1 Item</span>
+                            </p>
+                        </td>
+                        <td class="right-align" colspan="2">AED ${totalAmount2}</td>
+                    </tr>
+                </table>
+
+                <table>
+                    <tr>
+                        <td>Subtotal</td>
+                        <td class="right-align">AED ${subtotal}</td>
+                    </tr>
+                    <tr>
+                        <td>Discount</td>
+                        <td class="right-align">AED ${discount}</td>
+                    </tr>
+                    <tr>
+                        <td>Damage Protection</td>
+                        <td class="right-align">AED ${damage}</td>
+                    </tr>
+                    <tr class="bold-block">
+                        <td>Total</td>
+                        <td class="right-align bold-block">AED ${total}</td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

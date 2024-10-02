@@ -54,7 +54,7 @@ const getMessageTemplates = async (req: any, res: any) => {
 
     // console.log("Getting Message Templates");
     try {
-        let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components`;
+        let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&limit=1000`;
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
@@ -78,7 +78,7 @@ const getMessageTemplates = async (req: any, res: any) => {
 const fetchTemplateStatus = async (req: any, res: any) => {
 
     try {
-        let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components`;
+        let url = `https://graph.facebook.com/v17.0/104160086072686/message_templates?fields=name,status,language,components&limit=1000`;
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
@@ -102,10 +102,123 @@ const fetchTemplateStatus = async (req: any, res: any) => {
             // Update the template and return the result
             const updatedList: IWTemplate | null = await template.findOneAndUpdate({ name: name }, update, options);
 
-            // Push the result to the responseData array
-            if (updatedList) responseData.push(updatedList);
-        });
 
+            // Push the result to the responseData array
+            if (updatedList === null) {
+                let obj: any = {};
+                let footerText = "";
+                obj.name = element.name
+                obj.status = element.status
+                obj.language = element.language
+                obj.body = textToHtml(element.components.filter((itm: any) => itm.type === "BODY")[0].text || "")
+                obj.headerImageUrl = element.components.filter((itm: any) => itm.type === "HEADER" && itm.format === "IMAGE")[0]?.example?.header_handle || ""
+                obj.headerEnabled = true;
+                obj.headerText = textToHtml(element.components.filter((itm: any) => itm.type === "HEADER" && itm.format === "TEXT")[0]?.text || "")
+                obj.templateId = element.id;
+                obj.bodyVariables = [];
+                obj.headerVariables = [];
+                if (element.components.filter((itm: any) => itm.type === "BODY")[0]?.example) {
+                    let body_var = obj.bodyVariables;
+                    element.components.filter((itm: any) => itm.type === "BODY")[0]?.example?.body_text.map((itm: any, index: any) => {
+                        body_var.push({
+                            "label": index + 1,
+                            "value": itm[0],
+                            "field": "first_name"
+                        })
+                        obj.bodyVariables = body_var
+
+                    })
+
+                }
+                if (element.components.filter((itm: any) => itm.type === "HEADER")[0]?.example) {
+                    let body_var = obj.headerVariables;
+                    element.components.filter((itm: any) => itm.type === "HEADER")[0]?.example?.header_text?.map((itm: any, i: any) => {
+                        body_var.push({
+                            "label": i + 1,
+                            "value": itm,
+                            "field": "first_name"
+                        })
+                        obj.headerVariables = body_var
+
+                    })
+
+                }
+                obj.buttonEnabled = element.components.filter((itm: any) => itm.type === "BUTTONS") ? true : false;
+                obj.buttons = [];
+                if (element.components.filter((itm: any) => itm.type === "FOOTER")[0]) {
+                    if (element.components.filter((itm: any) => itm.type === "FOOTER")[0].type === "FOOTER") {
+                        footerText = element.components.filter((itm: any) => itm.type === "FOOTER")[0].text
+                    }
+                }
+
+
+
+                if (element.components.filter((itm: any) => itm.type === "BUTTONS")[0]?.buttons) {
+                    let buttonVar = obj.buttons;
+                    element.components.filter((itm: any) => itm.type === "BUTTONS")[0]?.buttons?.map((itm: any, i: any) => {
+                        if (itm.type === "PHONE_NUMBER") {
+                            buttonVar.push({
+                                "action_type": "callNumber",
+                                "buttonType": "callToAction",
+                                "type": 'text',
+                                "text": itm.text,
+                                "phoneNumber": itm.phone_number,
+                                "phoneCode": ""
+                            })
+                            obj.buttons = buttonVar
+                        }
+                        if (itm.type == "URL") {
+
+
+                            buttonVar.push({
+                                action_type: "link",
+                                buttonType: "callToAction",
+                                text: itm.text,
+                                type: itm.type,
+                                url: itm.url
+                            })
+                            obj.buttons = buttonVar
+                        }
+
+                        if (itm.type === "QUICK_REPLY") {
+
+
+                            if (footerText !== "") {
+                                buttonVar.push({
+                                    action_type: "marketingOptOut",
+                                    buttonType: "QUICK_REPLY",
+                                    footerText: footerText,
+                                    text: itm.text,
+                                    type: "text"
+                                })
+                                obj.buttons = buttonVar
+                            } else {
+
+                                buttonVar.push({
+                                    action_type: "custom",
+                                    buttonType: "QUICK_REPLY",
+                                    text: itm.text
+                                })
+                                obj.buttons = buttonVar
+                            }
+
+                        }
+
+
+                    })
+
+                }
+                element.components.filter((itm: any) => itm.type === "BUTTONS") ? true : false;
+
+                // console.log(obj, "obj")
+                responseData.push(obj);
+                if (obj.name === "final_test") {
+                    let newTemplate: IWTemplate = new template(obj);
+
+                    let savedList: IWTemplate = await newTemplate.save();
+                }
+            }
+        });
 
         await Promise.all(promises);
 
@@ -119,10 +232,15 @@ const fetchTemplateStatus = async (req: any, res: any) => {
         res.status(200).json({
             success: true,
             message: "Whatsapp Templates Status Updated Successfully",
-            data: responseData,
+            data: response.data,
+            count: response.data.data.length,
+            data2: responseData
         });
     } catch (error) {
         console.error("Failed to Update Whatsapp Templates Status:", error);
+        res
+            .status(500)
+            .json({ success: false, msg: "Failed to send WhatsApp notification", error: error });
     }
 
 }
@@ -134,7 +252,10 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
             .replace(/<em>/g, '_')
             .replace(/<\/em>/g, '_')
             .replace(/<del>/g, '~')
-            .replace(/<\/del>/g, '~');
+            .replace(/<\/del>/g, '~')
+            .replace(/<br>/g, '')
+        // .replace(/<\/p>/g, '</p>\n');
+
 
         // Set the access token for your WhatsApp Business API
         const accessToken = process.env.AUTHORIZATION_TOKEN;
@@ -172,13 +293,22 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
         }
         let body: any = {
             type: 'body',
-            text: htmlToText(bodyText),
+            text: htmlToText(bodyText, {
+                selectors: [
+                    {
+                        selector: 'p',
+                        format: 'block' // Treat <p> as inline, to avoid extra newlines
+                    }
+                ],
+                // preserveNewlines: true,  // Optionally disable extra newlines if needed
+                wordwrap: false,
+            })
         }
         if (savedList.body.length > 0 && savedList.bodyVariables.length > 0) {
             body = {
                 ...body, example: {
                     "body_text": [
-                        savedList.bodyVariables.map((itm: any) => itm.field === 'TEXT' && itm.value)
+                        savedList.bodyVariables.map((itm: any) => itm.value)
                     ]
                 },
             }
@@ -186,6 +316,13 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
         }
         componentsData.push(body)
 
+        let videoBody = {
+            "type": "video",
+            "video": {
+                "link": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            }
+        }
+        componentsData.push(videoBody)
         savedList.buttonEnabled === true && savedList.buttons.length > 0 &&
             componentsData.push({
                 type: 'buttons',
@@ -252,8 +389,10 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
             .replace(/<\/strong>/g, '*')
             .replace(/<em>/g, '_')
             .replace(/<\/em>/g, '_')
-            // .replace(/<del>/g, '~')
-            // .replace(/<\/del>/g, '~');
+            .replace(/<br>/g, '')
+            .replace(/<del>/g, '~')
+            .replace(/<\/del>/g, '~')
+        // .replace(/<\/p>/g, '</p>\n');
 
 
         // Set the access token for your WhatsApp Business API
@@ -283,7 +422,6 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
                 headerPayload = {
                     ...headerPayload, example: {
                         "header_text": savedList.headerVariables.map((itm: any) => itm.value)
-
                     }
                 }
 
@@ -292,13 +430,23 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
         }
         let body: any = {
             type: 'body',
-            text: htmlToText(bodyText),
+            text: htmlToText(bodyText, {
+                selectors: [
+                    {
+                        selector: 'p',
+                        format: 'block' // Treat <p> as inline, to avoid extra newlines
+                    }
+                ],
+                // preserveNewlines: true,  // Optionally disable extra newlines if needed
+                wordwrap: false,
+            })
+            // .replace(/(\n{2})+/g, '\n')
         }
         if (savedList.body.length > 0 && savedList.bodyVariables.length > 0) {
             body = {
                 ...body, example: {
                     "body_text": [
-                        savedList.bodyVariables.map((itm: any) => itm.field === 'TEXT' && itm.value)
+                        savedList.bodyVariables.map((itm: any) => itm.value)
                     ]
                 }
             }
@@ -330,11 +478,18 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
         }
 
         // console.log(JSON.stringify(componentsData, null, 2), "componentsData update");
-        console.log(JSON.stringify(componentsData, null, 2), "componentsData update2", htmlToText(savedList.body));
+        console.log(JSON.stringify(componentsData, null, 2), "componentsData update2", htmlToText(bodyText, {
+            selectors: [
+                {
+                    selector: 'p',
+                    format: 'inline' // Treat <p> as inline, to avoid extra newlines
+                }
+            ],
+            wordWrap: false
+        }));
 
         // Define the WhatsApp Business API endpoint
         const apiURL = 'https://graph.facebook.com/v17.0/' + savedList.templateId;
-
         // Define the payload for sending a WhatsApp template message
         const payload = {
             "category": savedList.category ?? 'MARKETING', //MARKETING, UTILITY
@@ -394,6 +549,13 @@ const deleteTemplateFromFB = (req: any, res: any, savedList: any) => {
         console.log(e)
     }
 
+}
+
+
+const textToHtml = (text: any) => {
+    // Replace newlines with <br> for line breaks
+    const html = text.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');;
+    return `<p>${html}</p>`;
 }
 
 export { sendWhatsappMsg, getMessageTemplates, createTemplate, fetchTemplateStatus, updateTemplateToFB, deleteTemplateFromFB }

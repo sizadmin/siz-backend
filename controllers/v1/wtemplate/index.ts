@@ -31,7 +31,7 @@ const s3 = new S3Client({
 const getTemplates = async (req: Request, res: Response): Promise<void> => {
     try {
 
-        const contactList: IWTemplate[] = await template.find();
+        const contactList: IWTemplate[] = await template.find().sort({ updatedAt: -1 }) ;
 
         res.status(200).json({ count: contactList.length, results: contactList });
 
@@ -63,7 +63,17 @@ const SubmitTemplateForReview = async (req: Request, res: Response): Promise<voi
         let options = { new: true };
         const { body } = req;
         let templateDetails: any = await template.find({ _id: body._id })
-        const textContent = htmlToText(templateDetails[0].body);
+        const textContent = htmlToText(templateDetails[0].body,{
+            selectors: [
+                {
+                    selector: 'p',
+                    format: 'block' // Treat <p> as inline, to avoid extra newlines
+                }
+            ],
+            // preserveNewlines: true,  // Optionally disable extra newlines if needed
+            wordwrap: false,
+        });
+        
         const textContentHeader = htmlToText(templateDetails[0].headerText);
         templateDetails = { ...templateDetails, body: textContent, headerText: textContentHeader }
         let templateStatus: any = {}
@@ -101,7 +111,7 @@ const updateTemplate = async (req: Request, res: Response): Promise<void> => {
         res.status(201).json({ message: 'Template Updated', result: [updatedList] });
         return;
     } catch (error) {
-
+        console.log(error,"error")
         res.status(400).json({ message: 'Something went wrong', error });
         // throw error;
     }
@@ -162,7 +172,7 @@ const uploadImageToFB = async (req: any, res: any) => {
             Body: file.buffer, // File content
             'ContentType': file.mimetype,
         };
-        // console.log(uploadParams,"file")
+        console.log(file,"file")
 
         const upload = new Upload({
             client: s3,

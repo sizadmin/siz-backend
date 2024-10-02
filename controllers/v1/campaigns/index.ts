@@ -9,14 +9,14 @@ import axios from 'axios';
 import { IWTemplate } from '../../../types/WTemplate';
 import template from '../../../models/template';
 
-var _ = require('lodash');
+// var _ = require('lodash');
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
 
 const getCampaign = async (req: Request, res: Response): Promise<void> => {
     try {
 
-        const contactList: ICampaign[] = await campaign.find().populate("contact_list");
+        const contactList: ICampaign[] = await campaign.find().populate("contact_list").sort({ updatedAt: -1 }) // Sort by updatedAt in descending order;
 
         res.status(200).json({ count: contactList.length, results: contactList });
 
@@ -35,7 +35,13 @@ const addCampaign = async (req: Request, res: Response): Promise<void> => {
 
         const savedList: ICampaign = await newCampaign.save();
 
+
+        if (body.sendNow === true) {
+            sendCampaignMessages(req, res);
+        }
+
         res.status(201).json({ message: 'Campaign Created', result: [savedList] });
+
         return;
     } catch (error) {
 
@@ -56,14 +62,18 @@ const updateCampaign = async (req: Request, res: Response): Promise<void> => {
 
         const updatedList: ICampaign | null = await campaign.findByIdAndUpdate({ _id: id }, body, options);
 
+
+        if (body.sendNow === true) {
+            await sendCampaignMessages(req, res);
+        }
+
         res.status(200).json({
             message: 'Campaign List updated',
             result: [updatedList],
         });
-        return;
     } catch (error) {
-
-        // res.status(400).json({ message: 'Something went wrong', error });
+        console.log(error)
+        res.status(400).json({ message: 'Something went wrong', error });
         // throw error;
     }
 };
@@ -127,13 +137,14 @@ const sendCampaignMessages = async (req: Request, res: Response): Promise<void> 
                 let options = { new: true };
 
                 campaign1.status = true;
+                campaign1.isActive = false;
                 const isCampaignUpdated: ICampaign | null = await campaign.findByIdAndUpdate({ _id: campaign1._id }, campaign1, options);
 
                 await Promise.all(userPromises);
 
             }));
 
-
+            console.log(final_obj, "final_obj")
 
             res.status(200).json({
                 message: final_obj.length > 0 ? 'Campaign found' : 'Campaign not found',
@@ -190,7 +201,7 @@ const sendDynamicMessage = async (obj: any) => {
         components.push({
             type: 'body',
             parameters: obj.template.bodyVariables.map((itm: any) => ({ type: 'text', text: itm.field === 'TEXT' ? itm.value : obj.user[itm.field] !== "" ? obj.user[itm.field] : itm.value }))
-             // parameters: [
+            // parameters: [
             //     { type: 'text', text: 'Deepak' },
             //   ]
         })
