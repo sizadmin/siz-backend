@@ -316,13 +316,13 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
         }
         componentsData.push(body)
 
-        let videoBody = {
-            "type": "video",
-            "video": {
-                "link": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            }
-        }
-        componentsData.push(videoBody)
+        // let videoBody = {
+        //     "type": "video",
+        //     "video": {
+        //         "link": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        //     }
+        // }
+        // componentsData.push(videoBody)
         savedList.buttonEnabled === true && savedList.buttons.length > 0 &&
             componentsData.push({
                 type: 'buttons',
