@@ -40,7 +40,7 @@ const getRecentOrdersSizApp = async (req: any, res: any) => {
     p.title, p.description, p.user_id, p.brand, p.color, p.retail_price,
     m.name as image, m.sub_path,
     u.full_name, u.phone,u.country_code 
-     FROM siz_orders o left join siz_users u on o.user_id=u.id  left join siz_products p on o.product_id=p.id left join siz_product_media m on p.image_id=m.id WHERE o.created_at >= UNIX_TIMESTAMP(NOW() - INTERVAL 6 DAY);`;
+     FROM siz_orders o left join siz_users u on o.user_id=u.id  left join siz_products p on o.product_id=p.id left join siz_product_media m on p.image_id=m.id WHERE o.created_at >= UNIX_TIMESTAMP(NOW() - INTERVAL 5 MINUTE);`;
     mysqlConnection.query(sql, async (err, results: any) => {
         if (err) {
             return res.status(500).json({ error: 'Failed to fetch orders from MySQL', errorMsg: err });
