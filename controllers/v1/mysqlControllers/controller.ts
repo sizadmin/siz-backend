@@ -2,8 +2,15 @@ import path from "path";
 import { transporter } from "../../../middleware/helperFuc";
 import { mysqlConnection } from "../../../src/app";
 import fs from "fs";
-import moment from "moment";
+import moment, { duration } from "moment";
+import { title } from "process";
+import _ from 'lodash'
+import { createShopifyProductFunc, updateMetafieldShopifyProductFunc } from "../shopify";
+import { basicLogger } from "../../../middleware/logger";
+import { ICronJob } from "../../../types/cronJob";
+import cronJobs from "../../../models/cronJobs";
 require("dotenv").config();
+let options = { new: true };
 
 
 const getUsersSizApp = async (req: any, res: any) => {
@@ -25,15 +32,239 @@ const getOrdersSizApp = async (req: any, res: any) => {
     });
 }
 
-const getProductSizApp = async (req: any, res: any) => {
-    const sql = 'SELECT * FROM siz_products WHERE created_at >= UNIX_TIMESTAMP(NOW() - INTERVAL 1 DAY);';
-    mysqlConnection.query(sql, (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: 'Failed to fetch siz_products from MySQL' ,err:err});
-        }
-        res.status(200).json(results);
-    });
+const generateTags = (itm: any) => {
+    let tags = []
+    if (itm.size) tags.push('ASize_' + itm.size)
+    if (itm.color_name) tags.push('color_' + itm.color_name)
+    if (itm.lender_name) tags.push('influencer_' + itm.lender_name)
+    if (itm.brand_name) tags.push('brand_' + itm.brand_name)
+    if (itm.category == "Clothing") tags.push('category_Clothes')
+    if (itm.category == "Clothing") tags.push('categories_' + itm.sub_category)
+    if (itm.category == "Bag") tags.push('category_Bags')
+    tags.push('App');
+    if (itm.type === 2) tags.push('managed_closet')
+
+    return tags
 }
+const getProductSizApp = async (req: any, res: any) => {
+    let startTime: any = '';
+    let endTime: any = ''
+
+
+    const customDate = new Date(); // Replace with your custom date
+    const unixTimestampEnd = Math.floor(customDate.getTime() / 1000);
+
+    const customStartDate = new Date(customDate.getTime() - 24 * 60 * 60 * 1000); // Replace with your custom date
+    const unixTimestampStart = Math.floor(customStartDate.getTime() / 1000);
+
+
+    let findEntry: ICronJob[] | null = await cronJobs.find({
+        name: 'productUpload'
+    })
+
+    if (findEntry.length === 0 || findEntry === null) {
+        startTime = unixTimestampStart  // Subtracts 1 day
+        endTime = unixTimestampEnd;
+
+        let payload = {
+            name: 'productUpload',
+            timestamp: unixTimestampEnd
+        }
+        const newCampaign: ICronJob = new cronJobs(payload);
+
+        const savedList: ICronJob = await newCampaign.save();
+
+    } else {
+        startTime = findEntry[0].timestamp
+        endTime = unixTimestampEnd;
+        let payload = {
+            name: 'productUpload',
+            timestamp: unixTimestampEnd
+        }
+        let updatedEntry: ICronJob[] | null = await cronJobs.findByIdAndUpdate({ _id: findEntry[0]._id }, payload, options)
+    }
+
+
+    let sql = `SELECT p.id 
+    FROM siz_products p 
+    WHERE p.created_at BETWEEN '${startTime}' AND '${endTime}';`;
+
+    console.log(sql)
+    mysqlConnection.query(sql, async (err, results: any) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to fetch siz_products from MySQL', err: err });
+        }
+        let productIds: any = []
+        for await (const itm of results) {
+            productIds.push(itm.id)
+        }
+        req.body.productid = productIds
+        await getProductSizAppById(req, res)
+
+    });
+    // res.status(200).json({ results: productIds });
+
+}
+
+
+const getProductSizAppById = async (req: any, res: any) => {
+    let productid = req.body.productid || [''];
+
+    let finalResponse = [];
+    console.log(productid, "productid")
+    const productPromises = productid.map(async (product: any) => {
+        return new Promise((resolve, reject) => {
+            let sql = `SELECT p.*, b.name as brand_name, p.retail_price, s.title as size, cl.name as color_name, cat.name as category, pr.amount as price, pr.days as days, 
+                       u.full_name as lender_name, sc.name as sub_category, med.name as image_name, med.sub_path as image_sub_path 
+                       FROM siz_products p 
+                       LEFT JOIN siz_ms_brands b ON p.brand = b.id 
+                       LEFT JOIN siz_ms_sizes s ON p.size_id = s.id 
+                       LEFT JOIN siz_ms_colors cl ON p.color = cl.id 
+                       LEFT JOIN siz_ms_categories cat ON p.category_id = cat.id 
+                       LEFT JOIN siz_product_prices pr ON p.id = pr.product_id 
+                       LEFT JOIN siz_users u ON p.user_id = u.id
+                       LEFT JOIN siz_ms_sub_categories sc ON p.sub_category_id = sc.id
+                       LEFT JOIN siz_product_media med ON p.id = med.product_id
+                       WHERE p.id = ${product}`;
+
+            mysqlConnection.query(sql, async (err, results: any) => {
+                if (err) {
+                    return reject({ error: 'Failed to fetch siz_products from MySQL', err });
+                }
+
+                let payload = [];
+                let imageData = [];
+                let variantData = [];
+                let optionsData: any = {
+                    size: [],
+                    color: [],
+                    duration: []
+                };
+
+                for await (const itm of results) {
+                    let position = itm.days === 3 ? 1 : itm.days === 8 ? 2 : itm.days === 20 ? 3 : 4;
+
+                    // Handle variant data based on category
+                    if (itm.category === "Clothing" && [3, 8, 20].includes(itm.days)) {
+                        variantData.push({
+                            price: itm.price.toString(),
+                            option1: itm.size,
+                            option2: itm.color_name,
+                            option3: itm.days + ' days',
+                            inventory_quantity: 1,
+                            requires_shipping: true,
+                            position
+                        });
+                    } else if (itm.category === "Bag" && [8, 20].includes(itm.days)) {
+                        variantData.push({
+                            price: itm.price.toString(),
+                            option1: itm.size,
+                            option2: itm.color_name,
+                            option3: itm.days + ' days',
+                            inventory_quantity: 1,
+                            requires_shipping: true,
+                            position
+                        });
+                    }
+
+                    optionsData.size.push(itm.size);
+                    optionsData.color.push(itm.color_name);
+                    optionsData.duration.push(itm.days + ' days');
+                    imageData.push({
+                        src: `https://sizcdn.s3.ap-south-1.amazonaws.com/media/products/${itm.image_sub_path}/${itm.image_name}`
+                    });
+
+                    payload.push({
+                        product: {
+                            title: itm.title,
+                            id: itm.id,
+                            retail_price: itm.retail_price,
+                            body_html: itm.description,
+                            vendor: itm.brand_name,
+                            product_type: itm.start_price.toString(),
+                            tags: generateTags(itm),
+                            variants: [],
+                            is_try_on: itm.is_try_on,
+                            size: itm.size,
+                            color_name: itm.color_name,
+                            options: [
+                                {
+                                    name: "Size",
+                                    values: _.uniq(optionsData.size)
+                                },
+                                {
+                                    name: "Color",
+                                    values: _.uniq(optionsData.color)
+                                },
+                                {
+                                    name: "Select Duration",
+                                    values: _.uniq(optionsData.duration)
+                                }
+                            ],
+                            images: []
+                        }
+                    });
+                }
+
+                let finalPayload: any = payload;
+                finalPayload[0].product.images = _.uniqBy(imageData, 'src');
+                finalPayload[0].product.variants = _.uniqBy(variantData, 'option3');
+
+                if (finalPayload[0].product.is_try_on === 1) {
+                    finalPayload[0].product.variants.push({
+                        price: "0",
+                        option1: finalPayload[0].product.size,
+                        option2: finalPayload[0].product.color_name,
+                        option3: 'Try On',
+                        inventory_quantity: 1,
+                        position: finalPayload[0].product.variants.length + 1
+                    });
+                    finalPayload[0].product.options[2].values.push('Try On');
+                }
+                delete finalPayload[0].product.is_try_on
+                delete finalPayload[0].product.size
+                delete finalPayload[0].product.color_name
+
+                let apicallsData = _.uniqBy(finalPayload, 'product.id');
+                delete apicallsData.product.id
+                let responseList = [];
+                for (const api of apicallsData) {
+                    try {
+                        let responseData = await createShopifyProductFunc(api);
+
+                        let payload2 = {
+                            metafield: {
+                                id: responseData.product.id,
+                                namespace: "my_fields",
+                                key: "retail_price",
+                                value: api.product.retail_price,
+                                value_type: "integer"
+                            }
+                        };
+
+                        let responseData2 = await updateMetafieldShopifyProductFunc(payload2);
+                        responseList.push({ ...responseData, metafields: responseData2 });
+                    } catch (error) {
+                        reject(error); // Reject promise if there's an error
+                    }
+                }
+
+                resolve(responseList); // Resolve with the response data
+
+
+            });
+        });
+    });
+
+    try {
+        const allResults = await Promise.all(productPromises);
+        finalResponse = allResults.flat(); // Flatten the results array
+        res.status(200).json({ results: finalResponse });
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching product data', details: error });
+    }
+};
+
 
 const getRecentOrdersSizApp = async (req: any, res: any) => {
     const sql = `SELECT  o.created_at, o.order_no, o.product_id, o.start_date, o.end_date, o.days, o.amount , o.total_amount, o.disc_amt, o.deposit_amount,o.lender_id,o.damage_protection_amt,
@@ -77,9 +308,8 @@ const getRecentOrdersSizApp = async (req: any, res: any) => {
 
 
             const mailOptions = {
-                from: "hey@siz.ae", // Your verified email address
-                to: "db671996@gmail.com",
-                // to: [process.env.SENDINBLUE_USER, "heysiz.ae@gmail.com"], // Recipient email
+                from: process.env.SENDINBLUE_USER, // Your verified email address
+                to: [process.env.SENDINBLUE_USER, "heysiz.ae@gmail.com"], // Recipient email
                 subject: '📦 New Order Received - [Order #' + orderData.order_no + ']',
                 html: htmlTemplate,
 
@@ -97,4 +327,4 @@ const getRecentOrdersSizApp = async (req: any, res: any) => {
 }
 
 
-export { getUsersSizApp, getOrdersSizApp, getRecentOrdersSizApp, getProductSizApp }
+export { getUsersSizApp, getOrdersSizApp, getRecentOrdersSizApp, getProductSizApp, getProductSizAppById }

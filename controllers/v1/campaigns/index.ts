@@ -8,6 +8,7 @@ import moment from 'moment';
 import axios from 'axios';
 import { IWTemplate } from '../../../types/WTemplate';
 import template from '../../../models/template';
+import { basicLogger } from '../../../middleware/logger';
 
 // var _ = require('lodash');
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
@@ -59,7 +60,13 @@ const updateCampaign = async (req: Request, res: Response): Promise<void> => {
 
         let options = { new: true };
         body.status = false;
-
+        body.schedule_date = new Date().toISOString();
+        basicLogger.info({
+            controller: 'updateCampaign',
+            method: 'GET',
+            terror: 'updateCampaign method',
+            body: body.schedule_date
+        });
         const updatedList: ICampaign | null = await campaign.findByIdAndUpdate({ _id: id }, body, options);
 
 

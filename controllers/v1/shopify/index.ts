@@ -1017,8 +1017,43 @@ const createShopifyProduct = async (req: any, res: any) => {
     console.log("Error creating product:", error);
     res
       .status(500)
-      .json({ success: false, error: "Failed to fetch shopify product" });
+      .json({ success: false, error: "Failed to fetch shopify product", errorMsg: error });
 
+  }
+}
+
+const createShopifyProductFunc = async (body: any) => {
+  const shopifyUrl = `https://${process.env.SHOPIFY_STORE_DOMAIN}/admin/api/2024-10/products.json`;
+
+  try {
+    const response = await axios.post(shopifyUrl, body, {
+      headers: {
+        'X-Shopify-Access-Token': process.env.SHOPIFY_ACCESS_TOKEN,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data
+  } catch (error) {
+    console.log("Error creating product:", error);
+    return error
+  }
+}
+
+const updateMetafieldShopifyProductFunc = async (record: any) => {
+  const shopifyUrl = `https://${process.env.SHOPIFY_STORE_DOMAIN}/admin/api/2024-10/products/${record.metafield.id}/metafields.json`;
+  let payload = record;
+  delete payload.metafield.id
+  try { 
+    const response = await axios.post(shopifyUrl, payload, {
+      headers: {
+        'X-Shopify-Access-Token': process.env.SHOPIFY_ACCESS_TOKEN,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data
+  } catch (error) {
+    console.log("Error creating product:", error);
+    return error
   }
 }
 
@@ -1027,5 +1062,5 @@ export {
   fetchShopifyOrder, fetchShopifyProducts, fetchShopifyLenders, sendUpdateOnPickupFromRenter,
   sendUpdateOnPaymentToLender, getOrderById, sendDeliveryReminderToRenter, sendReturnPickupReminderToRenter,
   sendFeedbackMessageToRenter, sendPickupReminderToLender,
-  createShopifyProduct
+  createShopifyProduct, createShopifyProductFunc,updateMetafieldShopifyProductFunc
 }

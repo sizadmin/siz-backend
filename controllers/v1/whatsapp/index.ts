@@ -7,6 +7,10 @@ const app = express();
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 import { htmlToText } from 'html-to-text';
 import { uploadImageToFB } from '../wtemplate';
+import WhatsappMessage from '../../../models/WhatsappMessage';
+import { Timestamp } from 'mongodb';
+import { IWhatsappMessage } from '../../../types/whatsappMessage';
+require("dotenv").config();
 
 
 
@@ -339,10 +343,10 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
                     }
                 })
             })
-        if (savedList.buttonEnabled === true && savedList.buttons.length > 0 && savedList.buttons.find((o: any) => o.action_type === 'marketingOptOut' && o.buttonType === "QUICK_REPLY")) {
+        if (savedList.footerText !== "") {
             componentsData.push({
                 type: 'footer',
-                text: savedList.buttons.find((o: any) => o.action_type === 'marketingOptOut' && o.buttonType === "QUICK_REPLY").footerText
+                text: savedList.footerText
             })
         }
 
@@ -470,23 +474,15 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
                     }
                 })
             })
-        if (savedList.buttonEnabled === true && savedList.buttons.length > 0 && savedList.buttons.find((o: any) => o.action_type === 'marketingOptOut' && o.buttonType === "QUICK_REPLY")) {
+        if (savedList.footerText !== "") {
             componentsData.push({
                 type: 'footer',
-                text: savedList.buttons.find((o: any) => o.action_type === 'marketingOptOut' && o.buttonType === "QUICK_REPLY").footerText
+                text: savedList.footerText
             })
         }
 
         // console.log(JSON.stringify(componentsData, null, 2), "componentsData update");
-        console.log(JSON.stringify(componentsData, null, 2), "componentsData update2", htmlToText(bodyText, {
-            selectors: [
-                {
-                    selector: 'p',
-                    format: 'inline' // Treat <p> as inline, to avoid extra newlines
-                }
-            ],
-            wordWrap: false
-        }));
+        console.log(JSON.stringify(componentsData, null, 2), "componentsData update2");
 
         // Define the WhatsApp Business API endpoint
         const apiURL = 'https://graph.facebook.com/v17.0/' + savedList.templateId;
@@ -558,4 +554,48 @@ const textToHtml = (text: any) => {
     return `<p>${html}</p>`;
 }
 
-export { sendWhatsappMsg, getMessageTemplates, createTemplate, fetchTemplateStatus, updateTemplateToFB, deleteTemplateFromFB }
+const sendWhatsappMessage = async (req: any, res: any) => {
+    const { phone, message } = req.body;
+    const PHONE_NUMBER_ID = 105942389228737
+    try {
+        const response = await axios.post(
+            `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+            {
+
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": phone,
+                "type": "text",
+                "text": {
+                    "body": message
+                }
+            },
+            {
+                headers: {
+                    'Authorization': "Bearer " + process.env.AUTHORIZATION_TOKEN,
+                    'Content-Type': 'application/json'
+                },
+            }
+        );
+        const timestamp = Timestamp
+        const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
+
+        if (existingMessage) {
+          const newMessage: IWhatsappMessage = new WhatsappMessage({
+            phone_number: "",
+            name: "SIZ",
+            message: message,
+            timestamp: timestamp,
+    
+          });
+          const savedMessage: IWhatsappMessage = await newMessage.save();
+        }
+
+        res.status(200).json(response.data);
+    } catch (error) {
+        console.error('Error sending message:', error.response.data);
+        res.status(500).json({ error: 'Error sending message' });
+    }
+}
+
+export { sendWhatsappMsg, getMessageTemplates, createTemplate, fetchTemplateStatus, updateTemplateToFB, deleteTemplateFromFB, sendWhatsappMessage }

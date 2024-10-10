@@ -10,6 +10,7 @@ import { IWhatsappMessage } from '../../../types/whatsappMessage';
 import orderstatus from '../../../models/orderstatus';
 import user from '../../../models/user';
 import markettingusers from '../../../models/markettingusers';
+import { basicLogger } from '../../../middleware/logger';
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 let options = { new: true };
 
@@ -50,11 +51,16 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     console.log(req.body);
 
 
-    
+
     const { entry } = req.body;
     const { from, name, text } = entry[0].changes[0].value.messages[0];
     console.log("ENTRYYYYY: ", entry);
-
+    basicLogger.info({
+      controller: 'listenRepliesFromWebhook',
+      method: 'GET',
+      terror: 'listenRepliesFromWebhook method',
+      body: entry
+    });
     var sender_name = entry[0].changes[0].value.contacts[0].profile.name;
     var sender_phone = entry[0].changes[0].value.contacts[0].wa_id;
     var type = entry[0].changes[0].value.messages[0].type;
@@ -79,15 +85,24 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
 
 async function insertMessage(from, name, text, timestamp) {
   try {
-    const newMessage: IWhatsappMessage = new WhatsappMessage({
-      phone_number: from,
-      name: name,
-      message: text,
-      timestamp: timestamp,
+    const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
 
+    if (existingMessage) {
+      const newMessage: IWhatsappMessage = new WhatsappMessage({
+        phone_number: from,
+        name: name,
+        message: text,
+        timestamp: timestamp,
+
+      });
+      const savedMessage: IWhatsappMessage = await newMessage.save();
+    }
+    basicLogger.info({
+      controller: 'insertMessage',
+      method: 'GET',
+      terror: 'insertMessage method',
+      body: { from, name, text, timestamp }
     });
-    const savedMessage: IWhatsappMessage = await newMessage.save();
-
     text.forEach(async (message: any) => {
       if (message.text && message.text.body.toLowerCase() === 'stop') {
         const phoneNumber = message.from;
@@ -115,7 +130,15 @@ async function convertUnixEpochToMySQLDatetime(epoch: any) {
 const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
   try {
     const { body } = req;
-    console.log(body);
+    // console.log(body);
+
+    basicLogger.info({
+      controller: 'fetchShopifyOrderUsingWebhook',
+      method: 'GET',
+      terror: 'Saved Order in fetchShopifyOrderUsingWebhook method',
+      body: body
+    });
+
     await saveOrderInDb(body);
     console.log("Order saved in DB");
 
@@ -129,6 +152,12 @@ const fetchShopifyOrderUsingWebhook = async (req: any, res: any) => {
   } catch (error) {
     // Handle errors and send an error response back to the client
     console.error("Failed to fetch shopify products:", error);
+    basicLogger.error({
+      controller: 'fetchShopifyOrderUsingWebhook',
+      method: 'GET',
+      terror: 'Error in fetchShopifyOrderUsingWebhook method',
+      body: error
+    });
     res
       .status(500)
       .json({ success: false, error: "Failed to fetch shopify products" });

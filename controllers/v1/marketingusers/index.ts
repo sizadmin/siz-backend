@@ -243,7 +243,7 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
                     let newUser = await createNewUser(user); // Wait for each user to be saved before proceeding
                     if (newUser) {
                         newUsers.push(newUser)
-                        list_phone_numbers.push({ label: user.first_name, value: user.phone_number,info:newUser })
+                        list_phone_numbers.push({ label: user.first_name, value: user.phone_number, info: newUser })
                     }
                 }
                 if (_id) {
@@ -291,6 +291,45 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
     }
 };
 
+const getChatUsers = async (req: any, res: any) => {
+
+    const searchAccName: any = req.query.name;
+
+    const page = Number(req.query.page) || 1;
+    const size = Number(req.query.size) || 20;
+    const skip = (page - 1) * size;
+    let searchCriteria = [{ first_name: new RegExp(searchAccName, 'i') },
+    { last_name: new RegExp(searchAccName, 'i') }
+    ]
+
+    console.log(searchAccName, "searchAccName", req.query)
+
+    const [usersList] = await Promise.all([
+        // Fetch the paginated data
+        markettingusers.find({
+            whatsapp_messaging: true,
+            $or: searchCriteria,
+            phone_number: { $exists: true, $ne: null } // Filter to include only documents where phone_number exists and is not null
+
+        })
+            .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
+            .limit(size)
+            .skip(skip),
+
+        // Get the total count of documents that match the criteria
+        // markettingusers.countDocuments({
+        //     whatsapp_messaging: true,
+        //     $or: searchCriteria,
+        //     phone_number: { $exists: true, $ne: null } // Filter to include only documents where phone_number exists and is not null
+
+        // })
+    ]);
+
+
+    res.status(200).json({results: usersList, page: page });
+
+}
+
 
 export {
     getMarketingUsers,
@@ -299,5 +338,6 @@ export {
     updateMarketingUser,
     fetchMarketingUsers,
     fetchContactsFromCSVFile,
-    deleteBulkMarketingUser
+    deleteBulkMarketingUser,
+    getChatUsers
 };

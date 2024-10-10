@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { fetchTemplateStatus, sendWhatsappMsg } from '../controllers/v1/whatsapp';
+import { fetchTemplateStatus, sendWhatsappMessage, sendWhatsappMsg } from '../controllers/v1/whatsapp';
 import { verifyToken, verifyTokenForApi } from '../middleware/auth';
 import { fetchShopifyLenders, fetchShopifyOrder, sendUpdateOnPaymentToLender, sendPickupReminderToLender, sendUpdateOnPickupFromRenter, fetchShopifyProducts, sendFeedbackMessageToRenter, getOrderById, sendDeliveryReminderToRenter, sendReturnPickupReminderToRenter, createShopifyProduct } from '../controllers/v1/shopify';
 import { getMessageTemplates } from '../controllers/v1/whatsapp';
-import { getWhatsappMessages } from '../controllers/v1/whatsappMessages';
+import { getChatByUser, getWhatsappMessages } from '../controllers/v1/whatsappMessages';
+
 const router: Router = Router();
 
 router.post('/msg', sendWhatsappMsg);
@@ -20,8 +21,13 @@ router.get('/updateToLenderAboutPayment/:id', sendUpdateOnPaymentToLender);
 router.get('/getMessageTemplates', verifyTokenForApi, getMessageTemplates);
 router.get('/order/:id', getOrderById);
 router.get('/fetchWTemplateStatus', verifyTokenForApi, fetchTemplateStatus);
-router.get("/userMessages", verifyToken, getWhatsappMessages)
-router.post("/createShopifyProduct", createShopifyProduct)
+router.get("/userMessages", verifyToken, getWhatsappMessages);
+router.get("/getChatByUser/:id", verifyToken, getChatByUser);
+
+
+router.post("/createShopifyProduct", createShopifyProduct);
+router.post("/sendWhatsappMessage", sendWhatsappMessage)
+
 
 
 

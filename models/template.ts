@@ -51,6 +51,9 @@ const WtemplateSchema: Schema = new Schema(
         },
         imageMediaCode: {
             type: String
+        },
+        footerText: {
+            type: String
         }
 
 
