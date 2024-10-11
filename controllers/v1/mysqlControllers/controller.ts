@@ -99,6 +99,7 @@ const getProductSizApp = async (req: any, res: any) => {
             productIds.push(itm.id)
         }
         req.body.productid = productIds
+        console.log(productIds)
         await getProductSizAppById(req, res)
 
     });
@@ -158,9 +159,9 @@ const getProductSizAppById = async (req: any, res: any) => {
                     } else if (itm.category === "Bag" && [8, 20].includes(itm.days)) {
                         variantData.push({
                             price: itm.price.toString(),
-                            option1: itm.size,
-                            option2: itm.color_name,
-                            option3: itm.days + ' days',
+                            // option1: itm.size,
+                            option1: itm.color_name,
+                            option2: itm.days + ' days',
                             inventory_quantity: 1,
                             requires_shipping: true,
                             position
@@ -187,6 +188,7 @@ const getProductSizAppById = async (req: any, res: any) => {
                             is_try_on: itm.is_try_on,
                             size: itm.size,
                             color_name: itm.color_name,
+                            category: itm.category,
                             options: [
                                 {
                                     name: "Size",
@@ -207,8 +209,11 @@ const getProductSizAppById = async (req: any, res: any) => {
                 }
 
                 let finalPayload: any = payload;
+                // console.log(finalPayload,"ddd")
+
                 finalPayload[0].product.images = _.uniqBy(imageData, 'src');
-                finalPayload[0].product.variants = _.uniqBy(variantData, 'option3');
+                if (finalPayload[0].product.category === "Bag") finalPayload[0].product.variants = _.uniqBy(variantData, 'option2');
+                else finalPayload[0].product.variants = _.uniqBy(variantData, 'option3');
 
                 if (finalPayload[0].product.is_try_on === 1) {
                     finalPayload[0].product.variants.push({
@@ -225,8 +230,14 @@ const getProductSizAppById = async (req: any, res: any) => {
                 delete finalPayload[0].product.size
                 delete finalPayload[0].product.color_name
 
+                if (finalPayload[0].product.category === "Bag") {
+                    finalPayload[0].product.options = finalPayload[0].product.options.splice(1)
+                }
+
                 let apicallsData = _.uniqBy(finalPayload, 'product.id');
-                delete apicallsData.product.id
+
+                // console.log(JSON.stringify(apicallsData, null, 2), "finalPayload update2");
+                // delete apicallsData.product.id
                 let responseList = [];
                 for (const api of apicallsData) {
                     try {

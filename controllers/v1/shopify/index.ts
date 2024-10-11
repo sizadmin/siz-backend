@@ -26,7 +26,8 @@ const fetchShopifyOrder = async (req: any, res: any) => {
     };
     const response = await axios.get(url, config);
 
-
+    console.log(response.data)
+    return;
     for await (const order of response.data.orders) {
 
       const findOrder: Array<IOrder> | null = await Order.find({
