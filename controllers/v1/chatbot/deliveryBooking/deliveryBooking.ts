@@ -56,6 +56,7 @@ const findLatestOrders = async  (req: any, res: any) => {
                         }
                     }
                 }; 
+                console.log("in findLatestOrders: ");
                 await sendMessage(to, 'Thank you for your order! Please confirm your details.');
                 await sendMessage(to, JSON.stringify(buttonTemplate));  // Send interactive buttons
         
