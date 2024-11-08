@@ -3,7 +3,8 @@ import { mysqlConnection } from "../../../../src/app";
 import fs from "fs";
 import moment, { duration } from "moment";
 import { title } from "process";
-import _ from 'lodash'
+import _ from 'lodash';
+import axios from 'axios';
 
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
