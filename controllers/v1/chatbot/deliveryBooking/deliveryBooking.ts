@@ -1,5 +1,5 @@
 import path from "path";
-import { mysqlConnection } from "../../../src/app";
+import { mysqlConnection } from "../../../../src/app";
 import fs from "fs";
 import moment, { duration } from "moment";
 import { title } from "process";
