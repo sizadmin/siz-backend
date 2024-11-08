@@ -1,15 +1,12 @@
 import path from "path";
-import { transporter } from "../../../middleware/helperFuc";
 import { mysqlConnection } from "../../../src/app";
 import fs from "fs";
 import moment, { duration } from "moment";
 import { title } from "process";
 import _ from 'lodash'
-import { createShopifyProductFunc, updateMetafieldShopifyProductFunc } from "../shopify";
+
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
-import { basicLogger } from "../../../middleware/logger";
-import { ICronJob } from "../../../types/cronJob";
-import cronJobs from "../../../models/cronJobs";
+
 require("dotenv").config();
 
 const findLatestOrders = async  (req: any, res: any) => {
