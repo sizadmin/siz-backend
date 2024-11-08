@@ -68,6 +68,7 @@ const findLatestOrders = async  (req: any, res: any) => {
 
 const sendMessage = async (to, text) => {
   //  const { phone, message } = req.body;
+  console.log("In sendMessage",to);
     const PHONE_NUMBER_ID = 105942389228737
     try {
         const response = await axios.post(
