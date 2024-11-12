@@ -54,7 +54,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
 
     const { entry } = req.body;
     const { from, name, text } = entry[0].changes[0].value.messages[0];
-    console.log("ENTRYYYYY: ", entry);
+    console.log("ENTRYYYYY: ", JSON.stringify(entry));
     basicLogger.info({
       controller: 'listenRepliesFromWebhook',
       method: 'GET',
