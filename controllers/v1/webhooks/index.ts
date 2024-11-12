@@ -51,6 +51,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     console.log(req.body);
 
 
+    // [{"id":"104160086072686","changes":[{"value":{"messaging_product":"whatsapp","metadata":{"display_phone_number":"971543909650","phone_number_id":"105942389228737"},"contacts":[{"profile":{"name":"Yuvraj"},"wa_id":"971561114006"}],"messages":[{"from":"971561114006","id":"wamid.HBgMOTcxNTYxMTE0MDA2FQIAEhgUM0FBRUVBNDhCMTdCQkZGNENGNUIA","timestamp":"1731401647","text":{"body":"Hiiifkkd"},"type":"text"}]},"field":"messages"}]}]
 
     const { entry } = req.body;
     const { from, name, text } = entry[0].changes[0].value.messages[0];
@@ -83,11 +84,10 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
   }
 }
 
-async function insertMessage(from, name, text, timestamp) {
+async function insertMessage(from:any, name:any, text:any, timestamp:any) {
   try {
-    const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
-
-    if (existingMessage) {
+    const existingMessage = await WhatsappMessage.find({ timestamp: timestamp,phone_number:from });
+    if (existingMessage.length === 0) {
       const newMessage: IWhatsappMessage = new WhatsappMessage({
         phone_number: from,
         name: name,
@@ -103,20 +103,15 @@ async function insertMessage(from, name, text, timestamp) {
       terror: 'insertMessage method',
       body: { from, name, text, timestamp }
     });
-   // text.forEach(async (message: any) => {
-      if (text && text.toLowerCase() === 'stop') {
+      if (text && text.toLowerCase().includes('stop')) {
         const phoneNumber = from;
         const existingUser = await markettingusers.findOne({ phone_number: phoneNumber });
-
+        
         if (existingUser) {
-          console.log(existingUser)
           existingUser.whatsapp_messaging = false;
           const updatedUser = await markettingusers.findByIdAndUpdate({ _id: existingUser._id }, existingUser, options);
-
         }
       }
-   //}
- // );
   } catch (error) {
     console.error('Error inserting data into RDS:', error);
     throw error; // Rethrow the error to handle it in the caller function
