@@ -103,9 +103,9 @@ async function insertMessage(from, name, text, timestamp) {
       terror: 'insertMessage method',
       body: { from, name, text, timestamp }
     });
-    text.forEach(async (message: any) => {
-      if (message.text && message.text.body.toLowerCase() === 'stop') {
-        const phoneNumber = message.from;
+   // text.forEach(async (message: any) => {
+      if (text && text.toLowerCase() === 'stop') {
+        const phoneNumber = from;
         const existingUser = await markettingusers.findOne({ phone_number: phoneNumber });
 
         if (existingUser) {
@@ -115,7 +115,8 @@ async function insertMessage(from, name, text, timestamp) {
 
         }
       }
-    });
+   //}
+  );
   } catch (error) {
     console.error('Error inserting data into RDS:', error);
     throw error; // Rethrow the error to handle it in the caller function

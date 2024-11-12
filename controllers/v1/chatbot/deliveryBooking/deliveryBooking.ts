@@ -28,12 +28,12 @@ const findLatestOrders = async  (req: any, res: any) => {
             const unixTimestamp = orderData.created_at;
             // Convert to milliseconds by multiplying by 1000
             //const date = moment(unixTimestamp * 1000).format("DD MMM YYYY hh:mm A");
-            let orderDetails = "Hey there ${customerName}, \nThank you for renting with Sizters App and for supporting sustainable fashion and circular economy! We're certain you'll love the outfit you selected! \n\n Please Confirm your order details below \n Order No : $order_no \n Product : $product_name \n Start Date : $start_date \n\nI am Sizters Virtual assistant who will assist you in scheduling your delivery\n\n Please select how you prefer to receive the package "
+            let orderDetails = "Hey there $customerName, \nThank you for renting with Sizters App and for supporting sustainable fashion and circular economy! We're certain you'll love the outfit you selected! \n\n Please Confirm your order details below \n Order No : $order_no \n Product : $product_name \n Start Date : $start_date \n\nI am Sizters Virtual assistant who will assist you in scheduling your delivery\n\n Please select how you prefer to receive the package "
             let to = "+971561114006" ;
-            orderDetails = orderDetails.replace('${customerName}', orderData.full_name)
-                .replace('${order_no}', orderData.order_no)
-                .replace('${product_name}', orderData.title)
-                .replace('${start_date}', orderData.start_date)
+            orderDetails = orderDetails.replace('$customerName', orderData.full_name)
+                .replace('$order_no', orderData.order_no)
+                .replace('$product_name', orderData.title)
+                .replace('$start_date', orderData.start_date)
           
                 const buttonTemplate = {
                     type: 'interactive',
