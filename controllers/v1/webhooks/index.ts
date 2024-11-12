@@ -116,7 +116,7 @@ async function insertMessage(from, name, text, timestamp) {
         }
       }
    //}
-  );
+ // );
   } catch (error) {
     console.error('Error inserting data into RDS:', error);
     throw error; // Rethrow the error to handle it in the caller function
