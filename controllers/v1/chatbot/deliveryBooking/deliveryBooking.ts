@@ -1,7 +1,6 @@
 import path from "path";
 import { mysqlConnection } from "../../../../src/app";
 import fs from "fs";
-import moment, { duration } from "moment";
 import { title } from "process";
 import _ from 'lodash';
 import axios from 'axios';
