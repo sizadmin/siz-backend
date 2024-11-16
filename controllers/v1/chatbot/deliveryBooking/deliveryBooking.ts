@@ -255,7 +255,6 @@ const sendOrderTemplate = async (req: any, res: any) => {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
-        getDateFromRenterForOrder(req,res,obj)
       })
       .catch((error) => {
         console.log(error);
