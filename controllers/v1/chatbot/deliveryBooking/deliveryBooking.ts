@@ -115,7 +115,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 918624086801,
+        to: 971561114006,
         type: "interactive",
         interactive: {
           type: "button",
@@ -170,6 +170,9 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
   }
 };
 const getTimeFromRenterForOrder = async (req: any, res: any, order: any) => {
+
+    // Check for this order id already time slot is saved in db or not 
+    
   const { phone, message } = req.body;
   const PHONE_NUMBER_ID = 105942389228737;
   try {
@@ -178,7 +181,7 @@ const getTimeFromRenterForOrder = async (req: any, res: any, order: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 918624086801,
+        to: 971561114006,
         type: "interactive",
         interactive: {
           type: "button",
@@ -282,7 +285,7 @@ const sendOrderTemplate = async (req: any, res: any) => {
   setTimeout(() => {
     let payload = {
       messaging_product: "whatsapp",
-      to: 918624086801,
+      to: 971561114006,
       type: "template",
       template: {
         name: "order_confirmation_to_renter_f",
