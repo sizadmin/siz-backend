@@ -102,7 +102,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: phone,
+        to: 918624086801,
         type: "interactive",
         interactive: {
           type: "button",
