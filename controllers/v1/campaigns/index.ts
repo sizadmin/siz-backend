@@ -11,15 +11,11 @@ import campaign from "../../../models/campaign";
 import { IMarketingUsers } from "../../../types/marketingusers";
 
 // var _ = require('lodash');
-const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } =
-  process.env;
+const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
 const getCampaign = async (req: Request, res: Response): Promise<void> => {
   try {
-    const contactList: ICampaign[] = await campaign
-      .find()
-      .populate("contact_list")
-      .sort({ updatedAt: -1 }); // Sort by updatedAt in descending order;
+    const contactList: ICampaign[] = await campaign.find().populate("contact_list").sort({ updatedAt: -1 }); // Sort by updatedAt in descending order;
 
     res.status(200).json({ count: contactList.length, results: contactList });
   } catch (error) {
@@ -66,11 +62,7 @@ const updateCampaign = async (req: Request, res: Response): Promise<void> => {
       terror: "updateCampaign method",
       body: body.schedule_date,
     });
-    const updatedList: ICampaign | null = await campaign.findByIdAndUpdate(
-      { _id: id },
-      body,
-      options
-    );
+    const updatedList: ICampaign | null = await campaign.findByIdAndUpdate({ _id: id }, body, options);
 
     if (body.sendNow === true) {
       await sendCampaignMessages(req, res);
@@ -89,9 +81,7 @@ const updateCampaign = async (req: Request, res: Response): Promise<void> => {
 
 const deleteCampaign = async (req: Request, res: Response): Promise<void> => {
   try {
-    const deletedList: ICampaign | null = await campaign.findByIdAndRemove(
-      req.params.id
-    );
+    const deletedList: ICampaign | null = await campaign.findByIdAndRemove(req.params.id);
 
     res.status(200).json({
       message: "Campaign List deleted",
@@ -104,10 +94,7 @@ const deleteCampaign = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-const sendCampaignMessages = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+const sendCampaignMessages = async (req: Request, res: Response): Promise<void> => {
   try {
     let final_obj = [];
     const oneMinuteAgo = moment().subtract(15, "minutes").toISOString();
@@ -120,9 +107,7 @@ const sendCampaignMessages = async (
       })
       .populate("contact_list");
 
-    const findAllContacts: IMarketingUsers[] | null = await markettingusers
-      .find({ whatsapp_messaging: true })
-      .select("-user_data");
+    const findAllContacts: IMarketingUsers[] | null = await markettingusers.find({ whatsapp_messaging: true }).select("-user_data");
 
     await Promise.all(
       findCampaigns.map(async (campaign1: any) => {
@@ -133,34 +118,24 @@ const sendCampaignMessages = async (
           name: campaign1.template.label,
         });
         // Create an array of promises for each user
-        const userPromises = campaign1.contact_list.phone_number.map(
-          (user: any) => {
-            if (
-              user?.info?.whatsapp_messaging === true ||
-              user?.whatsapp_messaging === true
-            ) {
-              let obj = {
-                ...campaign1.template,
-                phone_number: user.value,
-                user: { ...user, ...user?.info },
-                template: findTemplate[0],
-              };
-              if (obj.phone_number) sendDynamicMessage(obj);
-              final_obj.push(obj);
-            }
+        const userPromises = campaign1.contact_list.phone_number.map((user: any) => {
+          if (user?.info?.whatsapp_messaging === true || user?.whatsapp_messaging === true) {
+            let obj = {
+              ...campaign1.template,
+              phone_number: user.value,
+              user: { ...user, ...user?.info },
+              template: findTemplate[0],
+            };
+            if (obj.phone_number) sendDynamicMessage(obj);
+            final_obj.push(obj);
           }
-        );
+        });
 
         let options = { new: true };
 
         campaign1.status = true;
         campaign1.isActive = false;
-        const isCampaignUpdated: ICampaign | null =
-          await campaign.findByIdAndUpdate(
-            { _id: campaign1._id },
-            campaign1,
-            options
-          );
+        const isCampaignUpdated: ICampaign | null = await campaign.findByIdAndUpdate({ _id: campaign1._id }, campaign1, options);
 
         await Promise.all(userPromises);
       })
@@ -200,9 +175,7 @@ const sendDynamicMessage = async (obj: any) => {
   obj.template.headerImageUrl &&
     components.push({
       type: "header",
-      parameters: [
-        { type: "image", image: { link: obj.template.headerImageUrl } },
-      ],
+      parameters: [{ type: "image", image: { link: obj.template.headerImageUrl } }],
     });
 
   obj.template.headerVariables.length > 0 &&
@@ -221,47 +194,43 @@ const sendDynamicMessage = async (obj: any) => {
       type: "body",
       parameters: obj.template.bodyVariables.map((itm: any) => ({
         type: "text",
-        text:
-          itm.field === "TEXT"
-            ? itm.value
-            : obj.user[itm.field]
-            ? obj.user[itm.field]
-            : itm.value,
+        text: itm.field === "TEXT" ? itm.value : obj.user[itm.field] ? obj.user[itm.field] : itm.value,
       })),
       // parameters: [
       //     { type: 'text', text: 'Deepak' },
       //   ]
     });
-  //         let custom_payload= {
-  //             template_name:obj.label,
-  //             order_id:1234,
-  //         }
-  // components.push({
-
-  //         "type": "button",
-  //         "sub_type": "quick_reply",
-  //         "index": "0",
-  //         "parameters": [
-  //             {
-  //                 "type": "payload",
-  //                 "payload": JSON.stringify(custom_payload)
-  //             }
-  //         ]
-
-  // },
-  // {
-
-  //     "type": "button",
-  //     "sub_type": "quick_reply",
-  //     "index": "1",
-  //     "parameters": [
-  //         {
-  //             "type": "payload",
-  //             "payload": JSON.stringify(custom_payload)
-  //         }
-  //     ]
-
-  // })
+  let custom_payload = {
+    template_name: obj.label,
+    order_id: 1234,
+    step: 1,
+  };
+  if (obj.label === "order_confirmation_to_renter_f") {
+    components.push(
+      {
+        type: "button",
+        sub_type: "quick_reply",
+        index: "0",
+        parameters: [
+          {
+            type: "payload",
+            payload: JSON.stringify(custom_payload),
+          },
+        ],
+      },
+      {
+        type: "button",
+        sub_type: "quick_reply",
+        index: "1",
+        parameters: [
+          {
+            type: "payload",
+            payload: JSON.stringify(custom_payload),
+          },
+        ],
+      }
+    );
+  }
   // obj.buttonEnabled === true && obj.buttons.length > 0 &&
   //     components.push({
   //         type: 'button',
@@ -270,12 +239,7 @@ const sendDynamicMessage = async (obj: any) => {
   //         parameters: obj.buttons.map(itm => ({ type: 'text', text: itm.url }))
   //     })
 
-  console.log(
-    "-----obj",
-    JSON.stringify(components, null, 2),
-    "------obj",
-    obj
-  );
+  console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj);
   setTimeout(() => {
     let payload = {
       messaging_product: "whatsapp",
@@ -312,10 +276,4 @@ const sendDynamicMessage = async (obj: any) => {
   }, 5000);
 };
 
-export {
-  getCampaign,
-  addCampaign,
-  deleteCampaign,
-  updateCampaign,
-  sendCampaignMessages,
-};
+export { getCampaign, addCampaign, deleteCampaign, updateCampaign, sendCampaignMessages };

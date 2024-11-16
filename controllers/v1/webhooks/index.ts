@@ -11,6 +11,7 @@ import orderstatus from "../../../models/orderstatus";
 import user from "../../../models/user";
 import markettingusers from "../../../models/markettingusers";
 import { basicLogger } from "../../../middleware/logger";
+import { getDateFromRenterForOrder } from "../chatbot/deliveryBooking/deliveryBooking";
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 let options = { new: true };
 
@@ -66,10 +67,16 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     var message = "";
     if (type == "button") {
       message = entry[0].changes[0].value.messages[0].button.text;
+      if (message === "Confirm Address") {
+        let order: {
+          id: 1234;
+        };
+       await getDateFromRenterForOrder(req, res, order);
+      }
     } else if (type == "text") {
       message = entry[0].changes[0].value.messages[0].text.body;
     } else if (type === "interactive") {
-      message = entry[0].changes[0].value.messages[0].interactive.title;
+      message = entry[0].changes[0].value.messages[0].interactive.button_reply.title;
     }
     console.log(message);
     // Insert data into RDS table
