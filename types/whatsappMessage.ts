@@ -6,6 +6,7 @@ export interface IWhatsappMessage extends Document {
     phone_number: string;
     message: string
     timestamp: string;
+    log:Schema.Types.Mixed;
 }
 
 

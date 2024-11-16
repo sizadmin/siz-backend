@@ -74,7 +74,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     }
     console.log(message)
     // Insert data into RDS table
-    await insertMessage(sender_phone, sender_name, message, timestamp);
+    await insertMessage(sender_phone, sender_name, message, timestamp,req.body);
 
     // Respond with success
     res.status(200).json({ message: 'Data inserted successfully' });
@@ -84,7 +84,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
   }
 }
 
-async function insertMessage(from:any, name:any, text:any, timestamp:any) {
+async function insertMessage(from:any, name:any, text:any, timestamp:any,body:any) {
   try {
     const existingMessage = await WhatsappMessage.find({ timestamp: timestamp,phone_number:from });
     if (existingMessage.length === 0) {
@@ -93,7 +93,7 @@ async function insertMessage(from:any, name:any, text:any, timestamp:any) {
         name: name,
         message: text,
         timestamp: timestamp,
-
+        log:body
       });
       const savedMessage: IWhatsappMessage = await newMessage.save();
     }

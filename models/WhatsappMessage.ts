@@ -15,6 +15,9 @@ const whatsappMessageSchema: Schema = new Schema(
         timestamp: {
             type: String,
             unique: true
+        },
+        log: {
+            type: Schema.Types.Mixed,
         }
     },
     {
