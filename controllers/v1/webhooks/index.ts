@@ -74,9 +74,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
       message = entry[0].changes[0].value.messages[0].text.body;
     } else if (type === "interactive") {
       message = entry[0].changes[0].value.messages[0].interactive.button_reply.title;
-      if (message === "") {
         await getTimeFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].interactive.button_reply.id.split("_")[0]);
-      }
     }
     console.log(message);
     // Insert data into RDS table
