@@ -73,8 +73,8 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
           user: {
             first_name: "Deepak",
             item_name: "Pink Dress",
-            order_start_date: "16-Nov-2024",
-            order_end_date: "18-Nov-2024",
+            order_start_date: "16-11-2024",
+            order_end_date: "18-11-2024",
             order_deliver_address: "Pune",
             order_number: "0101",
           },
