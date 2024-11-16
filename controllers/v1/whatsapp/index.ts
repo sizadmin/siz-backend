@@ -187,7 +187,7 @@ const fetchTemplateStatus = async (req: any, res: any) => {
                         if (itm.type === "QUICK_REPLY") {
 
 
-                            if (footerText !== "") {
+                            if (footerText) {
                                 buttonVar.push({
                                     action_type: "marketingOptOut",
                                     buttonType: "QUICK_REPLY",
@@ -343,7 +343,7 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
                     }
                 })
             })
-        if (savedList.footerText !== "") {
+        if (savedList.footerText) {
             componentsData.push({
                 type: 'footer',
                 text: savedList.footerText
@@ -474,7 +474,7 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
                     }
                 })
             })
-        if (savedList.footerText !== "") {
+        if (savedList.footerText) {
             componentsData.push({
                 type: 'footer',
                 text: savedList.footerText
