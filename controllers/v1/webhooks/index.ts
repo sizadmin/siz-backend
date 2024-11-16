@@ -69,7 +69,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     } else if (type == "text") {
       message = entry[0].changes[0].value.messages[0].text.body;
     } else if (type === "interactive") {
-      message = entry[0].changes[0].value.messages[0].interactive.title;
+      message = entry[0].changes[0].value.messages[0].interactive.button_reply.title;
     }
     console.log(message);
     // Insert data into RDS table
