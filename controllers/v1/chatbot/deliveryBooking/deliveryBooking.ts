@@ -95,6 +95,18 @@ const sendMessage = async (to, text) => {
 };
 
 const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
+  let obj: any = {
+    // template: findTemplate[0],
+    user: {
+      first_name: "Deepak",
+      item_name: "Pink Dress",
+      order_start_date: "16-11-2024",
+      order_end_date: "18-11-2024",
+      order_deliver_address: "Pune",
+      order_number: "0101",
+    },
+  };
+  order = { ...order, ...obj };
   const { phone, message } = req.body;
   const PHONE_NUMBER_ID = 105942389228737;
   try {
@@ -103,7 +115,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 971561114006,
+        to: 918624086801,
         type: "interactive",
         interactive: {
           type: "button",
@@ -116,7 +128,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
                 type: "reply",
                 reply: {
                   id: order.order_number + "_1",
-                  title: moment(order.order_start_date).subtract(1,'day').format("DD-MM-YY"),
+                  title: moment(order.order_start_date).subtract(1, "day").format("DD-MM-YY"),
                 },
               },
               {
@@ -152,6 +164,61 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
     // }
 
     // res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Error sending message:", error.response.data);
+    res.status(500).json({ error: "Error sending message" });
+  }
+};
+const getTimeFromRenterForOrder = async (req: any, res: any, order: any) => {
+  const { phone, message } = req.body;
+  const PHONE_NUMBER_ID = 105942389228737;
+  try {
+    const response = await axios.post(
+      `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+      {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: 918624086801,
+        type: "interactive",
+        interactive: {
+          type: "button",
+          body: {
+            text: "Please choose your preferred delivery time slot",
+          },
+          action: {
+            buttons: [
+              {
+                type: "reply",
+                reply: {
+                  id: order + "_1",
+                  title: "9AM - 1PM",
+                },
+              },
+              {
+                type: "reply",
+                reply: {
+                  id: order + "_2",
+                  title: "1PM - 5PM",
+                },
+              },
+              {
+                type: "reply",
+                reply: {
+                  id: order + "_3",
+                  title: "5PM - 9PM",
+                },
+              },
+            ],
+          },
+        },
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error sending message:", error.response.data);
     res.status(500).json({ error: "Error sending message" });
@@ -199,38 +266,23 @@ const sendOrderTemplate = async (req: any, res: any) => {
     order_id: 1234,
     step: 1,
   };
-  if (obj.label === "order_confirmation_to_renter_f") {
-    components.push(
+  components.push({
+    type: "button",
+    sub_type: "quick_reply",
+    index: "0",
+    parameters: [
       {
-        type: "button",
-        sub_type: "quick_reply",
-        index: "0",
-        parameters: [
-          {
-            type: "payload",
-            payload: JSON.stringify(custom_payload),
-          },
-        ],
+        type: "payload",
+        payload: JSON.stringify(custom_payload),
       },
-      {
-        type: "button",
-        sub_type: "quick_reply",
-        index: "1",
-        parameters: [
-          {
-            type: "payload",
-            payload: JSON.stringify(custom_payload),
-          },
-        ],
-      }
-    );
-  }
+    ],
+  });
 
   console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj);
   setTimeout(() => {
     let payload = {
       messaging_product: "whatsapp",
-      to: 971561114006,
+      to: 918624086801,
       type: "template",
       template: {
         name: "order_confirmation_to_renter_f",
@@ -263,4 +315,4 @@ const sendOrderTemplate = async (req: any, res: any) => {
   }, 5000);
 };
 
-export { findLatestOrders, getDateFromRenterForOrder, sendOrderTemplate };
+export { findLatestOrders, getDateFromRenterForOrder, sendOrderTemplate, getTimeFromRenterForOrder };
