@@ -11,7 +11,7 @@ import orderstatus from "../../../models/orderstatus";
 import user from "../../../models/user";
 import markettingusers from "../../../models/markettingusers";
 import { basicLogger } from "../../../middleware/logger";
-import { getDateFromRenterForOrder } from "../chatbot/deliveryBooking/deliveryBooking";
+import { getDateFromRenterForOrder, getTimeFromRenterForOrder } from "../chatbot/deliveryBooking/deliveryBooking";
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 let options = { new: true };
 
@@ -68,23 +68,15 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     if (type == "button") {
       message = entry[0].changes[0].value.messages[0].button.text;
       if (message === "Confirm Address") {
-        let obj: any = {
-          // template: findTemplate[0],      
-          user: {
-            first_name: "Deepak",
-            item_name: "Pink Dress",
-            order_start_date: "16-11-2024",
-            order_end_date: "18-11-2024",
-            order_deliver_address: "Pune",
-            order_number: "0101",
-          },
-        };
-       await getDateFromRenterForOrder(req, res, obj);
+        await getDateFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].button.payload);
       }
     } else if (type == "text") {
       message = entry[0].changes[0].value.messages[0].text.body;
     } else if (type === "interactive") {
       message = entry[0].changes[0].value.messages[0].interactive.button_reply.title;
+      if (message === "") {
+        await getTimeFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].interactive.button_reply.id.split("_")[0]);
+      }
     }
     console.log(message);
     // Insert data into RDS table
