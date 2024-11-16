@@ -4,6 +4,7 @@ import fs from "fs";
 import axios from "axios";
 import { IWTemplate } from "../../../../types/WTemplate";
 import template from "../../../../models/template";
+import moment from "moment";
 
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
@@ -115,14 +116,14 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
                 type: "reply",
                 reply: {
                   id: order.order_number + "_1",
-                  title: "17-Nov-2024",
+                  title: moment(order.order_start_date).subtract(1,'day').format("DD-MM-YY"),
                 },
               },
               {
                 type: "reply",
                 reply: {
                   id: order.order_number + "_2",
-                  title: "18-Nov-2024",
+                  title: moment(order.order_start_date).format("DD-MM-YY"),
                 },
               },
             ],
@@ -167,8 +168,8 @@ const sendOrderTemplate = async (req: any, res: any) => {
     user: {
       first_name: "Deepak",
       item_name: "Pink Dress",
-      order_start_date: "16-Nov-2024",
-      order_end_date: "18-Nov-2024",
+      order_start_date: "16-11-2024",
+      order_end_date: "18-11-2024",
       order_deliver_address: "Pune",
       order_number: "0101",
     },
