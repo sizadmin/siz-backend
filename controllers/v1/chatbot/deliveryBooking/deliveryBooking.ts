@@ -114,14 +114,14 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
               {
                 type: "reply",
                 reply: {
-                  id: order.id + "_1",
+                  id: order.order_number + "_1",
                   title: "17-Nov-2024",
                 },
               },
               {
                 type: "reply",
                 reply: {
-                  id: order.id + "_2",
+                  id: order.order_number + "_2",
                   title: "18-Nov-2024",
                 },
               },
@@ -150,7 +150,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
     //   const savedMessage: IWhatsappMessage = await newMessage.save();
     // }
 
-    res.status(200).json(response.data);
+    // res.status(200).json(response.data);
   } catch (error) {
     console.error("Error sending message:", error.response.data);
     res.status(500).json({ error: "Error sending message" });
@@ -255,6 +255,7 @@ const sendOrderTemplate = async (req: any, res: any) => {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
+        getDateFromRenterForOrder(req,res,obj)
       })
       .catch((error) => {
         console.log(error);
