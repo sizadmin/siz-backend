@@ -102,7 +102,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 918624086801,
+        to: 971561114006,
         type: "interactive",
         interactive: {
           type: "button",
@@ -229,7 +229,7 @@ const sendOrderTemplate = async (req: any, res: any) => {
   setTimeout(() => {
     let payload = {
       messaging_product: "whatsapp",
-      to: 918624086801,
+      to: 971561114006,
       type: "template",
       template: {
         name: "order_confirmation_to_renter_f",
