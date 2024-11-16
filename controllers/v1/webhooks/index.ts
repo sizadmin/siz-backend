@@ -68,10 +68,18 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     if (type == "button") {
       message = entry[0].changes[0].value.messages[0].button.text;
       if (message === "Confirm Address") {
-        let order: {
-          id: 1234;
+        let obj: any = {
+          // template: findTemplate[0],      
+          user: {
+            first_name: "Deepak",
+            item_name: "Pink Dress",
+            order_start_date: "16-Nov-2024",
+            order_end_date: "18-Nov-2024",
+            order_deliver_address: "Pune",
+            order_number: "0101",
+          },
         };
-       await getDateFromRenterForOrder(req, res, order);
+       await getDateFromRenterForOrder(req, res, obj);
       }
     } else if (type == "text") {
       message = entry[0].changes[0].value.messages[0].text.body;
