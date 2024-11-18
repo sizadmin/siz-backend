@@ -1,10 +1,9 @@
-import path from "path";
 import { mysqlConnection } from "../../../../src/app";
-import fs from "fs";
 import axios from "axios";
+import moment from "moment";
+import { fetchOrderDeliveryData, fetchOrderDetails, insertDeliveryInfo, updateDeliveryInfo } from "../../mysqlControllers/controller";
 import { IWTemplate } from "../../../../types/WTemplate";
 import template from "../../../../models/template";
-import moment from "moment";
 
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
@@ -95,19 +94,8 @@ const sendMessage = async (to, text) => {
 };
 
 const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
-  let obj: any = {
-    // template: findTemplate[0],
-    user: {
-      first_name: "Deepak",
-      item_name: "Pink Dress",
-      order_start_date: "16-11-2024",
-      order_end_date: "18-11-2024",
-      order_deliver_address: "Pune",
-      order_number: "0101",
-    },
-  };
-  order = { ...order, ...obj };
-  const { phone, message } = req.body;
+  let orderData: any = await fetchOrderDetails(order.order_id);
+  if (!orderData) return;
   const PHONE_NUMBER_ID = 105942389228737;
   try {
     const response = await axios.post(
@@ -115,7 +103,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 971561114006,
+        to: 918624086801,
         type: "interactive",
         interactive: {
           type: "button",
@@ -127,15 +115,15 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
               {
                 type: "reply",
                 reply: {
-                  id: order.order_number + "_1",
-                  title: moment(order.order_start_date).subtract(1, "day").format("DD-MM-YY"),
+                  id: order.order_id + "_1",
+                  title: moment(orderData[0].start_date).subtract(1, "day").format("DD-MM-YY"),
                 },
               },
               {
                 type: "reply",
                 reply: {
-                  id: order.order_number + "_2",
-                  title: moment(order.order_start_date).format("DD-MM-YY"),
+                  id: order.order_id + "_2",
+                  title: moment(orderData[0].start_date).format("DD-MM-YY"),
                 },
               },
             ],
@@ -149,39 +137,45 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
         },
       }
     );
-    // const timestamp = Timestamp
-    // const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
-
-    // if (existingMessage) {
-    //   const newMessage: IWhatsappMessage = new WhatsappMessage({
-    //     phone_number: "",
-    //     name: "SIZ",
-    //     message: message,
-    //     timestamp: timestamp,
-
-    //   });
-    //   const savedMessage: IWhatsappMessage = await newMessage.save();
-    // }
-
-    // res.status(200).json(response.data);
   } catch (error) {
-    console.error("Error sending message:", error.response.data);
+    console.error("Error sending message:", error);
     res.status(500).json({ error: "Error sending message" });
   }
 };
-const getTimeFromRenterForOrder = async (req: any, res: any, order: any) => {
+const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
+  // orderId.id = "10084_time_3";
+  // orderId.title = "11-2";
+  // Check for this order id already time slot is saved in db or not
+  let OrderDate: any = null;
+  let OrderTimeSlot: any = null;
+  const OrderId = orderId.id.split("_")[0];
 
-    // Check for this order id already time slot is saved in db or not 
-    
-  const { phone, message } = req.body;
   const PHONE_NUMBER_ID = 105942389228737;
+  let dbResponse: any = await fetchOrderDeliveryData(OrderId);
+  //   console.log(OrderDate, OrderTimeSlot, "------", dbResponse);
+  if (orderId.id.split("_")[1] === "time") {
+    OrderTimeSlot = orderId.title;
+    OrderDate = dbResponse[0].delivery_date;
+  } else {
+    OrderDate = moment(orderId.title, "YY-MM-DD").format("DD-MM-YY");
+    OrderTimeSlot = dbResponse[0].delivery_timeslot;
+  }
+  if (dbResponse.length === 0) {
+    let savedInfo = await insertDeliveryInfo(10084, OrderDate, OrderTimeSlot, null);
+  }
+
+  if (dbResponse.length > 0 && (dbResponse[0].delivery_date === null || dbResponse[0].delivery_timeslot === null)) {
+    let savedInfo = await updateDeliveryInfo(10084, OrderDate, OrderTimeSlot);
+  } else {
+    return;
+  } //   console.log(savedInfo, "savedInfo");
   try {
     const response = await axios.post(
       `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 971561114006,
+        to: 918624086801,
         type: "interactive",
         interactive: {
           type: "button",
@@ -193,21 +187,21 @@ const getTimeFromRenterForOrder = async (req: any, res: any, order: any) => {
               {
                 type: "reply",
                 reply: {
-                  id: order + "_1",
+                  id: OrderId + "_time_1",
                   title: "9AM - 1PM",
                 },
               },
               {
                 type: "reply",
                 reply: {
-                  id: order + "_2",
+                  id: OrderId + "_time_2",
                   title: "1PM - 5PM",
                 },
               },
               {
                 type: "reply",
                 reply: {
-                  id: order + "_3",
+                  id: OrderId + "_time_3",
                   title: "5PM - 9PM",
                 },
               },
@@ -229,19 +223,24 @@ const getTimeFromRenterForOrder = async (req: any, res: any, order: any) => {
 };
 
 const sendOrderTemplate = async (req: any, res: any) => {
+  let order_id = 10084;
   const findTemplate: IWTemplate[] | null = await template.find({
     name: "order_confirmation_to_renter_f",
   });
+  // remove hard coding
+  const orderDetailsData: any = await fetchOrderDetails(order_id);
+  console.log(orderDetailsData, "orderDetailsData");
   let obj: any = {
     template: findTemplate[0],
 
     user: {
-      first_name: "Deepak",
-      item_name: "Pink Dress",
-      order_start_date: "16-11-2024",
-      order_end_date: "18-11-2024",
-      order_deliver_address: "Pune",
-      order_number: "0101",
+      //   first_name: "Deepak",
+      //   item_name: "Pink Dress",
+      //   order_start_date: "16-11-2024",
+      //   order_end_date: "18-11-2024",
+      //   order_deliver_address: "Pune",
+      //   order_number: "0101",
+      ...orderDetailsData[0],
     },
   };
   // delete obj.template.components;
@@ -252,22 +251,43 @@ const sendOrderTemplate = async (req: any, res: any) => {
       type: "header",
       parameters: obj.template.headerVariables.map((itm: any) => ({
         type: "text",
-        text: itm.field === "TEXT" ? itm.value : obj.user[itm.field],
+        text: obj.user.first_name,
       })),
     });
   obj.template.bodyVariables.length > 0 &&
     components.push({
       type: "body",
-      parameters: obj.template.bodyVariables.map((itm: any) => ({
-        type: "text",
-        text: itm.field === "TEXT" ? itm.value : obj.user[itm.field] ? obj.user[itm.field] : itm.value,
-      })),
+      parameters: [
+        {
+          type: "text",
+          text: obj.user.first_name,
+        },
+        {
+          type: "text",
+          text: order_id,
+        },
+        {
+          type: "text",
+          text: obj.user.product_name,
+        },
+        {
+          type: "text",
+          text: obj.user.start_date,
+        },
+        {
+          type: "text",
+          text: obj.user.end_date,
+        },
+        {
+          type: "text",
+          text: obj.user.address,
+        },
+      ],
     });
 
   let custom_payload = {
     template_name: obj.label,
-    order_id: 1234,
-    step: 1,
+    order_id: order_id,
   };
   components.push({
     type: "button",
@@ -285,7 +305,7 @@ const sendOrderTemplate = async (req: any, res: any) => {
   setTimeout(() => {
     let payload = {
       messaging_product: "whatsapp",
-      to: 971561114006,
+      to: 918624086801,
       type: "template",
       template: {
         name: "order_confirmation_to_renter_f",
