@@ -94,6 +94,7 @@ const sendMessage = async (to, text) => {
 };
 
 const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
+    console.log(order,"order")
   let orderData: any = await fetchOrderDetails(order.order_id);
   if (!orderData) return;
   const PHONE_NUMBER_ID = 105942389228737;
