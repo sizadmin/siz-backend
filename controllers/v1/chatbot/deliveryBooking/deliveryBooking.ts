@@ -152,6 +152,7 @@ const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
 
   const PHONE_NUMBER_ID = 105942389228737;
   let dbResponse: any = await fetchOrderDeliveryData(OrderId);
+  if (dbResponse.length > 0 && (dbResponse[0].delivery_date !== null || dbResponse[0].delivery_timeslot !== null)) return
     // console.log(OrderDate, OrderTimeSlot, "------", dbResponse);
   if (orderId.id.split("_")[1] === "time") {
     OrderTimeSlot = orderId.title;
@@ -166,9 +167,7 @@ const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
 
   if (dbResponse.length > 0 && (dbResponse[0].delivery_date === null || dbResponse[0].delivery_timeslot === null)) {
     let savedInfo = await updateDeliveryInfo(10084, OrderDate, OrderTimeSlot);
-  } else {
-    return;
-  } //   console.log(savedInfo, "savedInfo");
+  }
   try {
     const response = await axios.post(
       `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
