@@ -94,8 +94,8 @@ const sendMessage = async (to, text) => {
 };
 
 const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
-    console.log(order,"order")
-  let orderData: any = await fetchOrderDetails(order.order_id);
+  console.log(order, "order");
+  let orderData: any = await fetchOrderDetails(order);
   if (!orderData) return;
   const PHONE_NUMBER_ID = 105942389228737;
   try {
@@ -116,14 +116,14 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
               {
                 type: "reply",
                 reply: {
-                  id: order.order_id + "_1",
+                  id: order + "_1",
                   title: moment(orderData[0].start_date).subtract(1, "day").format("DD-MM-YY"),
                 },
               },
               {
                 type: "reply",
                 reply: {
-                  id: order.order_id + "_2",
+                  id: order + "_2",
                   title: moment(orderData[0].start_date).format("DD-MM-YY"),
                 },
               },
@@ -286,10 +286,9 @@ const sendOrderTemplate = async (req: any, res: any) => {
       ],
     });
 
-  let custom_payload = {
-    template_name: obj.label,
-    order_id: order_id,
-  };
+//   let custom_payload = {
+//     order_id: order_id,
+//   };
   components.push({
     type: "button",
     sub_type: "quick_reply",
@@ -297,7 +296,7 @@ const sendOrderTemplate = async (req: any, res: any) => {
     parameters: [
       {
         type: "payload",
-        payload: JSON.stringify(custom_payload),
+        payload: JSON.stringify(order_id),
       },
     ],
   });
