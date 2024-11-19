@@ -94,7 +94,6 @@ const sendMessage = async (to, text) => {
 };
 
 const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
-  console.log(order, "order");
   let orderData: any = await fetchOrderDetails(order);
   if (!orderData) return;
   const PHONE_NUMBER_ID = 105942389228737;
@@ -153,13 +152,13 @@ const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
 
   const PHONE_NUMBER_ID = 105942389228737;
   let dbResponse: any = await fetchOrderDeliveryData(OrderId);
-  //   console.log(OrderDate, OrderTimeSlot, "------", dbResponse);
+    // console.log(OrderDate, OrderTimeSlot, "------", dbResponse);
   if (orderId.id.split("_")[1] === "time") {
     OrderTimeSlot = orderId.title;
     OrderDate = dbResponse[0].delivery_date;
   } else {
-    OrderDate = moment(orderId.title, "YY-MM-DD").format("DD-MM-YY");
-    OrderTimeSlot = dbResponse[0].delivery_timeslot;
+    OrderDate = moment(orderId.title, "DD-MM-YY").format("DD-MM-YY");
+    OrderTimeSlot = dbResponse.length > 0 ? dbResponse[0].delivery_timeslot: null;
   }
   if (dbResponse.length === 0) {
     let savedInfo = await insertDeliveryInfo(10084, OrderDate, OrderTimeSlot, null);
