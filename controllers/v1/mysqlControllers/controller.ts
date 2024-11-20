@@ -287,7 +287,7 @@ const getRecentOrdersSizApp = async (req: any, res: any) => {
       const formattedDate = date; // This will use the local time zone
 
       const shortOrderId = Number(orderData.order_no) - 10000;
-
+      const totalAmt: any = Number(orderData.total_amount - orderData.disc_amt + orderData.damage_protection_amt).toFixed(2);
       let imageUrl = "https://sizcdn.s3.ap-south-1.amazonaws.com/media/products/" + orderData.sub_path + "/" + orderData.image;
       // Replace placeholders with dynamic data
       htmlTemplate = htmlTemplate
@@ -302,7 +302,7 @@ const getRecentOrdersSizApp = async (req: any, res: any) => {
         .replace("${subtotal}", orderData.amount)
         .replace("${discount}", orderData.disc_amt)
         .replace("${damage}", orderData.damage_protection_amt)
-        .replace("${total}", orderData.total_amount - orderData.disc_amt + orderData.damage_protection_amt);
+        .replace("${total}", totalAmt);
 
       const mailOptions = {
         from: process.env.SENDINBLUE_USER, // Your verified email address
