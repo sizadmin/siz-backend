@@ -103,7 +103,7 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 918624086801,
+        to: 971561114006,
         type: "interactive",
         interactive: {
           type: "button",
@@ -176,7 +176,7 @@ const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
       {
         messaging_product: "whatsapp",
         recipient_type: "individual",
-        to: 918624086801,
+        to: 971561114006,
         type: "interactive",
         interactive: {
           type: "button",
@@ -305,7 +305,7 @@ const sendOrderTemplate = async (req: any, res: any) => {
   setTimeout(() => {
     let payload = {
       messaging_product: "whatsapp",
-      to: 918624086801,
+      to: 971561114006,
       type: "template",
       template: {
         name: "order_confirmation_to_renter_f",
@@ -350,18 +350,16 @@ const sendOrderAggregatedInfo = async (orderId: any) => {
           messaging_product: "whatsapp",
 
           recipient_type: "individual",
-          to: 918624086801,
+          to: 971561114006,
           type: "text",
           text: {
-            body: `That's it! 😊 We'll notify you as soon as your order is out for delivery. 🚀 \n\nExpected Delivery Date: ${moment(
+            body: `That's it! 😊 We'll notify you as soon as your order is out for delivery. 🚀 \n\nExpected Delivery Date: *${moment(
               dbResponse[0].delivery_date
-            ).format("DD-MMM-YY")}\nExpected Delivery Time: ${
+            ).format("DD-MMM-YY")}*\nExpected Delivery Time: *${
               dbResponse[0].delivery_timeslot
-            }\n\nThank you for choosing Sizters! 💜 Happy renting! 😊👗\n\nIn the meantime, why not share the love? Refer your friends to the Sizters App and earn AED 50 credits for your next rental!
-            \n👉 Download the app here: https://siz.ae/pages/get-sizters-app
-            \n✨ Share your unique referral code ${
-              orderDetailsData[0].referral_code
-            } with your friends. Both of you will enjoy AED 50 credits to use on your next rental orders!
+            }*\n\nThank you for choosing Sizters! 💜 Happy renting! 😊👗\n\nIn the meantime, why not share the love? Refer your friends to the Sizters App and earn AED 50 credits for your next rental!
+            \n👉 Share the link to download the app : https://siz.ae/pages/get-sizters-app
+            \n✨ Share your unique referral code  *${orderDetailsData[0].referral_code}* with your friends. Both of you will enjoy AED 50 credits to use on your next rental orders!
             \nSpread the joy, and happy shopping! 💃`,
           },
         },
@@ -372,6 +370,7 @@ const sendOrderAggregatedInfo = async (orderId: any) => {
           },
         }
       );
+      console.log(response.data)
     }
     // console.log(response,"response")
   } catch (e) {
