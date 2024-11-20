@@ -341,7 +341,7 @@ const sendOrderTemplate = async (req: any, res: any) => {
 const sendOrderAggregatedInfo = async (orderId: any) => {
   try {
     let dbResponse: any = await fetchOrderDeliveryData(orderId);
-    console.log(dbResponse, "dbResponse");
+    const orderDetailsData: any = await fetchOrderDetails(orderId);
     if (dbResponse.length === 0) return;
     else {
       const response = await axios.post(
@@ -353,9 +353,16 @@ const sendOrderAggregatedInfo = async (orderId: any) => {
           to: 918624086801,
           type: "text",
           text: {
-            body: `Thank You for confirming you order details are below \nDelivery Date: ${moment(dbResponse[0].delivery_date).format(
-              "DD-MMM-YY"
-            )} \nDelivery Time Slot: ${dbResponse[0].delivery_timeslot}`,
+            body: `That's it! 😊 We'll notify you as soon as your order is out for delivery. 🚀 \n\nExpected Delivery Date: ${moment(
+              dbResponse[0].delivery_date
+            ).format("DD-MMM-YY")}\nExpected Delivery Time: ${
+              dbResponse[0].delivery_timeslot
+            }\n\nThank you for choosing Sizters! 💜 Happy renting! 😊👗\n\nIn the meantime, why not share the love? Refer your friends to the Sizters App and earn AED 50 credits for your next rental!
+            \n👉 Download the app here: https://siz.ae/pages/get-sizters-app
+            \n✨ Share your unique referral code ${
+              orderDetailsData[0].referral_code
+            } with your friends. Both of you will enjoy AED 50 credits to use on your next rental orders!
+            \nSpread the joy, and happy shopping! 💃`,
           },
         },
         {

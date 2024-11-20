@@ -337,11 +337,7 @@ const fetchOrderDeliveryData = async (orderId: any) => {
 };
 
 const fetchOrderDetails = async (orderId: any) => {
-  let sql = `SELECT u.first_name as first_name, p.title as product_name,o.start_date,o.end_date,CONCAT(oa.apartment," ", oa.area_name," ",oa.city," ",oa.state) as address FROM siz_orders o
-left join siz_users u on o.user_id = u.id 
-left join siz_order_addresses oa on o.group_id = oa.order_id
-left join siz_products p on o.product_id = p.id
-    WHERE o.order_no = ${orderId}`;
+  let sql = `SELECT u.first_name as first_name,u.referral_code, p.title as product_name,o.start_date,o.end_date,CONCAT(oa.apartment," ", oa.area_name," ",oa.city," ",oa.state) as address FROM siz_orders o left join siz_users u on o.user_id = u.id left join siz_order_addresses oa on o.group_id = oa.order_id left join siz_products p on o.product_id = p.id where order_no = ${orderId};`;
   console.log(sql);
   return new Promise((resolve, reject) => {
     mysqlConnection.query(sql, (err, results) => {
@@ -373,7 +369,7 @@ const insertDeliveryInfo = (order_id: any, delivery_date: any, delivery_timeslot
   });
 };
 
-const updateDeliveryInfo = (order_id:any, delivery_date:any, delivery_timeslot:any) => {
+const updateDeliveryInfo = (order_id: any, delivery_date: any, delivery_timeslot: any) => {
   const sql = `
       UPDATE delivery_info 
       SET  delivery_date = ?, delivery_timeslot = ? 
@@ -387,29 +383,29 @@ const updateDeliveryInfo = (order_id:any, delivery_date:any, delivery_timeslot:a
         return;
       }
       console.log(`Record updated successfully:`, result);
-      resolve(result)
+      resolve(result);
     });
   });
 };
 
-const insertDataIntoSizApp = (tableName:any, fieldName:any, value:any,conditionField:any,conditionVal:any) => {
-    const sql = `
+const insertDataIntoSizApp = (tableName: any, fieldName: any, value: any, conditionField: any, conditionVal: any) => {
+  const sql = `
         UPDATE ${tableName} 
         SET  ${fieldName} = ?
         WHERE ${conditionField} = ?
       `;
-    const values = [value, conditionVal];
-    return new Promise((resolve, reject) => {
-      mysqlConnection.execute(sql, values, (err, result) => {
-        if (err) {
-          console.error("Error updating record:", err);
-          return;
-        }
-        console.log(`Record updated successfully:`, result);
-        resolve(result)
-      });
+  const values = [value, conditionVal];
+  return new Promise((resolve, reject) => {
+    mysqlConnection.execute(sql, values, (err, result) => {
+      if (err) {
+        console.error("Error updating record:", err);
+        return;
+      }
+      console.log(`Record updated successfully:`, result);
+      resolve(result);
     });
-  };
+  });
+};
 
 export {
   getUsersSizApp,
@@ -421,5 +417,5 @@ export {
   fetchOrderDetails,
   insertDeliveryInfo,
   updateDeliveryInfo,
-  insertDataIntoSizApp
+  insertDataIntoSizApp,
 };
