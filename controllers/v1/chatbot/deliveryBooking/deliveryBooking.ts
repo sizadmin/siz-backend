@@ -4,6 +4,7 @@ import moment from "moment";
 import { fetchOrderDeliveryData, fetchOrderDetails, insertDeliveryInfo, updateDeliveryInfo } from "../../mysqlControllers/controller";
 import { IWTemplate } from "../../../../types/WTemplate";
 import template from "../../../../models/template";
+const PHONE_NUMBER_ID = 105942389228737;
 
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 
@@ -67,7 +68,6 @@ const findLatestOrders = async (req: any, res: any) => {
 const sendMessage = async (to, text) => {
   //  const { phone, message } = req.body;
   console.log("In sendMessage", to);
-  const PHONE_NUMBER_ID = 105942389228737;
   try {
     const response = await axios.post(
       `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
@@ -116,14 +116,14 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
                 type: "reply",
                 reply: {
                   id: order + "_1",
-                  title: moment(orderData[0].start_date).subtract(1, "day").format("DD-MM-YY"),
+                  title: moment(orderData[0].start_date).subtract(1, "day").format("DD-MMM-YY"),
                 },
               },
               {
                 type: "reply",
                 reply: {
                   id: order + "_2",
-                  title: moment(orderData[0].start_date).format("DD-MM-YY"),
+                  title: moment(orderData[0].start_date).format("DD-MMM-YY"),
                 },
               },
             ],
@@ -143,32 +143,34 @@ const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
   }
 };
 const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
-  // orderId.id = "10084_time_3";
-  // orderId.title = "11-2";
-  // Check for this order id already time slot is saved in db or not
-  let OrderDate: any = null;
-  let OrderTimeSlot: any = null;
-  const OrderId = orderId.id.split("_")[0];
-
-  const PHONE_NUMBER_ID = 105942389228737;
-  let dbResponse: any = await fetchOrderDeliveryData(OrderId);
-  if (dbResponse.length > 0 && (dbResponse[0].delivery_date !== null || dbResponse[0].delivery_timeslot !== null)) return
-    // console.log(OrderDate, OrderTimeSlot, "------", dbResponse);
-  if (orderId.id.split("_")[1] === "time") {
-    OrderTimeSlot = orderId.title;
-    OrderDate = dbResponse[0].delivery_date;
-  } else {
-    OrderDate = moment(orderId.title, "DD-MM-YY").format("DD-MM-YY");
-    OrderTimeSlot = dbResponse.length > 0 ? dbResponse[0].delivery_timeslot: null;
-  }
-  if (dbResponse.length === 0) {
-    let savedInfo = await insertDeliveryInfo(10084, OrderDate, OrderTimeSlot, null);
-  }
-
-  if (dbResponse.length > 0 && (dbResponse[0].delivery_date === null || dbResponse[0].delivery_timeslot === null)) {
-    let savedInfo = await updateDeliveryInfo(10084, OrderDate, OrderTimeSlot);
-  }
   try {
+    let OrderDate: any = null;
+    let OrderTimeSlot: any = null;
+    const OrderId = orderId.id.split("_")[0];
+
+    const PHONE_NUMBER_ID = 105942389228737;
+    let dbResponse: any = await fetchOrderDeliveryData(OrderId);
+    if (dbResponse.length > 0 && dbResponse[0].delivery_date !== null && dbResponse[0].delivery_timeslot !== null) return;
+    if (orderId.id.split("_")[1] === "time") {
+      OrderTimeSlot = orderId.title;
+      OrderDate = dbResponse[0].delivery_date;
+    } else {
+      OrderDate = moment(orderId.title, "YY-MMM-DD").format("DD-MM-YY");
+      OrderTimeSlot = dbResponse.length > 0 ? dbResponse[0].delivery_timeslot : null;
+    }
+    if (dbResponse.length === 0) await insertDeliveryInfo(OrderId, OrderDate, OrderTimeSlot, null);
+
+    if (dbResponse.length > 0 && (dbResponse[0].delivery_date === null || dbResponse[0].delivery_timeslot === null)) {
+      let updatedDeliveryData = await updateDeliveryInfo(OrderId, OrderDate, OrderTimeSlot);
+      if (updatedDeliveryData) {
+        let dbResponse: any = await fetchOrderDeliveryData(OrderId);
+        if (dbResponse.length > 0 && dbResponse[0].delivery_date !== null && dbResponse[0].delivery_timeslot !== null) {
+          await sendOrderAggregatedInfo(OrderId);
+          return;
+        }
+      }
+    }
+
     const response = await axios.post(
       `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
       {
@@ -284,9 +286,9 @@ const sendOrderTemplate = async (req: any, res: any) => {
       ],
     });
 
-//   let custom_payload = {
-//     order_id: order_id,
-//   };
+  //   let custom_payload = {
+  //     order_id: order_id,
+  //   };
   components.push({
     type: "button",
     sub_type: "quick_reply",
@@ -334,6 +336,40 @@ const sendOrderTemplate = async (req: any, res: any) => {
         console.log(error);
       });
   }, 5000);
+};
+
+const sendOrderAggregatedInfo = async (orderId: any) => {
+  try {
+    let dbResponse: any = await fetchOrderDeliveryData(orderId);
+    console.log(dbResponse, "dbResponse");
+    if (dbResponse.length === 0) return;
+    else {
+      const response = await axios.post(
+        `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+        {
+          messaging_product: "whatsapp",
+
+          recipient_type: "individual",
+          to: 918624086801,
+          type: "text",
+          text: {
+            body: `Thank You for confirming you order details are below \nDelivery Date: ${moment(dbResponse[0].delivery_date).format(
+              "DD-MMM-YY"
+            )} \nDelivery Time Slot: ${dbResponse[0].delivery_timeslot}`,
+          },
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+    // console.log(response,"response")
+  } catch (e) {
+    console.log(e, "e");
+  }
 };
 
 export { findLatestOrders, getDateFromRenterForOrder, sendOrderTemplate, getTimeFromRenterForOrder };

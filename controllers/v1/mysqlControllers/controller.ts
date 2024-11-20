@@ -392,6 +392,25 @@ const updateDeliveryInfo = (order_id:any, delivery_date:any, delivery_timeslot:a
   });
 };
 
+const insertDataIntoSizApp = (tableName:any, fieldName:any, value:any,conditionField:any,conditionVal:any) => {
+    const sql = `
+        UPDATE ${tableName} 
+        SET  ${fieldName} = ?
+        WHERE ${conditionField} = ?
+      `;
+    const values = [value, conditionVal];
+    return new Promise((resolve, reject) => {
+      mysqlConnection.execute(sql, values, (err, result) => {
+        if (err) {
+          console.error("Error updating record:", err);
+          return;
+        }
+        console.log(`Record updated successfully:`, result);
+        resolve(result)
+      });
+    });
+  };
+
 export {
   getUsersSizApp,
   getOrdersSizApp,
@@ -401,5 +420,6 @@ export {
   fetchOrderDeliveryData,
   fetchOrderDetails,
   insertDeliveryInfo,
-  updateDeliveryInfo
+  updateDeliveryInfo,
+  insertDataIntoSizApp
 };
