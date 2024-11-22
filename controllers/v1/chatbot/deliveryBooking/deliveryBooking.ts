@@ -224,7 +224,7 @@ const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
 };
 
 const sendOrderTemplate = async (req: any, res: any) => {
-  let order_id: any = req.query.order_id || 10084;
+  let order_id: any = Number(req.query.order_id) || 10084;
   const findTemplate: IWTemplate[] | null = await template.find({
     name: "order_confirmation_to_renter_f",
   });
