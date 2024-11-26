@@ -487,7 +487,7 @@ const sendOrderAggregatedInfo = async (orderId: any) => {
 };
 const changeDeliveryDetails = async (req: any, res: any, payload: any) => {
   let updatedPayload = JSON.parse(payload);
-  await insertDeliveryInfo(updatedPayload.order_id, null, null, null);
+  await updateDeliveryInfo(updatedPayload.order_id, null, null);
   await getDateFromRenterForOrder(req, res, updatedPayload.order_id);
 };
 
