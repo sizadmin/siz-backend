@@ -11,7 +11,7 @@ import orderstatus from "../../../models/orderstatus";
 import user from "../../../models/user";
 import markettingusers from "../../../models/markettingusers";
 import { basicLogger } from "../../../middleware/logger";
-import { getDateFromRenterForOrder, getTimeFromRenterForOrder } from "../chatbot/deliveryBooking/deliveryBooking";
+import { changeDeliveryDetails, getDateFromRenterForOrder, getTimeFromRenterForOrder, sendThankYouMsgToRenter } from "../chatbot/deliveryBooking/deliveryBooking";
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 let options = { new: true };
 
@@ -70,6 +70,14 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
       if (message === "Confirm Address") {
         await getDateFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].button.payload);
       }
+      if (message === "Change Delivery Details") {
+        await changeDeliveryDetails(req, res, entry[0].changes[0].value.messages[0].button.payload);
+      }
+      if (message === "Confirm Details") {
+        await sendThankYouMsgToRenter(req, res, entry[0].changes[0].value.messages[0].button.payload);
+      }
+
+      
     } else if (type == "text") {
       message = entry[0].changes[0].value.messages[0].text.body;
     } else if (type === "interactive") {
