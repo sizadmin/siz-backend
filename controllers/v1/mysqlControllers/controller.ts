@@ -407,6 +407,20 @@ const insertDataIntoSizApp = (tableName: any, fieldName: any, value: any, condit
   });
 };
 
+const fetchOrderPickupData = (orderId:any)=>{
+  const sql = `SELECT * FROM pickup_info where order_id=${orderId}`;
+  return new Promise((resolve, reject) => {
+    mysqlConnection.query(sql, (err, results) => {
+      if (err) {
+        // reject(err);
+        // return null;
+      }
+      resolve(results);
+      return results;
+    });
+  });
+}
+
 export {
   getUsersSizApp,
   getOrdersSizApp,
@@ -418,4 +432,5 @@ export {
   insertDeliveryInfo,
   updateDeliveryInfo,
   insertDataIntoSizApp,
+  fetchOrderPickupData
 };

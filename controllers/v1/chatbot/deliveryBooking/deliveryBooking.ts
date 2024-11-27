@@ -1,7 +1,13 @@
 import { mysqlConnection } from "../../../../src/app";
 import axios from "axios";
 import moment from "moment";
-import { fetchOrderDeliveryData, fetchOrderDetails, insertDeliveryInfo, updateDeliveryInfo } from "../../mysqlControllers/controller";
+import {
+  fetchOrderDeliveryData,
+  fetchOrderDetails,
+  fetchOrderPickupData,
+  insertDeliveryInfo,
+  updateDeliveryInfo,
+} from "../../mysqlControllers/controller";
 import { IWTemplate } from "../../../../types/WTemplate";
 import template from "../../../../models/template";
 const PHONE_NUMBER_ID = 105942389228737;
@@ -42,7 +48,6 @@ const findLatestOrders = async (req: any, res: any) => {
           type: "button",
           header: { type: "text", text: "Order Confirmation" },
           body: { text: `${orderDetails}` },
-          //footer: { text: 'Please confirm your order details and select delivery options.' },
           action: {
             buttons: [
               {
@@ -146,6 +151,10 @@ const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
     let OrderDate: any = null;
     let OrderTimeSlot: any = null;
     const OrderId = orderId.id.split("_")[0];
+    if (orderId.id.split("_")[2] === "return") {
+      await updateRenterPickupTime(OrderId, orderId.title);
+      return;
+    }
 
     let dbResponse: any = await fetchOrderDeliveryData(OrderId);
     if (dbResponse.length > 0 && dbResponse[0].delivery_date !== null && dbResponse[0].delivery_timeslot !== null) return;
@@ -499,6 +508,117 @@ const sendThankYouMsgToRenter = async (req: any, res: any, payload: any) => {
   res.send(200);
 };
 
+const getAddressFromRenter = async (req: any, res: any, order: any) => {
+  // let orderData: any = await fetchOrderDetails(order);
+  // if (!orderData) return;
+  try {
+    const response = await axios.post(
+      `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+      {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: 918624086801,
+        type: "interactive",
+        interactive: {
+          type: "location_request_message",
+          body: {
+            text: "Thanks for your order! Tell us what address you'd like this order delivered to.",
+          },
+          action: {
+            name: "send_location",
+          },
+        },
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).json({ error: "Error sending message" });
+  }
+};
+
+const storeRenterDeliveryLocation = async (req: any, res: any, payload: any) => {
+  let lat = payload.latitude || 18.550493240356;
+  let long = payload.longitude || 73.934310913086;
+
+  const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=json`);
+  console.log(response.data.display_name, "response");
+  // store this in database
+  await sendMessage(
+    918624086801,
+    `Thank you for confirming delivery address below is your confirmed delivery address \n${response.data.display_name}  `
+  );
+  res.sendStatus(200);
+};
+
+const getPickupSlotsFromRenterForOrder = async (req: any, res: any, orderId: any) => {
+  try {
+    let OrderTimeSlot: any = null;
+    const OrderId = 10084;
+
+    const response = await axios.post(
+      `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+      {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: 918624086801,
+        type: "interactive",
+        interactive: {
+          type: "button",
+          body: {
+            text: "Please let us know your preferred return pick-up time slot",
+          },
+          action: {
+            buttons: [
+              {
+                type: "reply",
+                reply: {
+                  id: OrderId + "_time_return_1",
+                  title: "9AM - 1PM",
+                },
+              },
+              {
+                type: "reply",
+                reply: {
+                  id: OrderId + "_time_return_2",
+                  title: "1PM - 5PM",
+                },
+              },
+              {
+                type: "reply",
+                reply: {
+                  id: OrderId + "_time_return_3",
+                  title: "5PM - 9PM",
+                },
+              },
+            ],
+          },
+        },
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error sending message:", error.response.data);
+    res.status(500).json({ error: "Error sending message" });
+  }
+};
+
+const updateRenterPickupTime = async (orderId: any, text: any) => {
+  // store pickup time in database
+  await sendMessage(918624086801, "Thank you for confirming details.");
+
+
+};
 export {
   findLatestOrders,
   getDateFromRenterForOrder,
@@ -507,4 +627,7 @@ export {
   reconfirmOrderFromRenter,
   changeDeliveryDetails,
   sendThankYouMsgToRenter,
+  getAddressFromRenter,
+  storeRenterDeliveryLocation,
+  getPickupSlotsFromRenterForOrder,
 };

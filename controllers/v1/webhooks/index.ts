@@ -11,7 +11,7 @@ import orderstatus from "../../../models/orderstatus";
 import user from "../../../models/user";
 import markettingusers from "../../../models/markettingusers";
 import { basicLogger } from "../../../middleware/logger";
-import { changeDeliveryDetails, getDateFromRenterForOrder, getTimeFromRenterForOrder, sendThankYouMsgToRenter } from "../chatbot/deliveryBooking/deliveryBooking";
+import { changeDeliveryDetails, getDateFromRenterForOrder, getTimeFromRenterForOrder, sendThankYouMsgToRenter, storeRenterDeliveryLocation } from "../chatbot/deliveryBooking/deliveryBooking";
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 let options = { new: true };
 
@@ -60,10 +60,10 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
       terror: "listenRepliesFromWebhook method",
       body: entry,
     });
-    var sender_name = entry[0].changes[0].value.contacts[0].profile.name;
-    var sender_phone = entry[0].changes[0].value.contacts[0].wa_id;
-    var type = entry[0].changes[0].value.messages[0].type;
-    var timestamp = entry[0].changes[0].value.messages[0].timestamp;
+    var sender_name = entry[0]?.changes[0]?.value?.contacts[0]?.profile.name;
+    var sender_phone = entry[0]?.changes[0]?.value?.contacts[0]?.wa_id;
+    var type = entry[0]?.changes[0]?.value?.messages[0]?.type;
+    var timestamp = entry[0]?.changes[0]?.value?.messages[0]?.timestamp;
     var message = "";
     if (type == "button") {
       message = entry[0].changes[0].value.messages[0].button.text;
@@ -83,6 +83,9 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     } else if (type === "interactive") {
       message = entry[0].changes[0].value.messages[0].interactive.button_reply.title;
       await getTimeFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].interactive.button_reply);
+    }else if (type === "location") {
+      message = type;
+      await storeRenterDeliveryLocation(req, res,entry[0].changes[0].value.messages[0].location);
     }
     console.log(message);
     // Insert data into RDS table
