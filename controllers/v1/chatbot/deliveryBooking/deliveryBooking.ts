@@ -63,40 +63,14 @@ const findLatestOrders = async (req: any, res: any) => {
         },
       };
       console.log("in findLatestOrders: ");
-      await sendMessage(to, "Thank you for your order! Please confirm your details.");
-      await sendMessage(to, JSON.stringify(buttonTemplate)); // Send interactive buttons
+      await sendTextMessage(to, "Thank you for your order! Please confirm your details.");
+      await sendTextMessage(to, JSON.stringify(buttonTemplate)); // Send interactive buttons
     });
     res.status(200).json(results);
   });
 };
 
-const sendMessage = async (to, text) => {
-  //  const { phone, message } = req.body;
-  console.log("In sendMessage", to);
-  try {
-    const response = await axios.post(
-      `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
-      {
-        messaging_product: "whatsapp",
-        recipient_type: "individual",
-        to: to,
-        type: "text",
-        text: {
-          body: text,
-        },
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error) {
-    console.error("Error sending message:", error.response.data);
-    //  res.status(500).json({ error: 'Error sending message' });
-  }
-};
+
 
 const getDateFromRenterForOrder = async (req: any, res: any, order: any) => {
   let orderData: any = await fetchOrderDetails(order);
@@ -231,37 +205,30 @@ const getTimeFromRenterForOrder = async (req: any, res: any, orderId: any) => {
 };
 
 const sendOrderTemplate = async (req: any, res: any) => {
+  const template_name = "order_confirmation_to_renter_f";
   let order_id: any = Number(req.query.order_id) || 10084;
   const findTemplate: IWTemplate[] | null = await template.find({
-    name: "order_confirmation_to_renter_f",
+    name: template_name,
   });
   // remove hard coding
   const orderDetailsData: any = await fetchOrderDetails(order_id);
-  console.log(orderDetailsData, "orderDetailsData");
   let obj: any = {
     template: findTemplate[0],
 
     user: {
-      //   first_name: "Deepak",
-      //   item_name: "Pink Dress",
-      //   order_start_date: "16-11-2024",
-      //   order_end_date: "18-11-2024",
-      //   order_deliver_address: "Pune",
-      //   order_number: "0101",
       ...orderDetailsData[0],
     },
   };
-  // delete obj.template.components;
   let components = [];
 
-  obj.template.headerVariables.length > 0 &&
-    components.push({
-      type: "header",
-      parameters: obj.template.headerVariables.map((itm: any) => ({
-        type: "text",
-        text: obj.user.first_name,
-      })),
-    });
+  // obj.template.headerVariables.length > 0 &&
+  //   components.push({
+  //     type: "header",
+  //     parameters: obj.template.headerVariables.map((itm: any) => ({
+  //       type: "text",
+  //       text: obj.user.first_name,
+  //     })),
+  //   });
   obj.template.bodyVariables.length > 0 &&
     components.push({
       type: "body",
@@ -293,9 +260,6 @@ const sendOrderTemplate = async (req: any, res: any) => {
       ],
     });
 
-  //   let custom_payload = {
-  //     order_id: order_id,
-  //   };
   components.push({
     type: "button",
     sub_type: "quick_reply",
@@ -309,40 +273,8 @@ const sendOrderTemplate = async (req: any, res: any) => {
   });
 
   console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj);
-  setTimeout(() => {
-    let payload = {
-      messaging_product: "whatsapp",
-      to: 918624086801,
-      type: "template",
-      template: {
-        name: "order_confirmation_to_renter_f",
-        language: {
-          code: "en",
-          policy: "deterministic",
-        },
-        components: components,
-      },
-    };
-
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "https://graph.facebook.com/v17.0/105942389228737/messages",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
-      },
-      data: payload,
-    };
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, 5000);
+  await sendTemplateFunc(template_name, components, null);
+  res.sendStatus(200);
 };
 // template to send to renter before 1 day of order start date
 const reconfirmOrderFromRenter = async (req: any, res: any) => {
@@ -351,7 +283,6 @@ const reconfirmOrderFromRenter = async (req: any, res: any) => {
   const findTemplate: IWTemplate[] | null = await template.find({
     name: template_name,
   });
-  // remove hard coding
   const orderDetailsData: any = await fetchOrderDetails(order_id);
   let dbResponse: any = await fetchOrderDeliveryData(order_id);
 
@@ -364,14 +295,14 @@ const reconfirmOrderFromRenter = async (req: any, res: any) => {
   };
   let components = [];
 
-  obj.template?.headerVariables.length > 0 &&
-    components.push({
-      type: "header",
-      parameters: obj.template.headerVariables.map((itm: any) => ({
-        type: "text",
-        text: obj.user.first_name,
-      })),
-    });
+  // obj.template?.headerVariables.length > 0 &&
+  //   components.push({
+  //     type: "header",
+  //     parameters: obj.template.headerVariables.map((itm: any) => ({
+  //       type: "text",
+  //       text: obj.user.first_name,
+  //     })),
+  //   });
   obj.template?.bodyVariables.length > 0 &&
     components.push({
       type: "body",
@@ -417,40 +348,9 @@ const reconfirmOrderFromRenter = async (req: any, res: any) => {
   );
 
   console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj);
-  setTimeout(() => {
-    let payload = {
-      messaging_product: "whatsapp",
-      to: 918624086801,
-      type: "template",
-      template: {
-        name: template_name,
-        language: {
-          code: "en",
-          policy: "deterministic",
-        },
-        components: components,
-      },
-    };
 
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "https://graph.facebook.com/v17.0/105942389228737/messages",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
-      },
-      data: payload,
-    };
-    axios
-      .request(config)
-      .then((response) => {
-        console.log(JSON.stringify(response.data));
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, 5000);
+  await sendTemplateFunc(template_name, components, null);
+  res.sendStatus(200);
 };
 
 const sendOrderAggregatedInfo = async (orderId: any) => {
@@ -459,35 +359,18 @@ const sendOrderAggregatedInfo = async (orderId: any) => {
     const orderDetailsData: any = await fetchOrderDetails(orderId);
     if (dbResponse.length === 0) return;
     else {
-      const response = await axios.post(
-        `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
-        {
-          messaging_product: "whatsapp",
-
-          recipient_type: "individual",
-          to: 918624086801,
-          type: "text",
-          text: {
-            body: `That's it! 😊 We'll notify you as soon as your order is out for delivery. 🚀 \n\nExpected Delivery Date: *${moment(
-              dbResponse[0].delivery_date
-            ).format("DD-MMM-YY")}*\nExpected Delivery Time: *${
-              dbResponse[0].delivery_timeslot
-            }*\n\nThank you for choosing Sizters! 💜 Happy renting! 😊👗\n\nIn the meantime, why not share the love? Refer your friends to the Sizters App and earn AED 50 credits for your next rental!
+      let bodyText = `That's it! 😊 We'll notify you as soon as your order is out for delivery. 🚀 \n\nExpected Delivery Date: *${moment(
+        dbResponse[0].delivery_date
+      ).format("DD-MMM-YY")}*\nExpected Delivery Time: *${
+        dbResponse[0].delivery_timeslot
+      }*\n\nThank you for choosing Sizters! 💜 Happy renting! 😊👗\n\nIn the meantime, why not share the love? Refer your friends to the Sizters App and earn AED 50 credits for your next rental!
             \n👉 Share the link to download the app : https://siz.ae/pages/get-sizters-app
             \n✨ Share your unique referral code  *${
               orderDetailsData[0].referral_code
             }* with your friends. Both of you will enjoy AED 50 credits to use on your next rental orders!
-            \nSpread the joy, and happy shopping! 💃`,
-          },
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log(response.data);
+            \nSpread the joy, and happy shopping! 💃`;
+
+      await sendTextMessage(null, bodyText);
     }
     // console.log(response,"response")
   } catch (e) {
@@ -504,7 +387,7 @@ const sendThankYouMsgToRenter = async (req: any, res: any, payload: any) => {
   let updatedPayload = JSON.parse(payload);
   const orderDetailsData: any = await fetchOrderDetails(updatedPayload.order_id);
   // TODO :- pass customer phone number
-  await sendMessage(918624086801, "Thank you for your order");
+  await sendTextMessage(918624086801, "Thank you for your order");
   res.send(200);
 };
 
@@ -549,7 +432,7 @@ const storeRenterDeliveryLocation = async (req: any, res: any, payload: any) => 
   const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=json`);
   console.log(response.data.display_name, "response");
   // store this in database
-  await sendMessage(
+  await sendTextMessage(
     918624086801,
     `Thank you for confirming delivery address below is your confirmed delivery address \n${response.data.display_name}  `
   );
@@ -615,9 +498,118 @@ const getPickupSlotsFromRenterForOrder = async (req: any, res: any, orderId: any
 
 const updateRenterPickupTime = async (orderId: any, text: any) => {
   // store pickup time in database
-  await sendMessage(918624086801, "Thank you for confirming details.");
+  await sendTextMessage(918624086801, "Thank you for confirming details.");
+};
 
+// template for sending thanks and feedback to renter
 
+const thanksFeedbackToRenter = async (req: any, res: any) => {
+  const template_name = "thanks_n_feeback_from_renter";
+  let order_id: any = Number(req.query.order_id) || 10085;
+  const findTemplate: IWTemplate[] | null = await template.find({
+    name: template_name,
+  });
+  // remove hard coding
+  const orderDetailsData: any = await fetchOrderDetails(order_id);
+  let dbResponse: any = await fetchOrderDeliveryData(order_id);
+
+  let obj: any = {
+    template: findTemplate[0],
+
+    user: {
+      ...orderDetailsData[0],
+    },
+  };
+  let components = [];
+
+  obj.template?.bodyVariables.length > 0 &&
+    components.push({
+      type: "body",
+      parameters: [
+        {
+          type: "text",
+          text: obj.user.first_name,
+        },
+        {
+          type: "text",
+          text: "1PM - 5PM", //dbResponse[0].pickup_timeslot,
+        },
+      ],
+    });
+
+  console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj);
+  await sendTemplateFunc(template_name, components, null);
+  res.sendStatus(200);
+};
+
+const sendTemplateFunc = (template_name: any, components: any, phone_number: any) => {
+  try {
+    let payload = {
+      messaging_product: "whatsapp",
+      to: phone_number || 918624086801,
+      type: "template",
+      template: {
+        name: template_name,
+        language: {
+          code: "en",
+          policy: "deterministic",
+        },
+        components: components,
+      },
+    };
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+      },
+      data: payload,
+    };
+    return new Promise((resolve, reject) => {
+      axios
+        .request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+          resolve(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+          reject(error);
+        });
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const sendTextMessage = async (to:any, text:any) => {
+  try {
+    const response = await axios.post(
+      `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+      {
+        messaging_product: "whatsapp",
+        recipient_type: "individual",
+        to: to || 918624086801,
+        type: "text",
+        text: {
+          body: text,
+        },
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(response.data)
+  } catch (error) {
+    console.error("Error sending message:", error.response.data);
+    //  res.status(500).json({ error: 'Error sending message' });
+  }
 };
 export {
   findLatestOrders,
@@ -630,4 +622,5 @@ export {
   getAddressFromRenter,
   storeRenterDeliveryLocation,
   getPickupSlotsFromRenterForOrder,
+  thanksFeedbackToRenter,
 };
