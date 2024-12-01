@@ -11,7 +11,14 @@ import orderstatus from "../../../models/orderstatus";
 import user from "../../../models/user";
 import markettingusers from "../../../models/markettingusers";
 import { basicLogger } from "../../../middleware/logger";
-import { changeDeliveryDetails, getDateFromRenterForOrder, getTimeFromRenterForOrder, sendThankYouMsgToRenter, storeRenterDeliveryLocation } from "../chatbot/deliveryBooking/deliveryBooking";
+import {
+  changeDeliveryDetails,
+  getDateFromRenterForOrder,
+  getTimeFromRenterForOrder,
+  sendThankYouMsgToRenter,
+  storeRenterDeliveryLocation,
+} from "../chatbot/deliveryBooking/deliveryBooking";
+import { downloadImageFromFB } from "../whatsapp";
 const { AUTHORIZATION_TOKEN, WHATSAPP_VERSION, WHATSAPP_PHONE_VERSION } = process.env;
 let options = { new: true };
 
@@ -44,53 +51,101 @@ const verifyTokenWhatsapp = async (req: any, res: any) => {
   }
 };
 
+const extractData = (entry: any) => {
+  const changes = entry?.[0]?.changes?.[0]?.value || {};
+  const messages = changes.messages?.[0] || {};
+  const contacts = changes.contacts?.[0] || {};
+
+  return {
+    senderName: contacts.profile?.name || "Unknown",
+    senderPhone: contacts.wa_id || "Unknown",
+    type: messages.type || "Unknown",
+    timestamp: messages.timestamp || new Date().toISOString(),
+    messageData: messages,
+  };
+};
+
+const processMessage = async (req: any, res: any, { type, messageData }) => {
+  switch (type) {
+    case "button":
+      await handleButtonActions(req, res, messageData.button.text, messageData.button.payload);
+      return messageData.button.text;
+    case "text":
+      return messageData.text.body;
+    case "interactive":
+      await getTimeFromRenterForOrder(req, res, messageData.interactive.button_reply);
+      return messageData.interactive.button_reply.title;
+    case "location":
+      await storeRenterDeliveryLocation(req, res, messageData.location);
+      return "location";
+    default:
+      console.warn("Unhandled message type:", type);
+      return "Unhandled";
+  }
+};
+
+const handleButtonActions = async (req: any, res: any, message: any, payload: any) => {
+  const actions = {
+    "Confirm Address": getDateFromRenterForOrder,
+    "Change Delivery Details": changeDeliveryDetails,
+    "Confirm Details": sendThankYouMsgToRenter,
+  };
+
+  const action = actions[message];
+  if (action) await action(req, res, payload);
+};
+
 const listenRepliesFromWebhook = async (req: any, res: any) => {
   try {
     // Extract relevant data from the request body
     console.log(req.body);
-
-    // [{"id":"104160086072686","changes":[{"value":{"messaging_product":"whatsapp","metadata":{"display_phone_number":"971543909650","phone_number_id":"105942389228737"},"contacts":[{"profile":{"name":"Yuvraj"},"wa_id":"971561114006"}],"messages":[{"from":"971561114006","id":"wamid.HBgMOTcxNTYxMTE0MDA2FQIAEhgUM0FBRUVBNDhCMTdCQkZGNENGNUIA","timestamp":"1731401647","text":{"body":"Hiiifkkd"},"type":"text"}]},"field":"messages"}]}]
-
+    let imageUrl = "";
     const { entry } = req.body;
-    const { from, name, text } = entry[0].changes[0].value.messages[0];
-    console.log("ENTRYYYYY: ", JSON.stringify(entry));
     basicLogger.info({
       controller: "listenRepliesFromWebhook",
       method: "GET",
       terror: "listenRepliesFromWebhook method",
-      body: entry,
+      body: req.body,
     });
-    var sender_name = entry[0]?.changes[0]?.value?.contacts[0]?.profile.name;
-    var sender_phone = entry[0]?.changes[0]?.value?.contacts[0]?.wa_id;
-    var type = entry[0]?.changes[0]?.value?.messages[0]?.type;
-    var timestamp = entry[0]?.changes[0]?.value?.messages[0]?.timestamp;
-    var message = "";
-    if (type == "button") {
-      message = entry[0].changes[0].value.messages[0].button.text;
-      if (message === "Confirm Address") {
-        await getDateFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].button.payload);
-      }
-      if (message === "Change Delivery Details") {
-        await changeDeliveryDetails(req, res, entry[0].changes[0].value.messages[0].button.payload);
-      }
-      if (message === "Confirm Details") {
-        await sendThankYouMsgToRenter(req, res, entry[0].changes[0].value.messages[0].button.payload);
-      }
+    const { senderName, senderPhone, type, timestamp, messageData } = extractData(entry);
+    // var senderName = entry[0]?.changes[0]?.value?.contacts[0]?.profile.name;
+    // var senderPhone = entry[0]?.changes[0]?.value?.contacts[0]?.wa_id;
+    // var type = entry[0]?.changes[0]?.value?.messages[0]?.type;
+    // var timestamp = entry[0]?.changes[0]?.value?.messages[0]?.timestamp;
 
-      
-    } else if (type == "text") {
-      message = entry[0].changes[0].value.messages[0].text.body;
-    } else if (type === "interactive") {
-      message = entry[0].changes[0].value.messages[0].interactive.button_reply.title;
-      await getTimeFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].interactive.button_reply);
-    }else if (type === "location") {
-      message = type;
-      await storeRenterDeliveryLocation(req, res,entry[0].changes[0].value.messages[0].location);
-    }
-    console.log(message);
+    // var message = "";
+    // if (type == "button") {
+    //   message = entry[0].changes[0].value.messages[0].button.text;
+    //   if (message === "Confirm Address") {
+    //     await getDateFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].button.payload);
+    //   }
+    //   if (message === "Change Delivery Details") {
+    //     await changeDeliveryDetails(req, res, entry[0].changes[0].value.messages[0].button.payload);
+    //   }
+    //   if (message === "Confirm Details") {
+    //     await sendThankYouMsgToRenter(req, res, entry[0].changes[0].value.messages[0].button.payload);
+    //   }
+
+    // } else if (type == "text") {
+    //   message = entry[0].changes[0].value.messages[0].text.body;
+    // } else if (type === "interactive") {
+    //   message = entry[0].changes[0].value.messages[0].interactive.button_reply.title;
+    //   await getTimeFromRenterForOrder(req, res, entry[0].changes[0].value.messages[0].interactive.button_reply);
+    // }else if (type === "location") {
+    //   message = type;
+    //   await storeRenterDeliveryLocation(req, res,entry[0].changes[0].value.messages[0].location);
+    // }
+    // console.log(message);
     // Insert data into RDS table
-    await insertMessage(sender_phone, sender_name, message, timestamp, req.body);
+    // await insertMessage(senderPhone, senderName, message, timestamp, req.body);
+    const message = await processMessage(req, res, { type, messageData });
+    // console.log("Received message:", message);
 
+    if (type === "image") {
+      let mediaId = entry[0].changes[0].value.messages[0].image.id;
+      imageUrl = await downloadImageFromFB(mediaId);
+    }
+    await insertMessage(senderPhone, senderName, message, timestamp, req.body, imageUrl);
     // Respond with success
     res.status(200).json({ message: "Data inserted successfully" });
   } catch (error) {
@@ -98,7 +153,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-async function insertMessage(from: any, name: any, text: any, timestamp: any, body: any) {
+const insertMessage = async (from: any, name: any, text: any, timestamp: any, body: any, imageUrl = "") => {
   try {
     const existingMessage = await WhatsappMessage.find({ timestamp: timestamp, phone_number: from });
     if (existingMessage.length === 0) {
@@ -108,6 +163,7 @@ async function insertMessage(from: any, name: any, text: any, timestamp: any, bo
         message: text,
         timestamp: timestamp,
         log: body,
+        imageUrl: imageUrl,
       });
       const savedMessage: IWhatsappMessage = await newMessage.save();
     }
@@ -130,7 +186,7 @@ async function insertMessage(from: any, name: any, text: any, timestamp: any, bo
     console.error("Error inserting data into RDS:", error);
     throw error; // Rethrow the error to handle it in the caller function
   }
-}
+};
 
 async function convertUnixEpochToMySQLDatetime(epoch: any) {
   return new Date(epoch * 1000).toISOString().slice(0, 19).replace("T", " ");

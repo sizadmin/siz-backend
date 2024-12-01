@@ -31,6 +31,4 @@ router.post('/uploadImage',upload.single('file'), uploadImageToFB);
 
 
 
-
-
 export default router;

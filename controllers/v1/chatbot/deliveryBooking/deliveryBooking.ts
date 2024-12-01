@@ -388,7 +388,7 @@ const sendThankYouMsgToRenter = async (req: any, res: any, payload: any) => {
   const orderDetailsData: any = await fetchOrderDetails(updatedPayload.order_id);
   // TODO :- pass customer phone number
   await sendTextMessage(918624086801, "Thank you for your order");
-  res.send(200);
+  res.sendStatus(200);
 };
 
 const getAddressFromRenter = async (req: any, res: any, order: any) => {
@@ -419,6 +419,7 @@ const getAddressFromRenter = async (req: any, res: any, order: any) => {
         },
       }
     );
+    res.sendStatus(200);
   } catch (error) {
     console.error("Error sending message:", error);
     res.status(500).json({ error: "Error sending message" });
@@ -611,6 +612,94 @@ const sendTextMessage = async (to:any, text:any) => {
     //  res.status(500).json({ error: 'Error sending message' });
   }
 };
+
+const reminderToRenter = async (req: any, res: any) => {
+  const template_name = "reminder_for_return";
+  let order_id: any = Number(req.query.order_id) || 10085;
+  const findTemplate: IWTemplate[] | null = await template.find({
+    name: template_name,
+  });
+  // remove hard coding
+  const orderDetailsData: any = await fetchOrderDetails(order_id);
+  let dbResponse: any = await fetchOrderDeliveryData(order_id);
+
+  let obj: any = {
+    template: findTemplate[0],
+
+    user: {
+      ...orderDetailsData[0],
+    },
+  };
+  let components = [];
+
+  obj.template?.bodyVariables.length > 0 &&
+    components.push({
+      type: "body",
+      parameters: [
+        {
+          type: "text",
+          text: obj.user.first_name,
+        },
+        {
+          type: "text",
+          text: "1PM - 5PM", //dbResponse[0].pickup_timeslot,
+        },
+      ],
+    });
+
+  console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj);
+  // await sendTemplateFunc(template_name, components, null);
+
+
+  const response = await axios.post(
+    `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+    {
+      messaging_product: "whatsapp",
+      recipient_type: "individual",
+      to: 918624086801,
+      type: "interactive",
+      interactive: {
+        type: "button",
+        body: {
+          text: "Please choose your preferred delivery time slot",
+        },
+        action: {
+          buttons: [
+            {
+              type: "reply",
+              reply: {
+                id: order_id + "_pickup_1",
+                title: "9AM - 1PM",
+              },
+            },
+            {
+              type: "reply",
+              reply: {
+                id: order_id + "_pickup_2",
+                title: "1PM - 5PM",
+              },
+            },
+            {
+              type: "reply",
+              reply: {
+                id: order_id + "_pickup_3",
+                title: "5PM - 9PM",
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      headers: {
+        Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+    res.sendStatus(200);
+};
+
 export {
   findLatestOrders,
   getDateFromRenterForOrder,
@@ -623,4 +712,5 @@ export {
   storeRenterDeliveryLocation,
   getPickupSlotsFromRenterForOrder,
   thanksFeedbackToRenter,
+  reminderToRenter
 };
