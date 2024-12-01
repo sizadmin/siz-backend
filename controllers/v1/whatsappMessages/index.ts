@@ -19,20 +19,20 @@ const getWhatsappMessages = async (req: any, res: any) => {
 const getChatByUser = async (req: any, res: any) => {
 
     const { params: { id } } = req;
-    let findUser = await markettingusers.findOne({ _id: id })
+    // let findUser = await markettingusers.findOne({ _id: id })
 
-    console.log(findUser)
+    console.log(id)
     const [usersList] = await Promise.all([
         // Fetch the paginated data
         WhatsappMessage.find({
-            phone_number: findUser.phone_number
+            phone_number: { $eq: id, $ne: null } // Combine both conditions in one field
         })
-            .sort({ updatedAt: 1 }) // Sort by updatedAt in descending order
+            .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
 
     ]);
 
 
-    res.status(200).json({ results: findUser, messages: usersList });
+    res.status(200).json({ results: id, messages: usersList });
 
 }
 

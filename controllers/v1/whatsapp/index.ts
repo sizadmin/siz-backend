@@ -557,9 +557,11 @@ const sendWhatsappMessage = async (req: any, res: any) => {
         },
       }
     );
-    const timestamp = Timestamp;
-    const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
 
+    const customDate = new Date(); // Replace with your custom date
+    const timestamp = Math.floor(customDate.getTime() / 1000);
+    const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
+    console.log(existingMessage,"existingMessage")
     if (!existingMessage) {
       const newMessage: IWhatsappMessage = new WhatsappMessage({
         phone_number: phone,
