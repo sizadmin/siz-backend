@@ -27,7 +27,7 @@ const getChatByUser = async (req: any, res: any) => {
         WhatsappMessage.find({
             phone_number: { $eq: id, $ne: null } // Combine both conditions in one field
         })
-            .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
+            .sort({ updatedAt: 1 }) // Sort by updatedAt in descending order
 
     ]);
 
