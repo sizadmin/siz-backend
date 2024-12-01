@@ -144,7 +144,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
     if (type === "image") {
       let mediaId = entry[0].changes[0].value.messages[0].image.id;
       imageUrl = await downloadImageFromFB(mediaId);
-    }
+    } 
     await insertMessage(senderPhone, senderName, message, timestamp, req.body, imageUrl);
     // Respond with success
     res.status(200).json({ message: "Data inserted successfully" });
@@ -155,6 +155,7 @@ const listenRepliesFromWebhook = async (req: any, res: any) => {
 };
 const insertMessage = async (from: any, name: any, text: any, timestamp: any, body: any, imageUrl = "") => {
   try {
+    if(from === "Unknown") return;
     const existingMessage = await WhatsappMessage.find({ timestamp: timestamp, phone_number: from });
     if (existingMessage.length === 0) {
       const newMessage: IWhatsappMessage = new WhatsappMessage({
