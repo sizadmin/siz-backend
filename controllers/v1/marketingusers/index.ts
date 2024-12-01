@@ -271,7 +271,7 @@ const getChatUsers = async (req: any, res: any) => {
   // Get phone numbers from messages
 
   // Ensure uniqueness by 'phone_number'
-  let uniqueUsers = _.uniqBy(messages, "name");
+  let uniqueUsers = _.uniqBy(messages, (msg) => `${msg.name}-${msg.phone_number}`);
 
   // Filter out unwanted users (e.g., name "SIZ")
   uniqueUsers = uniqueUsers.filter((msg) => msg.name !== "SIZ");
