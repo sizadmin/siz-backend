@@ -581,7 +581,7 @@ const sendWhatsappMessage = async (req: any, res: any) => {
 
 const downloadImageFromFB = async (mediaId: any) => {
   try {
-    const mediaUrlResponse = await axios.get(`${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/947658000560992`, {
+    const mediaUrlResponse = await axios.get(`${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${mediaId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`, // Bearer token authorization
       },
