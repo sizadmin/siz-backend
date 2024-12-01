@@ -10,7 +10,25 @@ import { uploadImageToFB } from "../wtemplate";
 import WhatsappMessage from "../../../models/WhatsappMessage";
 import { Timestamp } from "mongodb";
 import { IWhatsappMessage } from "../../../types/whatsappMessage";
+import path from "path";
 require("dotenv").config();
+const { Upload } = require("@aws-sdk/lib-storage");
+const { S3Client } = require("@aws-sdk/client-s3");
+
+const fs = require("fs");
+const accessToken = process.env.AUTHORIZATION_TOKEN;
+
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    // accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    // secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Use your own AWS access key
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // Use your own AWS secret key
+    // region: process.env.AWS_REGION  // Your bucket's region
+  },
+});
 
 const sendWhatsappMsg = async (req: any, res: any) => {
   try {
@@ -241,7 +259,6 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
     // .replace(/<\/p>/g, '</p>\n');
 
     // Set the access token for your WhatsApp Business API
-    const accessToken = process.env.AUTHORIZATION_TOKEN;
 
     // let imageURL: any = await uploadImageToFB(req, res);
     let componentsData = [];
@@ -528,31 +545,9 @@ const sendWhatsappMessage = async (req: any, res: any) => {
         messaging_product: "whatsapp",
         recipient_type: "individual",
         to: phone,
-        type: "interactive",
-        interactive: {
-          type: "button",
-          body: {
-            text: "Please choose your preferred delivery date",
-          },
-          action: {
-            buttons: [
-              {
-                type: "reply",
-                reply: {
-                  id: "1234_1",
-                  title: "17-Nov-2024",
-                },
-              },
-              {
-                type: "reply",
-                reply: {
-                  id: "1234_2",
-                  title: "18-Nov-2024",
-
-                },
-              },
-            ],
-          },
+        type: "text",
+        text: {
+          body: message,
         },
       },
       {
@@ -562,19 +557,20 @@ const sendWhatsappMessage = async (req: any, res: any) => {
         },
       }
     );
-    // const timestamp = Timestamp
-    // const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
 
-    // if (existingMessage) {
-    //   const newMessage: IWhatsappMessage = new WhatsappMessage({
-    //     phone_number: "",
-    //     name: "SIZ",
-    //     message: message,
-    //     timestamp: timestamp,
-
-    //   });
-    //   const savedMessage: IWhatsappMessage = await newMessage.save();
-    // }
+    const customDate = new Date(); // Replace with your custom date
+    const timestamp = Math.floor(customDate.getTime() / 1000);
+    const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
+    console.log(existingMessage,"existingMessage")
+    if (!existingMessage) {
+      const newMessage: IWhatsappMessage = new WhatsappMessage({
+        phone_number: phone,
+        name: "SIZ",
+        message: message,
+        timestamp: timestamp,
+      });
+      const savedMessage: IWhatsappMessage = await newMessage.save();
+    }
 
     res.status(200).json(response.data);
   } catch (error) {
@@ -582,6 +578,64 @@ const sendWhatsappMessage = async (req: any, res: any) => {
     res.status(500).json({ error: "Error sending message" });
   }
 };
+
+const downloadImageFromFB = async (mediaId: any) => {
+  try {
+    const mediaUrlResponse = await axios.get(`${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/947658000560992`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`, // Bearer token authorization
+      },
+    });
+
+    const mediaUrl = mediaUrlResponse.data.url;
+    // Download the actual image
+    const imageResponse = await axios.get(mediaUrl, {
+      responseType: "stream",
+      headers: {
+        Authorization: `Bearer ${accessToken}`, // Include the token again if required
+      },
+    });
+
+    const fileName = `${Date.now()}_image.jpg`;
+    // Step 3: Upload the image to S3
+    const uploadParams = {
+      Bucket: process.env.S3_BUCKET_NAME, // S3 bucket name
+      Key: fileName, // File name in S3
+      Body: imageResponse.data, // File content
+      ContentType: "image/jpeg",
+    };
+
+    const upload = new Upload({
+      client: s3,
+      params: uploadParams,
+    });
+
+    await upload.done();
+    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    // await deleteFileFromUploads(fileName)
+    console.log(fileUrl,"fileUrl")
+    return fileUrl;
+  } catch (error) {
+    console.error("Error downloading image :", error.response?.data || error.message);
+  }
+};
+
+const deleteFileFromUploads = (fileName: any) => {
+  // Construct the full file path to the uploads folder
+  const filePath = path.join(__dirname, "uploads", fileName);
+
+  // Check if the file exists and then delete it
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error("Error deleting the file:", err);
+      return;
+    }
+    console.log(`File ${fileName} deleted successfully.`);
+  });
+};
+
+// Example usage: delete a file named 'image.jpg'
+deleteFileFromUploads("image.jpg");
 
 export {
   sendWhatsappMsg,
@@ -591,4 +645,5 @@ export {
   updateTemplateToFB,
   deleteTemplateFromFB,
   sendWhatsappMessage,
+  downloadImageFromFB,
 };

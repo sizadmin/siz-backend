@@ -18,6 +18,10 @@ const whatsappMessageSchema: Schema = new Schema(
         },
         log: {
             type: Schema.Types.Mixed,
+        },
+        imageUrl:{
+            type:String,
+            default:""
         }
     },
     {
