@@ -247,11 +247,11 @@ const sendOrderTemplate = async (req: any, res: any) => {
         },
         {
           type: "text",
-          text: obj.user.start_date,
+          text: moment(obj.user.start_date).format("DD MMM YYYY"),
         },
         {
           type: "text",
-          text: obj.user.end_date,
+          text: moment(obj.user.end_date).format("DD MMM YYYY"),
         },
         {
           type: "text",
@@ -621,7 +621,7 @@ const reminderToRenter = async (req: any, res: any) => {
   });
   // remove hard coding
   const orderDetailsData: any = await fetchOrderDetails(order_id);
-  let dbResponse: any = await fetchOrderDeliveryData(order_id);
+  // let dbResponse: any = await fetchOrderDeliveryData(order_id);
 
   let obj: any = {
     template: findTemplate[0],
@@ -640,63 +640,83 @@ const reminderToRenter = async (req: any, res: any) => {
           type: "text",
           text: obj.user.first_name,
         },
-        {
-          type: "text",
-          text: "1PM - 5PM", //dbResponse[0].pickup_timeslot,
-        },
+        // {
+        //   type: "text",
+        //   text: "1PM - 5PM", //dbResponse[0].pickup_timeslot,
+        // },
       ],
     });
+
+    let custom_obj = {
+      name: "select_pickup_slots",
+      order_id: order_id,
+    };
+    components.push(
+      {
+        type: "button",
+        sub_type: "quick_reply",
+        index: "0",
+        parameters: [
+          {
+            type: "payload",
+            payload: JSON.stringify(custom_obj),
+          },
+        ],
+      }
+    );
+
 
   console.log("-----obj", JSON.stringify(components, null, 2), "------obj", obj);
   // await sendTemplateFunc(template_name, components, null);
 
+  await sendTemplateFunc(template_name, components, null);
 
-  const response = await axios.post(
-    `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
-    {
-      messaging_product: "whatsapp",
-      recipient_type: "individual",
-      to: 918624086801,
-      type: "interactive",
-      interactive: {
-        type: "button",
-        body: {
-          text: "Please choose your preferred delivery time slot",
-        },
-        action: {
-          buttons: [
-            {
-              type: "reply",
-              reply: {
-                id: order_id + "_pickup_1",
-                title: "9AM - 1PM",
-              },
-            },
-            {
-              type: "reply",
-              reply: {
-                id: order_id + "_pickup_2",
-                title: "1PM - 5PM",
-              },
-            },
-            {
-              type: "reply",
-              reply: {
-                id: order_id + "_pickup_3",
-                title: "5PM - 9PM",
-              },
-            },
-          ],
-        },
-      },
-    },
-    {
-      headers: {
-        Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  // const response = await axios.post(
+  //   `${process.env.WHATSAPP_API_URL}${process.env.WHATSAPP_VERSION}/${PHONE_NUMBER_ID}/messages`,
+  //   {
+  //     messaging_product: "whatsapp",
+  //     recipient_type: "individual",
+  //     to: 918624086801,
+  //     type: "interactive",
+  //     interactive: {
+  //       type: "button",
+  //       body: {
+  //         text: "Please choose your preferred delivery time slot",
+  //       },
+  //       action: {
+  //         buttons: [
+  //           {
+  //             type: "reply",
+  //             reply: {
+  //               id: order_id + "_pickup_1",
+  //               title: "9AM - 1PM",
+  //             },
+  //           },
+  //           {
+  //             type: "reply",
+  //             reply: {
+  //               id: order_id + "_pickup_2",
+  //               title: "1PM - 5PM",
+  //             },
+  //           },
+  //           {
+  //             type: "reply",
+  //             reply: {
+  //               id: order_id + "_pickup_3",
+  //               title: "5PM - 9PM",
+  //             },
+  //           },
+  //         ],
+  //       },
+  //     },
+  //   },
+  //   {
+  //     headers: {
+  //       Authorization: "Bearer " + process.env.AUTHORIZATION_TOKEN,
+  //       "Content-Type": "application/json",
+  //     },
+  //   }
+  // );
     res.sendStatus(200);
 };
 
