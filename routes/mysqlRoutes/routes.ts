@@ -11,7 +11,7 @@ router.get('/uploadProductById', getProductSizAppById);
 
 router.get('/sendOrderConfirmation',findLatestOrders)
 router.get('/sendOrderConfirmationTemplate',sendOrderTemplate)
-// router.get('/testAPI',downloadImageFromFB)
+router.get('/testAPI',getAddressFromRenter)
 
 router.get('/reconfirmOrderFromRenter',reconfirmOrderFromRenter)
 router.get('/thanksFeedbackToRenter',thanksFeedbackToRenter)

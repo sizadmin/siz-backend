@@ -86,9 +86,10 @@ const processMessage = async (req: any, res: any, { type, messageData }) => {
 
 const handleButtonActions = async (req: any, res: any, message: any, payload: any) => {
   const actions = {
-    "Confirm Address": getDateFromRenterForOrder,
+    "Schedule Delivery": getDateFromRenterForOrder,
     "Change Delivery Details": changeDeliveryDetails,
     "Confirm Details": sendThankYouMsgToRenter,
+    // "Check Pickup Slots": getTimeFromRenterForOrder,
   };
 
   const action = actions[message];
