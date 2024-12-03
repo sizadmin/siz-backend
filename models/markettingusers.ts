@@ -29,7 +29,10 @@ const marketingUsersSchema: Schema = new Schema(
         },
         tags: [{
             type: Schema.Types.Mixed,
-        }]
+        }],
+        info:{
+            type: Schema.Types.Mixed,
+        }
 
     },
     {
