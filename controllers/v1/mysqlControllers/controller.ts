@@ -421,6 +421,20 @@ const fetchOrderPickupData = (orderId:any)=>{
   });
 }
 
+
+
+const findSizAppUser = (phone:any)=>{
+  const sql = `SELECT * FROM siz_users where phone=${phone}`;
+  return new Promise((resolve, reject) => {
+    mysqlConnection.query(sql, (err, results) => {
+      if (err) {
+      }
+      resolve(results);
+      return results;
+    });
+  });
+}
+
 export {
   getUsersSizApp,
   getOrdersSizApp,
@@ -432,5 +446,6 @@ export {
   insertDeliveryInfo,
   updateDeliveryInfo,
   insertDataIntoSizApp,
-  fetchOrderPickupData
+  fetchOrderPickupData,
+  findSizAppUser
 };
