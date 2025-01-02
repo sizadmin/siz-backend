@@ -108,7 +108,6 @@ const sendCampaignMessages = async (req: Request, res: Response): Promise<void> 
       .populate("contact_list");
 
     const findAllContacts: IMarketingUsers[] | null = await markettingusers.find({ whatsapp_messaging: true }).select("-user_data");
-
     await Promise.all(
       findCampaigns.map(async (campaign1: any) => {
         if (campaign1.contact_list.select_all === true) {
@@ -118,8 +117,9 @@ const sendCampaignMessages = async (req: Request, res: Response): Promise<void> 
           name: campaign1.template.label,
         });
         // Create an array of promises for each user
-        const userPromises = campaign1.contact_list.phone_number.map((user: any) => {
-          if (user?.info?.whatsapp_messaging === true || user?.whatsapp_messaging === true) {
+        const userPromises = campaign1.contact_list.phone_number.map(async (user: any) => {
+          const userFound: any = await markettingusers.find({ phone_number: user.value }).select("-user_data");
+          if (userFound[0]?.info?.whatsapp_messaging === true || userFound[0]?.whatsapp_messaging === true) {
             let obj = {
               ...campaign1.template,
               phone_number: user.value,
