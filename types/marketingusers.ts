@@ -6,5 +6,6 @@ export interface IMarketingUsers extends Document {
     phone_number: string;
     isActive: boolean;
     whatsapp_messaging:boolean;
-    tags:Schema.Types.Mixed
+    tags:Schema.Types.Mixed;
+    info:Schema.Types.Mixed;
 }

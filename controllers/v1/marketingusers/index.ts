@@ -11,6 +11,7 @@ import { IContactList } from "../../../types/conatctlist";
 import contactlist from "../../../models/contactlist";
 import { IWhatsappMessage } from "../../../types/whatsappMessage";
 import WhatsappMessage from "../../../models/WhatsappMessage";
+import { findSizAppUser } from "../mysqlControllers/controller";
 
 const getMarketingUsers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -190,10 +191,13 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
     let newUsers = [];
     let list_phone_numbers = [];
     const createNewUser = async (data: any) => {
+      let userData: any = await findSizAppUser(data.phone_number);
+      let info: any = {
+        referral_code: userData[0].referral_code,
+      };
       const checkUserExist: IMarketingUsers[] = await markettingusers.findOne({ phone_number: data.phone_number });
-
       if (!checkUserExist) {
-        const newUser: IMarketingUsers = new markettingusers(data);
+        const newUser: IMarketingUsers = new markettingusers({ ...data, info });
 
         const savedList: IMarketingUsers = await newUser.save();
 
