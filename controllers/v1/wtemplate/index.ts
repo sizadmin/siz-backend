@@ -33,7 +33,7 @@ const s3 = new S3Client({
 
 const getTemplates = async (req: Request, res: Response): Promise<void> => {
   try {
-    const contactList: IWTemplate[] = await template.find().sort({ updatedAt: -1 });
+    const contactList: IWTemplate[] = await template.find().sort({ createdAt: -1 });
 
     res.status(200).json({ count: contactList.length, results: contactList });
   } catch (error) {
