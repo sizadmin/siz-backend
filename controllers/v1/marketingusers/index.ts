@@ -192,12 +192,12 @@ const fetchContactsFromCSVFile = async (req: any, res: any): Promise<void> => {
     let list_phone_numbers = [];
     const createNewUser = async (data: any) => {
       let userData: any = await findSizAppUser(data.phone_number);
-      let info: any = {
-        referral_code: userData[0].referral_code,
-      };
+      // let info: any = {
+      //   referral_code: userData[0].referral_code,
+      // };
       const checkUserExist: IMarketingUsers[] = await markettingusers.findOne({ phone_number: data.phone_number });
       if (!checkUserExist) {
-        const newUser: IMarketingUsers = new markettingusers({ ...data, info });
+        const newUser: IMarketingUsers = new markettingusers({ ...data });
 
         const savedList: IMarketingUsers = await newUser.save();
 
