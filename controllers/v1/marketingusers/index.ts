@@ -99,7 +99,7 @@ const updateMarketingUser = async (req: Request, res: Response): Promise<void> =
     });
     return;
   } catch (error) {
-    // res.status(400).json({ message: 'Something went wrong', error });
+    res.status(400).json({ message: 'Something went wrong', error });
     // throw error;
   }
 };

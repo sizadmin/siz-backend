@@ -256,6 +256,15 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
       .replace(/<del>/g, "~")
       .replace(/<\/del>/g, "~")
       .replace(/<br>/g, "");
+
+    let headerText = savedList.headerText
+      .replace(/<strong>/g, "*")
+      .replace(/<\/strong>/g, "*")
+      .replace(/<em>/g, "_")
+      .replace(/<\/em>/g, "_")
+      .replace(/<del>/g, "~")
+      .replace(/<\/del>/g, "~")
+      .replace(/<br>/g, "");
     // .replace(/<\/p>/g, '</p>\n');
 
     // Set the access token for your WhatsApp Business API
@@ -274,7 +283,16 @@ const createTemplate = async (req: any, res: any, savedList: any) => {
     } else if (savedList.headerText !== "") {
       let headerPayload: any = {
         type: "header",
-        text: savedList.headerText,
+        text: htmlToText(headerText, {
+          selectors: [
+            {
+              selector: "p",
+              format: "block", // Treat <p> as inline, to avoid extra newlines
+            },
+          ],
+          // preserveNewlines: true,  // Optionally disable extra newlines if needed
+          wordwrap: false,
+        }),
         format: "text",
       };
       if (savedList.headerVariables && savedList.headerVariables.length > 0) {
@@ -387,6 +405,15 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
       .replace(/<\/del>/g, "~");
     // .replace(/<\/p>/g, '</p>\n');
 
+    let headerText = savedList.headerText
+    .replace(/<strong>/g, "*")
+    .replace(/<\/strong>/g, "*")
+    .replace(/<em>/g, "_")
+    .replace(/<\/em>/g, "_")
+    .replace(/<del>/g, "~")
+    .replace(/<\/del>/g, "~")
+    .replace(/<br>/g, "");
+
     // Set the access token for your WhatsApp Business API
     const accessToken = process.env.AUTHORIZATION_TOKEN;
 
@@ -404,7 +431,15 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
     if (savedList.headerText) {
       let headerPayload: any = {
         type: "header",
-        text: htmlToText(savedList.headerText),
+        text:  htmlToText(headerText, {
+          selectors: [
+            {
+              selector: "p",
+              format: "block", // Treat <p> as inline, to avoid extra newlines
+            },
+          ],
+          wordwrap: false,
+        }),
         format: "text",
       };
       if (savedList.headerVariables.length > 0) {
@@ -423,13 +458,12 @@ const updateTemplateToFB = (req: any, res: any, savedList: any) => {
         selectors: [
           {
             selector: "p",
-            format: "block", // Treat <p> as inline, to avoid extra newlines
+            format: "block", 
           },
         ],
-        // preserveNewlines: true,  // Optionally disable extra newlines if needed
         wordwrap: false,
       }),
-      // .replace(/(\n{2})+/g, '\n')
+
     };
     if (savedList.body.length > 0 && savedList.bodyVariables.length > 0) {
       body = {
@@ -561,7 +595,7 @@ const sendWhatsappMessage = async (req: any, res: any) => {
     const customDate = new Date(); // Replace with your custom date
     const timestamp = Math.floor(customDate.getTime() / 1000);
     const existingMessage = await WhatsappMessage.findOne({ timestamp: timestamp });
-    console.log(existingMessage,"existingMessage")
+    console.log(existingMessage, "existingMessage");
     if (!existingMessage) {
       const newMessage: IWhatsappMessage = new WhatsappMessage({
         phone_number: phone,
@@ -613,7 +647,7 @@ const downloadImageFromFB = async (mediaId: any) => {
     await upload.done();
     const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
     // await deleteFileFromUploads(fileName)
-    console.log(fileUrl,"fileUrl")
+    console.log(fileUrl, "fileUrl");
     return fileUrl;
   } catch (error) {
     console.error("Error downloading image :", error.response?.data || error.message);
