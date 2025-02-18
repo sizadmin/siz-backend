@@ -16,6 +16,7 @@ import campaignRoutes from "./../routes/campaignRoutes"
 import templateRoutes from "./../routes/template"
 import permissionRoutes from "./../routes/permissionRoutes"
 import appRoutes from "./../routes/mysqlRoutes/routes"
+import zohoRoutes from "./../routes/zohoBooksRoutes/zohoBooksRoutes"
 
 import mysql from "mysql2"
 require("dotenv").config();
@@ -51,6 +52,7 @@ app.use('/api/v1/campaign/', campaignRoutes)
 app.use('/api/v1/template/', templateRoutes)
 app.use('/api/v1/permission/', permissionRoutes)
 app.use('/api/v1/siz-app/', appRoutes)
+app.use('/api/v1/zoho-books/', zohoRoutes)
 
 
 
