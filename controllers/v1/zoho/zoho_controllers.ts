@@ -24,15 +24,16 @@ const getZohoAccessToken = async () => {
 };
 
 const getInvoices = async (req,res) => {
-  const accessToken = await getZohoAccessToken();
+  // const accessToken = await getZohoAccessToken();
+  const accessToken = "1000.af518cb5d781d4c02411024306edf4c6.a073c03cd790920e8da05083362d1e7e"
     console.log(accessToken,"accessToken")
-  // const response = await axios.get(ZOHO_URL + "/invoices", {
-  //   headers: {
-  //     Authorization: `Zoho-oauthtoken ${accessToken}`,
-  //     "Content-Type": "application/json",
-  //     "X-com-zoho-organizationid": process.env.ZOHO_ORGANIZATION_ID,
-  //   },
-  // });
+  const response = await axios.get(ZOHO_URL + "/invoices", {
+    headers: {
+      Authorization: `Zoho-oauthtoken ${accessToken}`,
+      "Content-Type": "application/json",
+      "X-com-zoho-organizationid": process.env.ZOHO_ORGANIZATION_ID,
+    },
+  });
 
   console.log(accessToken);
   res.status(200).json(accessToken);
