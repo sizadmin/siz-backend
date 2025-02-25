@@ -77,6 +77,7 @@ app.get('/api/v1/zoho-books/oauth', (req, res) => {
 // Step 2: Handle the OAuth callback to get the authorization code
 app.get('/api/v1/zoho-books/oauth/callback', async (req, res) => {
   const { code } = req.query;
+  console.log(code,"code");
 
   if (!code || typeof code !== 'string') {
     return res.status(400).send('Authorization code is missing or invalid');
@@ -117,7 +118,7 @@ app.get('/api/v1/zoho-books/oauth/callback', async (req, res) => {
 // Step 4: Refresh access token using refresh token
 app.get('/api/v1/zoho-books/refresh-token', async (req, res) => {
   const { refresh_token } = req.query;
-
+  console.log(refresh_token,"refresh_token");
   if (!refresh_token) {
     return res.status(400).send('Refresh token is missing');
   }
@@ -139,7 +140,7 @@ app.get('/api/v1/zoho-books/refresh-token', async (req, res) => {
     );
 
     const { access_token, expires_in } = response.data;
-
+    console.log(response.data,"response.data");
     res.json({
       access_token,
       expires_in,
