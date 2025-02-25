@@ -25,7 +25,7 @@ const getZohoAccessToken = async () => {
 
 const getInvoices = async (req,res) => {
   // const accessToken = await getZohoAccessToken();
-  const accessToken = "1000.af518cb5d781d4c02411024306edf4c6.a073c03cd790920e8da05083362d1e7e"
+  const accessToken = ""
     console.log(accessToken,"accessToken")
   const response = await axios.get(ZOHO_URL + "/invoices", {
     headers: {
