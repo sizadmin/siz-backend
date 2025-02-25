@@ -4,7 +4,7 @@ import { addCustomer, createInvoice, getInvoices } from '../../controllers/v1/zo
 
 const router: Router = Router();
 
-router.get('/invoice',verifyToken, getInvoices);
+router.get('/invoice', getInvoices);
 
 router.post('/invoice',verifyToken, createInvoice);
 

@@ -3,12 +3,12 @@ import { transporter } from "../../../middleware/helperFuc";
 import { mysqlConnection } from "../../../src/app";
 import fs from "fs";
 import moment, { duration } from "moment";
-import { title } from "process";
 import _ from "lodash";
 import { createShopifyProductFunc, updateMetafieldShopifyProductFunc } from "../shopify";
 import { basicLogger } from "../../../middleware/logger";
 import { ICronJob } from "../../../types/cronJob";
 import cronJobs from "../../../models/cronJobs";
+import { findRecordsGlobal, findRecordsLastXMinutes } from "./globalFunc";
 require("dotenv").config();
 let options = { new: true };
 
@@ -18,6 +18,7 @@ const getUsersSizApp = async (req: any, res: any) => {
     if (err) {
       return res.status(500).json({ error: "Failed to fetch users from MySQL" });
     }
+    // let findData =  await findRecordsLastXMinutes("siz_orders", "*", "created_at", 30); // Last 30 minutes
     res.status(200).json(results);
   });
 };
@@ -407,7 +408,7 @@ const insertDataIntoSizApp = (tableName: any, fieldName: any, value: any, condit
   });
 };
 
-const fetchOrderPickupData = (orderId:any)=>{
+const fetchOrderPickupData = (orderId: any) => {
   const sql = `SELECT * FROM pickup_info where order_id=${orderId}`;
   return new Promise((resolve, reject) => {
     mysqlConnection.query(sql, (err, results) => {
@@ -419,11 +420,9 @@ const fetchOrderPickupData = (orderId:any)=>{
       return results;
     });
   });
-}
+};
 
-
-
-const findSizAppUser = (phone:any)=>{
+const findSizAppUser = (phone: any) => {
   const sql = `SELECT * FROM siz_users where phone=${phone}`;
   return new Promise((resolve, reject) => {
     mysqlConnection.query(sql, (err, results) => {
@@ -433,7 +432,18 @@ const findSizAppUser = (phone:any)=>{
       return results;
     });
   });
-}
+};
+
+const findRecords = async (tableName: any, query: any) => {
+  const sqlQuery = `SELECT ${query} FROM ${tableName}`;
+  mysqlConnection.query(sqlQuery, (err, results) => {
+    if (err) {
+      return [];
+    }
+    return results;
+  });
+};
+
 
 export {
   getUsersSizApp,
@@ -447,5 +457,6 @@ export {
   updateDeliveryInfo,
   insertDataIntoSizApp,
   fetchOrderPickupData,
-  findSizAppUser
+  findSizAppUser,
+  findRecords
 };
