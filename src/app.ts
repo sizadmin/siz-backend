@@ -101,7 +101,7 @@ app.get('/api/v1/zoho-books/oauth/callback', async (req, res) => {
     );
 
     const { access_token, refresh_token, expires_in } = response.data;
-
+    console.log(response.data,"response.data");
     // Save the tokens or send them as a response (You can save them in a database or in memory)
     res.json({
       access_token,
