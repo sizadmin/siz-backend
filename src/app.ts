@@ -16,9 +16,20 @@ import campaignRoutes from "./../routes/campaignRoutes"
 import templateRoutes from "./../routes/template"
 import permissionRoutes from "./../routes/permissionRoutes"
 import appRoutes from "./../routes/mysqlRoutes/routes"
+import zohoRoutes from "./../routes/zohoBooksRoutes/zohoBooksRoutes"
 
 import mysql from "mysql2"
+import axios from "axios";
 require("dotenv").config();
+
+// Your Zoho credentials from the .env file
+const {
+  ZOHO_CLIENT_ID,
+  ZOHO_CLIENT_SECRET,
+  ZOHO_REDIRECT_URI,
+  ZOHO_API_URL,
+} = process.env;
+
 
 const app: Express = express();
 const PORT: string | number = process.env.PORT || 5001;
@@ -51,6 +62,94 @@ app.use('/api/v1/campaign/', campaignRoutes)
 app.use('/api/v1/template/', templateRoutes)
 app.use('/api/v1/permission/', permissionRoutes)
 app.use('/api/v1/siz-app/', appRoutes)
+app.use('/api/v1/zoho-books/', zohoRoutes)
+
+
+
+
+// Step 1: Redirect to Zoho's OAuth authorization endpoint
+app.get('/api/v1/zoho-books/oauth', (req, res) => {
+  const authURL =`${ZOHO_API_URL}/auth?scope=ZohoBooks.fullaccess.all&client_id=${ZOHO_CLIENT_ID}&redirect_uri=${ZOHO_REDIRECT_URI}&response_type=code`;
+  console.log(authURL,"authURL")
+  res.redirect(authURL);
+});
+
+// Step 2: Handle the OAuth callback to get the authorization code
+app.get('/api/v1/zoho-books/oauth/callback', async (req, res) => {
+  const { code } = req.query;
+
+  if (!code || typeof code !== 'string') {
+    return res.status(400).send('Authorization code is missing or invalid');
+  }
+
+  try {
+    // Step 3: Exchange authorization code for access token
+    const response = await axios.post(
+      `${ZOHO_API_URL}/token`,
+      new URLSearchParams({
+        code,
+        client_id: ZOHO_CLIENT_ID,
+        client_secret: ZOHO_CLIENT_SECRET,
+        redirect_uri: ZOHO_REDIRECT_URI,
+        grant_type: 'authorization_code',
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+
+    const { access_token, refresh_token, expires_in } = response.data;
+
+    // Save the tokens or send them as a response (You can save them in a database or in memory)
+    res.json({
+      access_token,
+      refresh_token,
+      expires_in,
+    });
+  } catch (error) {
+    console.error('Error while exchanging authorization code:', error);
+    res.status(500).send('Failed to get access token');
+  }
+});
+
+// Step 4: Refresh access token using refresh token
+app.get('/api/v1/zoho-books/refresh-token', async (req, res) => {
+  const { refresh_token } = req.query;
+
+  if (!refresh_token) {
+    return res.status(400).send('Refresh token is missing');
+  }
+
+  try {
+    const response = await axios.post(
+      `${ZOHO_API_URL}/token`,
+      new URLSearchParams({
+        refresh_token: refresh_token as string,
+        client_id: ZOHO_CLIENT_ID,
+        client_secret: ZOHO_CLIENT_SECRET,
+        grant_type: 'refresh_token',
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
+    );
+
+    const { access_token, expires_in } = response.data;
+
+    res.json({
+      access_token,
+      expires_in,
+    });
+  } catch (error) {
+    console.error('Error while refreshing access token:', error);
+    res.status(500).send('Failed to refresh access token');
+  }
+});
+
 
 
 
