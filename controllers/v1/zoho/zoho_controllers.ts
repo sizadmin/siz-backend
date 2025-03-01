@@ -1,4 +1,5 @@
 import axios from "axios";
+import globalInfo from "../../../models/globalInfo";
 
 require("dotenv").config();
 
@@ -6,6 +7,17 @@ const ZOHO_URL = "https://www.zohoapis.com/books/v3";
 const { ZOHO_API_URL, ZOHO_ORGANIZATION_ID, ZOHO_REFRESH_TOKEN, ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REDIRECT_URI } = process.env;
 
 const getZohoAccessToken = async () => {
+  const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+
+  // Check if token exists in DB
+  let tokenData = await globalInfo.findOne();
+
+  // If token is valid, return it
+  if (tokenData && tokenData.expires_at > currentTime + 300) {
+    // Refresh 5 minutes before expiry
+    return tokenData.access_token;
+  }
+
   try {
     const response = await axios.post(ZOHO_API_URL + "/token", null, {
       params: {
@@ -17,16 +29,24 @@ const getZohoAccessToken = async () => {
     });
 
     // Save new token & expiry time
-    let accessToken = response.data.access_token;
-    return accessToken;
+    const newAccessToken = response.data.access_token;
+    const expiresAt = currentTime + 3600; // Zoho tokens expire in 1 hour
+
+    // Store in MongoDB (upsert: update if exists, insert if not)
+    await globalInfo.findOneAndUpdate({}, { access_token: newAccessToken, expires_at: expiresAt }, { upsert: true });
+
+    // console.log('New access token stored in MongoDB.');
+    return newAccessToken;
   } catch (error) {
     console.error("Error getting access token:", error.response ? error.response.data : error.message);
+    return null;
   }
 };
 
-const getInvoices = async (req:any, res:any) => {
+const getInvoices = async (req: any, res: any) => {
   try {
     let access_token = await getZohoAccessToken();
+    if (!access_token) return;
     const response = await axios.get(ZOHO_URL + "/invoices" + "?organization_id=" + ZOHO_ORGANIZATION_ID, {
       headers: {
         Authorization: `Zoho-oauthtoken ${access_token}`,
@@ -44,6 +64,8 @@ const getInvoices = async (req:any, res:any) => {
 const getCustomer = async (req: any, res: any) => {
   try {
     let access_token = await getZohoAccessToken();
+    if (!access_token) return;
+
     const response = await axios.get(ZOHO_URL + "/customers" + "?organization_id=" + ZOHO_ORGANIZATION_ID, {
       headers: {
         Authorization: `Zoho-oauthtoken ${access_token}`,
@@ -58,9 +80,11 @@ const getCustomer = async (req: any, res: any) => {
   }
 };
 
-const createInvoice = async (req:any,res:any) => {
+const createInvoice = async (req: any, res: any) => {
   try {
     const accessToken = await getZohoAccessToken();
+    if (!accessToken) return;
+
     const invoiceData = {
       customer_id: "6129386000000103001",
       // line_items: invoice.items.map((item: any) => ({
@@ -97,6 +121,8 @@ const createInvoice = async (req:any,res:any) => {
 const addCustomer = async (req: any, res: any) => {
   try {
     const accessToken = await getZohoAccessToken();
+    if (!accessToken) return;
+
     const customer: any = {
       name: "Deepak",
       company: "Deepak",
@@ -147,7 +173,6 @@ const addCustomer = async (req: any, res: any) => {
 const oauth = (req: any, res: any) => {
   try {
     const authURL = `${ZOHO_API_URL}/auth?scope=ZohoBooks.fullaccess.all&client_id=${ZOHO_CLIENT_ID}&redirect_uri=${ZOHO_REDIRECT_URI}&response_type=code&access_type=offline&prompt=consent`;
-    console.log(authURL, "authURL");
     res.redirect(authURL);
   } catch (error) {
     console.log("Error in oauth", error);
