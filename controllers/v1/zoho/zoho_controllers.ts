@@ -256,4 +256,32 @@ const oauthRefreshToken = async (req: any, res: any) => {
   }
 };
 
-export { getZohoAccessToken, getInvoices, createInvoice, addCustomer, getCustomer, oauth, oauthCallback, oauthRefreshToken };
+
+const scheduleTokenRefresh = async () => {
+  const currentTime = Math.floor(Date.now() / 1000);
+
+  // Fetch token details from DB
+  const tokenData = await globalInfo.findOne();
+  if (!tokenData) {
+    console.log("No token found, fetching new token...");
+    await getZohoAccessToken();
+    return scheduleTokenRefresh(); // Recalculate the next refresh time
+  }
+
+  const timeUntilExpiry = tokenData.expires_at - currentTime - 300; // 5 minutes before expiry
+
+  if (timeUntilExpiry > 0) {
+    console.log(`Token valid, scheduling refresh in ${timeUntilExpiry} seconds.`);
+    setTimeout(async () => {
+      console.log("Refreshing Zoho access token...");
+      await getZohoAccessToken();
+      scheduleTokenRefresh(); // Schedule the next refresh dynamically
+    }, timeUntilExpiry * 1000);
+  } else {
+    console.log("Token expired, fetching immediately...");
+    await getZohoAccessToken();
+    scheduleTokenRefresh();
+  }
+};
+
+export { getZohoAccessToken, getInvoices, createInvoice, addCustomer, getCustomer, oauth, oauthCallback, oauthRefreshToken,scheduleTokenRefresh };
